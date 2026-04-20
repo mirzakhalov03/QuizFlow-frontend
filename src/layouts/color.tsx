@@ -27,7 +27,6 @@ export default function ThemeDataProvider({
 
     const [themeColor, setThemeColor] =
         useState<ThemeColors>(getSavedThemeColor)
-    const [isMounted, setIsMounted] = useState(false)
     const { theme } = useTheme()
 
     useEffect(() => {
@@ -39,15 +38,7 @@ export default function ThemeDataProvider({
                     : "light"
                 : theme
         setGlobalColorTheme(resolved as "light" | "dark", themeColor)
-
-        if (!isMounted) {
-            setIsMounted(true)
-        }
     }, [themeColor, theme])
-
-    if (!isMounted) {
-        return null
-    }
 
     return (
         <ThemeContext.Provider value={{ themeColor, setThemeColor }}>

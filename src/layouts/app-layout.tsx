@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, ListChecks, LogOut, Menu, Settings, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { PATHS } from '@/lib/router/path'
@@ -14,12 +14,8 @@ const navItems = [
 
 export default function AppLayout() {
   const navigate = useNavigate()
-  const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  useEffect(() => {
-    setSidebarOpen(false)
-  }, [location.pathname])
+  const closeSidebar = () => setSidebarOpen(false)
 
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? 'hidden' : ''
@@ -39,7 +35,7 @@ export default function AppLayout() {
         <button
           type="button"
           aria-label="Close sidebar"
-          onClick={() => setSidebarOpen(false)}
+          onClick={closeSidebar}
           className="fixed inset-0 z-30 bg-black/50 lg:hidden"
         />
       )}
@@ -52,13 +48,13 @@ export default function AppLayout() {
         )}
       >
         <div className="flex items-center justify-between">
-          <Link to={PATHS.app.dashboard} className="text-lg font-semibold">
+          <Link to={PATHS.app.dashboard} onClick={closeSidebar} className="text-lg font-semibold">
             QuizFlow
           </Link>
           <button
             type="button"
             aria-label="Close sidebar"
-            onClick={() => setSidebarOpen(false)}
+            onClick={closeSidebar}
             className="hover:bg-muted rounded-md p-1.5 lg:hidden"
           >
             <X size={18} />
@@ -70,6 +66,7 @@ export default function AppLayout() {
             <NavLink
               key={to}
               to={to}
+              onClick={closeSidebar}
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',

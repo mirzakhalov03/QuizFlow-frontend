@@ -160,3 +160,22 @@ export default function setGlobalColorTheme(
         }
     }
 }
+
+export function applyStoredTheme(themeStorageKey = "vite-ui-theme") {
+    try {
+        const savedColor = localStorage.getItem("themeColor") as ThemeColors | null
+        const color: ThemeColors = savedColor && savedColor in themes ? savedColor : "Telegram"
+
+        const savedTheme = localStorage.getItem(themeStorageKey)
+        const mode: "light" | "dark" =
+            savedTheme === "light" || savedTheme === "dark"
+                ? savedTheme
+                : window.matchMedia("(prefers-color-scheme: dark)").matches
+                    ? "dark"
+                    : "light"
+
+        setGlobalColorTheme(mode, color)
+    } catch {
+        setGlobalColorTheme("light", "Telegram")
+    }
+}

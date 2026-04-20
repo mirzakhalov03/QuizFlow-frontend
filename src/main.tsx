@@ -5,7 +5,10 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { AppRouter } from "./app/router"
 import { ThemeProvider } from "./layouts/theme"
 import ThemeDataProvider from "./layouts/color"
+import { applyStoredTheme } from "./lib/theme-color"
 import "./index.css"
+
+applyStoredTheme()
 
 const queryClient = new QueryClient({
   defaultOptions: {
