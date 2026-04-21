@@ -27,16 +27,15 @@ axiosInstance.interceptors.response.use(
 
     async (error) => {
         const status = error.response?.status
-        const isLoginPage = window.location.pathname === '/auth';
+        const isLoginPage = window.location.pathname.startsWith('/auth');
 
         if (isLoginPage && (status === 401 || status === 403)) {
             return Promise.reject(error);
         }
 
         if (status === 401 || status === 403) {
-            location.href = "/auth"
             localStorage.removeItem("token")
-
+            location.href = "/auth"
         }
         if (status === 403) {
             // toast.error("Sizga ruxsat berilmagan" + ": " + error?.config?.url)
