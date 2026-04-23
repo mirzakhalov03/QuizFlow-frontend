@@ -3,12 +3,10 @@ export default function Settings() {
     <div className="space-y-6">
       <header>
         <h1 className="text-xl font-semibold sm:text-2xl">Settings</h1>
-        <p className="text-sm text-muted-foreground">
-          Manage your account and preferences.
-        </p>
+        <p className="text-muted-foreground text-sm">Manage your account and preferences.</p>
       </header>
 
-      <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground sm:p-6">
+      <div className="border-border text-muted-foreground rounded-lg border p-4 text-sm sm:p-6">
         Settings coming soon.
       </div>
     </div>

@@ -1,6 +1,9 @@
 export const PATHS = {
   landing: '/',
   about: '/about',
+  features: '/features',
+  contact: '/contact',
+  pricing: '/pricing',
 
   auth: {
     root: '/auth',

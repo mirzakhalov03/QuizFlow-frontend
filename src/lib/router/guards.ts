@@ -1,7 +1,7 @@
-import { redirect, type LoaderFunctionArgs } from "react-router-dom"
-import { PATHS } from "./path"
+import { redirect, type LoaderFunctionArgs } from 'react-router-dom'
+import { PATHS } from './path'
 
-const getToken = () => localStorage.getItem("token")
+const getToken = () => localStorage.getItem('token')
 
 export const requireAuth = ({ request }: LoaderFunctionArgs) => {
   if (!getToken()) {
@@ -13,8 +13,8 @@ export const requireAuth = ({ request }: LoaderFunctionArgs) => {
 
 export const requireGuest = ({ request }: LoaderFunctionArgs) => {
   if (getToken()) {
-    const from = new URL(request.url).searchParams.get("from")
-    throw redirect(from && from.startsWith("/app") ? from : PATHS.app.dashboard)
+    const from = new URL(request.url).searchParams.get('from')
+    throw redirect(from && from.startsWith('/app') ? from : PATHS.app.dashboard)
   }
   return null
 }
