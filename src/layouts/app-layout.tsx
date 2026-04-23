@@ -1,7 +1,8 @@
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ListChecks, LogOut, Settings } from 'lucide-react'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { LayoutDashboard, ListChecks, LogOut, Settings, UserCircle2 } from 'lucide-react'
 import { PATHS } from '@/lib/router/path'
 import { Button } from '@/components/ui/button'
+import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 
@@ -19,28 +20,30 @@ export default function AppLayout() {
     navigate(PATHS.landing, { replace: true })
   }
 
+  const onOpenAccount = () => {
+    navigate(PATHS.app.account)
+  }
+
   return (
     <div className="bg-background text-foreground flex min-h-screen">
-      <aside className="border-border bg-background hidden w-60 shrink-0 flex-col gap-4 border-r p-4 lg:flex">
-        <Link to={PATHS.app.dashboard} className="text-lg font-semibold">
-          QuizFlow
-        </Link>
+      <aside className="border-border bg-background hidden w-70 shrink-0 flex-col gap-4 border-r p-4 lg:flex">
+        <Logo to={PATHS.app.dashboard} size="lg" className="mt-1 flex justify-center" />
 
-        <nav className="flex flex-col gap-1">
+        <nav className="mt-5 flex flex-col gap-1">
           {navItems.map(({ label, to, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',
+                  'text-s flex items-center gap-2 rounded-md px-3 py-2 transition-colors',
                   isActive
-                    ? 'bg-primary/10 text-primary'
+                    ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )
               }
             >
-              <Icon size={16} />
+              <Icon size={20} />
               {label}
             </NavLink>
           ))}
@@ -48,11 +51,11 @@ export default function AppLayout() {
 
         <div className="mt-auto">
           <Button
-            variant="outline"
-            size="sm"
+            variant="ghost"
+            size="md"
             onClick={onLogout}
-            leftIcon={<LogOut size={14} />}
-            className="w-full"
+            className="w-full justify-start text-red-500"
+            leftIcon={<LogOut size={18} />}
           >
             Logout
           </Button>
@@ -60,10 +63,18 @@ export default function AppLayout() {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
-        <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-3 sm:px-6">
-          <span className="text-sm font-semibold lg:hidden">QuizFlow</span>
+        <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-4 sm:px-6">
+          <Logo to={PATHS.app.dashboard} size="sm" className="lg:hidden" />
           <div className="ml-auto flex items-center gap-1">
             <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={onOpenAccount}
+              leftIcon={<UserCircle2 size={20} />}
+            >
+              Account Details
+            </Button>
             <button
               type="button"
               onClick={onLogout}
@@ -74,7 +85,7 @@ export default function AppLayout() {
             </button>
           </div>
         </div>
-        <div className="p-4 pb-20 sm:p-6 sm:pb-24 lg:pb-6">
+        <div className="bg-secondary/15 flex-1 p-4 pb-20 sm:p-6 sm:pb-24 lg:pb-6">
           <Outlet />
         </div>
       </main>

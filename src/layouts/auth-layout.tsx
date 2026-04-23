@@ -1,6 +1,9 @@
 import { Link, Outlet } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { PATHS } from '@/lib/router/path'
+import Button from '@/components/ui/button'
+import googleLogo from '@/assets/googleLogo.png'
+import notionLogo from '@/assets/notionLogo.png'
 
 export default function AuthLayout() {
   return (
@@ -13,6 +16,18 @@ export default function AuthLayout() {
           <ArrowLeft size={14} /> Back to home
         </Link>
         <Outlet />
+        <div>
+          <p className="text-muted-foreground text-center text-sm"> or continue with </p>
+
+          <div className="mt-4">
+            <Button variant="outline" size="sm" className="mb-2 w-full p-2">
+              <img src={googleLogo} alt="Google" className="h-5 w-5" /> Google
+            </Button>
+            <Button variant="outline" size="sm" className="w-full p-2">
+              <img src={notionLogo} alt="Notion" className="h-5 w-5" /> Notion
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )
