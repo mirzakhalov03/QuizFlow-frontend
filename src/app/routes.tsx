@@ -15,7 +15,12 @@ export const routes: RouteObject[] = [
     children: [
       {
         element: <PublicLayout />,
-        children: [{ path: PATHS.landing, lazy: lazyPage(() => import('@/pages/landing')) }],
+        children: [
+          { path: PATHS.landing, lazy: lazyPage(() => import('@/pages/landing')) },
+          { path: PATHS.features, lazy: lazyPage(() => import('@/pages/landing/features')) },
+          { path: PATHS.contact, lazy: lazyPage(() => import('@/pages/landing/contact')) },
+          { path: PATHS.pricing, lazy: lazyPage(() => import('@/pages/landing/pricing')) },
+        ],
       },
 
       {

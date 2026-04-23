@@ -3,13 +3,15 @@ import { PATHS } from '@/lib/router/path'
 
 const productLinks = [
   { label: 'Home', to: PATHS.landing },
+  { label: 'Features', to: PATHS.features },
+  { label: 'Pricing', to: PATHS.pricing },
+  { label: 'Contact', to: PATHS.contact },
   { label: 'Sign in', to: PATHS.auth.login },
-  { label: 'Get started', to: PATHS.auth.register },
 ]
 
 const companyLinks = [
   { label: 'Dashboard', to: PATHS.app.dashboard },
-  { label: 'Theme switcher', to: PATHS.landing },
+  { label: 'Get started', to: PATHS.auth.register },
   { label: 'Support', to: PATHS.auth.login },
 ]
 
