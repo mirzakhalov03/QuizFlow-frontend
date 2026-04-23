@@ -1,5 +1,5 @@
-import type { ComponentType } from "react"
-import type { LoaderFunction, ActionFunction } from "react-router-dom"
+import type { ComponentType } from 'react'
+import type { LoaderFunction, ActionFunction } from 'react-router-dom'
 
 type LazyModule = Promise<{
   default: ComponentType

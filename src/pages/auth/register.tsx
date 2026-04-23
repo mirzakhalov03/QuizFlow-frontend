@@ -1,13 +1,13 @@
-import { useState, type FormEvent } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { PATHS } from "@/lib/router/path"
-import { toast } from "@/lib/toast"
-import { cn } from "@/lib/utils"
+import { useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { PATHS } from '@/lib/router/path'
+import { toast } from '@/lib/toast'
+import { cn } from '@/lib/utils'
 
 const inputClass = cn(
-  "w-full h-10 px-3 rounded-md border border-border bg-background text-sm",
-  "focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary",
+  'w-full h-10 px-3 rounded-md border border-border bg-background text-sm',
+  'focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary'
 )
 
 export default function Register() {
@@ -20,11 +20,11 @@ export default function Register() {
     try {
       // TODO: replace with real API call
       await new Promise((r) => setTimeout(r, 500))
-      localStorage.setItem("token", "demo-token")
-      toast.success("Account created")
+      localStorage.setItem('token', 'demo-token')
+      toast.success('Account created')
       navigate(PATHS.app.dashboard, { replace: true })
     } catch {
-      toast.error("Could not create account")
+      toast.error('Could not create account')
     } finally {
       setLoading(false)
     }
@@ -34,9 +34,7 @@ export default function Register() {
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold">Create account</h1>
-        <p className="text-sm text-muted-foreground">
-          Start building quizzes in under a minute.
-        </p>
+        <p className="text-muted-foreground text-sm">Start building quizzes in under a minute.</p>
       </div>
 
       <div className="space-y-1">
@@ -50,7 +48,14 @@ export default function Register() {
         <label htmlFor="email" className="text-sm font-medium">
           Email
         </label>
-        <input id="email" name="email" type="email" required autoComplete="email" className={inputClass} />
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          className={inputClass}
+        />
       </div>
 
       <div className="space-y-1">
@@ -72,8 +77,8 @@ export default function Register() {
         Create account
       </Button>
 
-      <p className="text-sm text-muted-foreground text-center">
-        Already have an account?{" "}
+      <p className="text-muted-foreground text-center text-sm">
+        Already have an account?{' '}
         <Link to={PATHS.auth.login} className="text-foreground hover:underline">
           Sign in
         </Link>

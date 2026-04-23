@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
-import Header from '@/shared/landing/header'
-import Footer from '@/shared/landing/footer'
+import Header from '@/components/landing/header'
+import Footer from '@/components/landing/footer'
 
 export default function PublicLayout() {
   return (
