@@ -14,6 +14,7 @@ export const PATHS = {
   app: {
     root: '/app',
     dashboard: '/app/dashboard',
+    account: '/app/account',
     quizzes: '/app/quizzes',
     settings: '/app/settings',
   },

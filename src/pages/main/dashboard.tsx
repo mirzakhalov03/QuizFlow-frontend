@@ -3,7 +3,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <header>
         <h1 className="text-xl font-semibold sm:text-2xl">Dashboard</h1>
-        <p className="text-muted-foreground text-sm">Welcome back. Here's what's happening.</p>
+        <p className="text-muted-foreground">Welcome back. Here's what's happening.</p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
