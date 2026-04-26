@@ -14,6 +14,9 @@ export default function Login() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const [loading, setLoading] = useState(false)
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:3000/auth/google'
+  }
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -77,7 +80,9 @@ export default function Login() {
       <Button type="submit" loading={loading} className="w-full">
         Sign in
       </Button>
-
+      <Button type="button" variant="outline" className="w-full" onClick={handleGoogleLogin}>
+        Continue with Google
+      </Button>
       <p className="text-muted-foreground text-center text-sm">
         No account?{' '}
         <Link to={PATHS.auth.register} className="text-foreground hover:underline">
