@@ -41,6 +41,7 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <Navigate to={PATHS.app.dashboard} replace /> },
           { path: 'dashboard', lazy: lazyPage(() => import('@/pages/main/dashboard')) },
+          { path: 'account', lazy: lazyPage(() => import('@/pages/main/account')) },
           { path: 'quizzes', lazy: lazyPage(() => import('@/pages/main/quizzes')) },
           { path: 'settings', lazy: lazyPage(() => import('@/pages/main/settings')) },
         ],

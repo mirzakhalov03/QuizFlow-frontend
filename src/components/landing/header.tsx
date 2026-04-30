@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { PATHS } from '@/lib/router/path'
 import { cn } from '@/lib/utils'
@@ -17,9 +18,7 @@ export default function Header() {
   return (
     <header className="border-border bg-background/85 supports-backdrop-filter:bg-background/70 sticky top-0 z-50 border-b shadow-sm backdrop-blur">
       <nav className="container mx-auto flex items-center justify-between gap-3 px-4 py-3 sm:py-4">
-        <Link to={PATHS.landing} className="text-base font-bold sm:text-lg">
-          QuizFlow <span className="text-primary">AI</span>
-        </Link>
+        <Logo to={PATHS.landing} size="md" />
 
         <ul className="hidden items-center gap-6 md:flex">
           {links.map(({ label, to }) => (
@@ -28,7 +27,7 @@ export default function Header() {
                 to={to}
                 className={({ isActive }) =>
                   cn(
-                    'text-sm transition-colors',
+                    'transition-colors',
                     isActive
                       ? 'text-primary border-primary border-b-2 pb-1 font-bold'
                       : 'text-muted-foreground hover:text-foreground'

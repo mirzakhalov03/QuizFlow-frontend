@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import Logo from '@/components/ui/logo'
 import { PATHS } from '@/lib/router/path'
 
 const productLinks = [
@@ -21,12 +22,10 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
         <div className="grid gap-10 md:grid-cols-[1.1fr_1fr_1fr] lg:gap-12">
           <div>
-            <Link to={PATHS.landing} className="inline-block">
-              <p className="text-2xl leading-none font-bold tracking-tight">QuizFlow</p>
-              <p className="text-primary-foreground/70 mt-1 text-xs font-medium tracking-[0.2em] uppercase">
-                Learn Faster
-              </p>
-            </Link>
+            <Logo to={PATHS.landing} size="lg" tone="light" />
+            <p className="text-primary-foreground/70 mt-2 text-xs font-medium tracking-[0.2em] uppercase">
+              Learn Faster
+            </p>
             <p className="text-primary-foreground/85 mt-4 max-w-xs text-sm leading-relaxed">
               Turn notes, PDFs, and lectures into interactive quizzes that stick.
             </p>
