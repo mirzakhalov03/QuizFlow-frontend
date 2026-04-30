@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AppRouter } from './app/router'
 import { ThemeProvider } from './layouts/theme'
+import { applyStoredTheme } from './lib/theme-color'
 import '@fontsource/inter/400.css'
 import '@fontsource/inter/500.css'
 import '@fontsource/inter/600.css'
@@ -20,11 +21,8 @@ const queryClient = new QueryClient({
 
 applyStoredTheme()
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { refetchOnWindowFocus: false },
-  },
-})
+ 
+ 
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
