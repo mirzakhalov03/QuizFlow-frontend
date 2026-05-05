@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/router/path'
-import { toast } from '@/lib/toast'
 import { cn } from '@/lib/utils'
 
 const inputClass = cn(
@@ -11,12 +10,7 @@ const inputClass = cn(
 )
 
 export default function Login() {
-  const navigate = useNavigate()
-  const [params] = useSearchParams()
   const [loading, setLoading] = useState(false)
-  const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/google'
-  }
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()

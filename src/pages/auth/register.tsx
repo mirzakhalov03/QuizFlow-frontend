@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/router/path'
-import { toast } from '@/lib/toast'
 import { cn } from '@/lib/utils'
 
 const inputClass = cn(
@@ -11,7 +10,6 @@ const inputClass = cn(
 )
 
 export default function Register() {
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {

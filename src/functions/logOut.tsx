@@ -9,7 +9,9 @@ export const logout = async (navigate?: (path: string) => void) => {
 
   try {
     await api.post('/auth/logout')
-  } catch {}
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
 
   setUser(null)
   setLoading(false)
