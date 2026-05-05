@@ -11,6 +11,7 @@ import '@fontsource/inter/700.css'
 import '@fontsource/dm-sans/500.css'
 import '@fontsource/dm-sans/700.css'
 import './index.css'
+import { ModalProvider } from '@/provider/modal-provider'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,11 +21,13 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <AppRouter />
-      </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <ModalProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <AppRouter />
+        </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ModalProvider>
   </StrictMode>
 )
