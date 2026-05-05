@@ -1,6 +1,5 @@
 import { redirect, type LoaderFunctionArgs } from 'react-router-dom'
-import { PATHS } from './path'
-
+import { PATHS } from '@/lib/path'
 const getToken = () => localStorage.getItem('token')
 
 export const requireAuth = ({ request }: LoaderFunctionArgs) => {

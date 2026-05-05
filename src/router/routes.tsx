@@ -4,10 +4,9 @@ import RootLayout from '@/layouts/root-layout'
 import PublicLayout from '@/layouts/public-layout'
 import AuthLayout from '@/layouts/auth-layout'
 import AppLayout from '@/layouts/app-layout'
-
-import { requireAuth, requireGuest } from '@/lib/router/guards'
-import { lazyPage } from '@/lib/router/lazy'
-import { PATHS } from '@/lib/router/path'
+import { requireAuth,requireGuest } from '@/lib/guards'
+import { lazyPage } from '@/lib/lazy'
+import { PATHS } from '@/lib/path'
 
 export const routes: RouteObject[] = [
   {
