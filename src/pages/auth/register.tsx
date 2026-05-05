@@ -17,17 +17,6 @@ export default function Register() {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    try {
-      // TODO: replace with real API call
-      await new Promise((r) => setTimeout(r, 500))
-      localStorage.setItem('token', 'demo-token')
-      toast.success('Account created')
-      navigate(PATHS.app.dashboard, { replace: true })
-    } catch {
-      toast.error('Could not create account')
-    } finally {
-      setLoading(false)
-    }
   }
 
   return (

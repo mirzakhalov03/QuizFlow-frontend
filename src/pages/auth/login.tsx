@@ -21,20 +21,6 @@ export default function Login() {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    try {
-      // TODO: replace with real API call
-      await new Promise((r) => setTimeout(r, 500))
-      localStorage.setItem('token', 'demo-token')
-      toast.success('Signed in')
-      const from = params.get('from')
-      navigate(from?.startsWith('/app') ? from : PATHS.app.dashboard, {
-        replace: true,
-      })
-    } catch {
-      toast.error('Sign in failed')
-    } finally {
-      setLoading(false)
-    }
   }
 
   return (
@@ -79,9 +65,6 @@ export default function Login() {
 
       <Button type="submit" loading={loading} className="w-full">
         Sign in
-      </Button>
-      <Button type="button" variant="outline" className="w-full" onClick={handleGoogleLogin}>
-        Continue with Google
       </Button>
       <p className="text-muted-foreground text-center text-sm">
         No account?{' '}

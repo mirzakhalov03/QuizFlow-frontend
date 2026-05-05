@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
+import { logout } from '@/functions/logOut'
 
 const navItems = [
   { label: 'Dashboard', to: PATHS.app.dashboard, icon: LayoutDashboard },
@@ -15,9 +16,8 @@ const navItems = [
 export default function AppLayout() {
   const navigate = useNavigate()
 
-  const onLogout = () => {
-    localStorage.removeItem('token')
-    navigate(PATHS.landing, { replace: true })
+  const onLogout = async () => {
+    await logout(navigate)
   }
 
   const onOpenAccount = () => {
