@@ -1,22 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import FileUpload from '@/components/form/file-upload'
 import { useModal } from '@/hooks/useModal'
 import { usePost } from '@/hooks/usePost'
 import { useForm } from 'react-hook-form'
 import { QUIZ_ADD } from '@/constants/api-endpoints'
-import type { GenerateQuizRequest } from '@/types/quiz'
 import FormInput from '@/components/form/input'
 import { FormSelect } from '@/components/form/form-select'
-import { questionTypes, questionCounts, difficulties } from '@/components/main/quizzes/utils'
+import { questionTypes } from '@/components/main/quizzes/utils'
 import { FormCheckbox } from '@/components/form/form-checkbox'
 import FormTextarea from '@/components/form/textarea'
 import Button from '@/components/ui/button'
 import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import { toast } from '@/lib/toast'
 
 type QuizFormValues = {
   title: string
   type: string
-  questionCount: number
-  difficulty: string
   isTimerEnabled: boolean
   timerDuration?: number
   file: File
@@ -25,12 +25,11 @@ type QuizFormValues = {
 
 export default function QuizForm() {
   const queryClient = useQueryClient()
+  const [isUploading, setIsUploading] = useState(false)
   const form = useForm<QuizFormValues>({
     defaultValues: {
       title: '',
       type: 'multiple_choice',
-      questionCount: 10,
-      difficulty: 'medium',
       isTimerEnabled: false,
       userInstructions: '',
     },
@@ -40,7 +39,7 @@ export default function QuizForm() {
   const { handleSubmit, reset, control } = form
 
   function onSuccess() {
-    queryClient.invalidateQueries({queryKey:[]})
+    queryClient.invalidateQueries({ queryKey: ['quizzes'] })
     closeModal()
     reset()
   }
@@ -50,35 +49,40 @@ export default function QuizForm() {
   })
 
   const onSubmit = async (values: QuizFormValues) => {
-    const presignedResponse = await fetch(
-      `/api/upload/presigned-url?filename=${values.file.name}&contentType=${values.file.type}`,
-      { credentials: 'include' }
-    )
-    const { data: presignedData } = await presignedResponse.json()
+    try {
+      setIsUploading(true)
 
-    await fetch(presignedData.uploadUrl, {
-      method: 'PUT',
-      body: values.file,
-      headers: {
-        'Content-Type': values.file.type,
-      },
-    })
+      const formData = new FormData()
+      formData.append('file', values.file)
 
-    const quizPayload: GenerateQuizRequest = {
-      key: presignedData.key,
-      bucket: presignedData.bucket || 'your-bucket-name',
-      title: values.title,
-      type: values.type,
-      questionCount: values.questionCount,
-      userInstructions: values.userInstructions,
-      isTimerEnabled: values.isTimerEnabled,
-      timerDuration: values.isTimerEnabled ? (values.timerDuration || 0) * 60 : undefined,
+      const uploadResponse = await fetch('http://localhost:3000/upload-file', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      })
+
+      const uploadData = await uploadResponse.json()
+
+      const fileKey = uploadData.data[0].key
+      const quizPayload = {
+        key: fileKey,
+        title: values.title,
+        type: values.type,
+        userInstructions: values.userInstructions || undefined,
+        isTimerEnabled: values.isTimerEnabled,
+        timerDuration: values.isTimerEnabled ? (values.timerDuration || 0) * 60 : undefined,
+      }
+
+      mutate(QUIZ_ADD, quizPayload)
+    } catch (error) {
+      toast.error('Error in quiz generation:')
+    } finally {
+      setIsUploading(false)
     }
-
-    mutate(QUIZ_ADD, quizPayload)
   }
 
   const timer = form.watch('isTimerEnabled')
+  const isSubmitting = isPending || isUploading
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
@@ -98,16 +102,6 @@ export default function QuizForm() {
         required
       />
 
-      <FormSelect
-        label="Number of Questions"
-        options={questionCounts}
-        name="questionCount"
-        control={control}
-        required
-      />
-
-      <FormSelect label="Difficulty" options={difficulties} name="difficulty" control={control} />
-
       <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
 
       {timer && (
@@ -125,7 +119,13 @@ export default function QuizForm() {
         />
       )}
 
-      <FileUpload label="Upload Source File" control={control} name="file" required />
+      <FileUpload
+        label="Upload Source File"
+        control={control}
+        name="file"
+        required
+        dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD']}
+      />
 
       <FormTextarea
         label="Instructions"
@@ -135,8 +135,8 @@ export default function QuizForm() {
       />
 
       <div className="flex justify-end">
-        <Button type="submit" loading={isPending}>
-          Generate Quiz
+        <Button type="submit" loading={isSubmitting}>
+          {isUploading ? 'Uploading...' : isPending ? 'Generating Quiz...' : 'Generate Quiz'}
         </Button>
       </div>
     </form>

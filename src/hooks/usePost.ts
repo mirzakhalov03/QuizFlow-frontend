@@ -13,7 +13,7 @@ export const postRequest = <T>(
     config: AxiosRequestConfig = {},
 ) =>
     axiosInstance
-        .post(`${url}`, payload, {
+        .post(url, payload, {
             headers: {
                 "Content-Type": "application/json",
             },

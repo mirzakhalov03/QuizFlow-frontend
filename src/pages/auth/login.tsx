@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { PATHS } from '@/lib/router/path'
+import { PATHS } from '@/lib/path'
 import { cn } from '@/lib/utils'
 
 const inputClass = cn(
