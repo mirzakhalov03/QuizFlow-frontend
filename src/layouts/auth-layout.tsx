@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { PATHS } from '@/lib/router/path'
+import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import googleLogo from '@/assets/googleLogo.png'
 import notionLogo from '@/assets/notionLogo.png'

@@ -8,6 +8,8 @@ import { requireAuth,requireGuest } from '@/lib/guards'
 import { lazyPage } from '@/lib/lazy'
 import { PATHS } from '@/lib/path'
 
+ 
+
 export const routes: RouteObject[] = [
   {
     element: <RootLayout />,

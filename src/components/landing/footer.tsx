@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import Logo from '@/components/ui/logo'
-import { PATHS } from '@/lib/router/path'
+import { PATHS } from '@/lib/path'
 
 const productLinks = [
   { label: 'Home', to: PATHS.landing },

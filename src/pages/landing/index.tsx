@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { CirclePlay } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PATHS } from '@/lib/router/path'
+import { PATHS } from '@/lib/path'
 import FeaturesSection from '@/components/landing/FeaturesSection'
 
 export default function Landing() {
