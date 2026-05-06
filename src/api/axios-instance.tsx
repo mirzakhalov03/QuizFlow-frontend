@@ -1,45 +1,26 @@
 import axios from 'axios'
-// import { toast } from "sonner"
+import { authEvents } from '@/functions/AuthEvents'
 
-export const baseURL = import.meta.env.VITE_DEFAULT_URL
-
-const axiosInstance = axios.create({
-  baseURL,
+export const api = axios.create({
+  baseURL: 'http://localhost:3000/',
+  withCredentials: true,
 })
+api.interceptors.response.use(
+  (res) => res,
+  async (err) => {
+    const originalRequest = err.config
 
-export const getAccessToken = () => localStorage.getItem('token')
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = getAccessToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
-
-axiosInstance.interceptors.response.use(
-  (response) => response,
-
-  async (error) => {
-    const status = error.response?.status
-    const isLoginPage = window.location.pathname.startsWith('/auth')
-
-    if (isLoginPage && (status === 401 || status === 403)) {
-      return Promise.reject(error)
+      try {
+        await api.post('/auth/refresh')
+        return api(originalRequest)
+      } catch {
+        authEvents.emit('SESSION_EXPIRED')
+      }
     }
 
-    if (status === 401 || status === 403) {
-      localStorage.removeItem('token')
-      location.href = '/auth'
-    }
-    if (status === 403) {
-      // toast.error("Sizga ruxsat berilmagan" + ": " + error?.config?.url)
-    }
-    return Promise.reject(error)
+    return Promise.reject(err)
   }
 )
-
-export default axiosInstance

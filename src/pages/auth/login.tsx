@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/router/path'
-import { toast } from '@/lib/toast'
 import { cn } from '@/lib/utils'
 
 const inputClass = cn(
@@ -11,27 +10,11 @@ const inputClass = cn(
 )
 
 export default function Login() {
-  const navigate = useNavigate()
-  const [params] = useSearchParams()
   const [loading, setLoading] = useState(false)
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    try {
-      // TODO: replace with real API call
-      await new Promise((r) => setTimeout(r, 500))
-      localStorage.setItem('token', 'demo-token')
-      toast.success('Signed in')
-      const from = params.get('from')
-      navigate(from?.startsWith('/app') ? from : PATHS.app.dashboard, {
-        replace: true,
-      })
-    } catch {
-      toast.error('Sign in failed')
-    } finally {
-      setLoading(false)
-    }
   }
 
   return (
@@ -77,7 +60,6 @@ export default function Login() {
       <Button type="submit" loading={loading} className="w-full">
         Sign in
       </Button>
-
       <p className="text-muted-foreground text-center text-sm">
         No account?{' '}
         <Link to={PATHS.auth.register} className="text-foreground hover:underline">

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import ImageUpload from '@/components/ui/image-upload'
 import NotionLogo from '@/assets/notionLogo.png'
 import GoogleLogo from '@/assets/googleLogo.png'
+import { useAuthStore } from '@/hooks/use-authstore'
 
 const connectedApps = [
   {
@@ -20,6 +21,8 @@ const connectedApps = [
 ]
 
 export default function Account() {
+  const fullName = useAuthStore((state) => state.user?.fullName)
+  const email = useAuthStore((state) => state.user?.email)
   return (
     <div className="space-y-6">
       <header className="space-y-2">
@@ -44,7 +47,7 @@ export default function Account() {
                 Full name
                 <input
                   type="text"
-                  defaultValue="J. Mirzakhalov"
+                  defaultValue={fullName}
                   className="border-border bg-background h-11 rounded-md border px-3"
                 />
               </label>
@@ -53,7 +56,7 @@ export default function Account() {
                 Email
                 <input
                   type="email"
-                  defaultValue="jm@example.com"
+                  defaultValue={email}
                   className="border-border bg-background h-11 rounded-md border px-3"
                 />
               </label>
