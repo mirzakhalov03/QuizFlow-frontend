@@ -4,6 +4,7 @@ import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { PATHS } from '@/lib/path'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/hooks/use-authstore'
 
 const links = [
   { label: 'Home', to: PATHS.landing },
@@ -13,8 +14,8 @@ const links = [
 ]
 
 export default function Header() {
-  const isAuthed = Boolean(localStorage.getItem('token'))
-
+  const user = useAuthStore((s) => s.user)
+  const isAuthed = !!user
   return (
     <header className="border-border bg-background/85 supports-backdrop-filter:bg-background/70 sticky top-0 z-50 border-b shadow-sm backdrop-blur">
       <nav className="container mx-auto flex items-center justify-between gap-3 px-4 py-3 sm:py-4">
@@ -42,6 +43,7 @@ export default function Header() {
 
         <div className="flex items-center gap-1 sm:gap-2">
           <ThemeToggle />
+
           {isAuthed ? (
             <Link to={PATHS.app.dashboard}>
               <Button size="sm" className="whitespace-nowrap">

@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/router/path'
-import { toast } from '@/lib/toast'
 import { cn } from '@/lib/utils'
 
 const inputClass = cn(
@@ -11,23 +10,11 @@ const inputClass = cn(
 )
 
 export default function Register() {
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    try {
-      // TODO: replace with real API call
-      await new Promise((r) => setTimeout(r, 500))
-      localStorage.setItem('token', 'demo-token')
-      toast.success('Account created')
-      navigate(PATHS.app.dashboard, { replace: true })
-    } catch {
-      toast.error('Could not create account')
-    } finally {
-      setLoading(false)
-    }
   }
 
   return (
