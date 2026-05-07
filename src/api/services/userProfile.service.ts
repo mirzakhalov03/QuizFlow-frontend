@@ -31,12 +31,7 @@ export const imageUploadService = {
     const formData = new FormData()
     formData.append('profilePicture', file)
 
-    const { data } = await api.put('/userProfile/me/avatar', formData, {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+    const { data } = await api.put('/userProfile/me/avatar', formData)
 
     return data
   },

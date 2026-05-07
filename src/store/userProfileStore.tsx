@@ -7,8 +7,8 @@ type ProfileData = {
 }
 
 type UpdateProfileData = {
-  bio?: string
-  profilePicture?: string
+  bio?: string | null
+  profilePicture?: string | null
 }
 
 type UserProfileState = {
@@ -17,8 +17,8 @@ type UserProfileState = {
   loading: boolean
 
   setProfile: (data: ProfileData) => void
-  setBio: (bio: string) => void
-  setProfilePicture: (url: string) => void
+  setBio: (bio: string | null) => void
+  setProfilePicture: (url: string | null) => void
 
   fetchProfile: () => Promise<void>
   updateProfile: (data: UpdateProfileData) => Promise<void>

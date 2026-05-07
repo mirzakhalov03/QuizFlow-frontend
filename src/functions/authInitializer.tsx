@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useAuthStore } from '@/hooks/use-authstore'
+import { useAuthStore } from '@/store/use-authstore'
 import { api } from '@/api/axios-instance'
 import { toast } from '@/lib/toast'
 import { authEvents } from './AuthEvents'

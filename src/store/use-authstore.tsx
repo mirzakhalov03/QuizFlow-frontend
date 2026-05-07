@@ -15,7 +15,7 @@ type AuthState = {
   setUser: (user: User | null) => void
   setLoading: (loading: boolean) => void
 
-  updateUser: (data: { email?: string; fullName?: string }) => Promise<void>
+  updateUser: (data: { fullName?: string }) => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }),
 
   updateUser: async (data) => {
-    try {
+    
       const updated = await userService.updateMe(data)
 
       set((state) => ({
@@ -46,8 +46,6 @@ export const useAuthStore = create<AuthState>((set) => ({
             }
           : state.user,
       }))
-    } catch (error) {
-      console.error('Failed to update user', error)
-    }
+   
   },
 }))

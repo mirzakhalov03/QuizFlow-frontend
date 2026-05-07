@@ -1,6 +1,6 @@
 import { redirect, type LoaderFunctionArgs } from 'react-router-dom'
 import { PATHS } from './path'
-import { useAuthStore } from '@/hooks/use-authstore'
+import { useAuthStore } from '@/store/use-authstore'
 
 export const requireAuth = ({ request }: LoaderFunctionArgs) => {
   const user = useAuthStore.getState().user

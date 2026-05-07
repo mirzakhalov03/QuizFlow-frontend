@@ -7,7 +7,7 @@ import ImageUpload from '@/components/ui/image-upload'
 import NotionLogo from '@/assets/notionLogo.png'
 import GoogleLogo from '@/assets/googleLogo.png'
 
-import { useAuthStore } from '@/hooks/use-authstore'
+import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
 
 import { imageUploadService } from '@/api/services/userProfile.service'
@@ -31,7 +31,7 @@ export default function Account() {
   const { user, updateUser } = useAuthStore()
   const [uploading, setUploading] = useState(false)
 
-  const { profilePicture, fetchProfile, updateProfile, loading } = useUserProfileStore()
+  const { profilePicture, fetchProfile, updateProfile} = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
   const email = user?.email
@@ -49,7 +49,11 @@ export default function Account() {
   }, [])
 
   const handleSave = async () => {
-    await Promise.all([updateUser({ fullName: draftFullName }), updateProfile({ bio: draftBio })])
+    try {
+    await Promise.all([updateUser({ fullName: draftFullName }), updateProfile({ bio: draftBio })])}
+    catch (error){
+      console.error('Failed to update profile', error)
+    }
   }
 
   const handleUpload = async (file: File) => {
@@ -66,13 +70,6 @@ export default function Account() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex h-32 items-center justify-center">
-        <span className="text-muted-foreground">Loading profile...</span>
-      </div>
-    )
-  } else {
     return (
       <div className="space-y-6">
         <header className="space-y-2">
@@ -146,7 +143,11 @@ export default function Account() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2">
                         <span className="text-primary inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-semibold">
-                          <img src={app.icon} alt={`${app.name} logo`} className="h-6 w-6" />
+                          {app.icon ? (
+                            <img src={app.icon} alt={`${app.name}+logo`} className="h-6 w-6" />
+                          ) : (
+                            <span>{app.name.charAt(0)}</span>
+                          )}
                         </span>
 
                         <h3 className="font-semibold">{app.name}</h3>
@@ -177,4 +178,4 @@ export default function Account() {
       </div>
     )
   }
-}
+

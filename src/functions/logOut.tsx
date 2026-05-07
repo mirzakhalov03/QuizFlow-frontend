@@ -1,5 +1,5 @@
 import { api } from '@/api/axios-instance'
-import { useAuthStore } from '@/hooks/use-authstore'
+import { useAuthStore } from '@/store/use-authstore'
 import { authEvents } from './AuthEvents'
 import { toast } from '@/lib/toast'
 
