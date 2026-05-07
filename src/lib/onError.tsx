@@ -14,7 +14,7 @@ export function handleFormError<T extends FieldValues = any>(
     form?: UseFormReturn<T>
 ) {
     const error = err as ApiError
-    const isClientError = error?.status !== 0 && Number(error?.status) < 500
+    const isClientError = Number(error?.status) >= 400 && Number(error?.status) < 500
     const data = error?.response?.data || {}
     const msg = data?.detail
 

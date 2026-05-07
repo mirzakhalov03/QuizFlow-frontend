@@ -1,7 +1,7 @@
 import { Control, FieldValues, Path, useController } from 'react-hook-form'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Button } from '../ui/button'
 import { FileUploader } from 'react-drag-drop-files'
 import Spinner from '../ui/spinner'
@@ -42,6 +42,7 @@ export default function FileUpload<TForm extends FieldValues>({
 }: TProps<TForm>) {
   const maxS = maxSize * 1024 * 1024
   const [isCompressing, setIsCompressing] = useState(false)
+
   const {
     field: { value, onChange, ...field },
     fieldState,
@@ -89,15 +90,42 @@ export default function FileUpload<TForm extends FieldValues>({
     },
   })
 
-  const fileArray: File[] = !multiple ? (value ? [value] : []) : value
+  // Memoize fileArray to prevent unnecessary re-renders
+  const fileArray: File[] = useMemo(() => {
+    return !multiple ? (value ? [value] : []) : value || []
+  }, [multiple, value])
+
+  const fileUrls = useMemo(() => {
+    const urls: Record<string, string> = {}
+
+    fileArray.forEach((file, index) => {
+      if (file instanceof File) {
+        const key = `${file.name}-${file.size}-${index}`
+        urls[key] = URL.createObjectURL(file)
+      }
+    })
+
+    return urls
+  }, [fileArray])
+
+  useEffect(() => {
+    return () => {
+      Object.values(fileUrls).forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [fileUrls])
+
+  const getFileUrl = (file: File, index: number) => {
+    const key = `${file.name}-${file.size}-${index}`
+    return fileUrls[key]
+  }
 
   async function handleOnChange(files: File[]) {
     if (files.length > 0) {
       if (isCompressed && files[0].type.includes('image')) {
         setIsCompressing(true)
-        const compressedFiles = await Promise.all(files.map((item) => item))
+        // TODO: Implement actual image compression logic here
         setIsCompressing(false)
-        onChange(multiple ? [...compressedFiles, ...fileArray] : compressedFiles[0])
+        onChange(multiple ? [...files, ...fileArray] : files[0])
       } else {
         onChange(multiple ? [...files, ...fileArray] : files[0])
       }
@@ -157,7 +185,9 @@ export default function FileUpload<TForm extends FieldValues>({
             if (!(file instanceof File)) {
               return null
             }
-            const url = URL.createObjectURL(file)
+            const url = getFileUrl(file, index)
+            if (!url) return null
+
             return (
               <main key={index} className="flex items-center justify-between gap-4">
                 <a

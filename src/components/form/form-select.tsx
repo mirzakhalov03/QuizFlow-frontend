@@ -100,7 +100,7 @@ export function FormSelect<
       />
       {!hideError && error && (
         <FieldError>
-          {control._formState.errors[name]?.message as string}
+          {error.message as string}
         </FieldError>
       )}
     </div>
