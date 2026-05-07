@@ -14,7 +14,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, fullWidth, suffix, prefixIcon, ...props }, ref) => {
     const [hide, setHide] = React.useState<boolean>(true)
-    const iconButtonClassnames = `absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground h-full box-content cursor-pointer backdrop-blur z-2 p-0 ${props.disabled && 'pointer-events-none cursor-not-allowed opacity-50'}`
+    const iconClassnames = `absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground h-full box-content cursor-pointer backdrop-blur z-2 ${props.disabled && 'pointer-events-none cursor-not-allowed opacity-50'}`
     const searchIconClassnames = `absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground p-0.5 box-content cursor-pointer backdrop-blur z-1 ${props.disabled && 'pointer-events-none cursor-not-allowed opacity-50'}`
 
     return (
@@ -24,9 +24,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           props?.itemClassName
         )}
       >
-        {type === 'search' && <Search width={16} className={searchIconClassnames} aria-hidden="true" />}
+        {type === 'search' && <Search width={16} className={searchIconClassnames} />}
         {!!prefixIcon && (
-          <span className="text-muted-foreground absolute top-1/2 left-1 z-1 box-content -translate-y-1/2 cursor-pointer p-1 backdrop-blur" aria-hidden="true">
+          <span className="text-muted-foreground absolute top-1/2 left-1 z-1 box-content -translate-y-1/2 cursor-pointer p-1 backdrop-blur">
             {prefixIcon}
           </span>
         )}
@@ -42,26 +42,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
           hidden={props.hidden}
         />
-        {type === 'password' && (
-          <button
-            type="button"
-            className={iconButtonClassnames}
-            onClick={() => setHide(!hide)}
-            disabled={props.disabled}
-            aria-label={hide ? 'Show password' : 'Hide password'}
-            tabIndex={props.disabled ? -1 : 0}
-          >
-            {hide ? (
-              <Eye width={18} aria-hidden="true" />
-            ) : (
-              <EyeOff width={18} aria-hidden="true" />
-            )}
-          </button>
-        )}
+        {type === 'password' &&
+          (hide ? (
+            <Eye width={18} className={iconClassnames} onClick={() => setHide(false)} />
+          ) : (
+            <EyeOff width={18} className={iconClassnames} onClick={() => setHide(true)} />
+          ))}
         {!!suffix && (
           <span
             className={`text-muted-foreground absolute top-1 right-1 z-1 box-content cursor-pointer p-1 backdrop-blur ${props.disabled && 'pointer-events-none cursor-not-allowed opacity-50'}`}
-            aria-hidden="true"
           >
             {suffix}
           </span>
