@@ -70,7 +70,7 @@ const Modal = ({
   }, [isOpen, closable, handleClose])
 
   const handleOverlayClick = (e: React.MouseEvent) => {
-    if (closable && e.target === overlayRef.current) {
+    if (closable && contentRef.current && !contentRef.current.contains(e.target as Node)) {
       handleClose()
     }
   }

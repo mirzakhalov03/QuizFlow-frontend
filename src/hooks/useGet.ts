@@ -5,12 +5,19 @@ import { AxiosRequestConfig } from "axios"
 const DEFAULT_STALE_TIME = 1000 * 5 * 60
 
 export const buildQueryKey = (url: string, params?: Record<string, unknown>) => {
-    const paramValues = Object.values(params || {}).filter(
-        (v) => v !== undefined && v !== null && v !== "",
-    )
-    return paramValues.length > 0 ? [url, ...paramValues] : [url]
+    const cleanedParams = params 
+        ? Object.fromEntries(
+            Object.entries(params).filter(
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                ([_, v]) => v !== undefined && v !== null && v !== ""
+            )
+        )
+        : undefined;
+    
+    return cleanedParams && Object.keys(cleanedParams).length > 0 
+        ? [url, cleanedParams] 
+        : [url];
 }
-
 export type UseGetArgs<TData = unknown, TQueryFnData = unknown, TError = unknown> = {
     options?: Partial<UseQueryOptions<TQueryFnData, TError, TData>>
     config?: Omit<AxiosRequestConfig, "params">
