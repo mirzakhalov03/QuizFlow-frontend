@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { userService } from '../api/services/user.service'
 
 type User = {
   id: string
@@ -13,6 +14,8 @@ type AuthState = {
 
   setUser: (user: User | null) => void
   setLoading: (loading: boolean) => void
+
+  updateUser: (data: { fullName?: string }) => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -30,4 +33,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({
       isLoading: loading,
     }),
+
+  updateUser: async (data) => {
+    
+      const updated = await userService.updateMe(data)
+
+      set((state) => ({
+        user: state.user
+          ? {
+              ...state.user,
+              fullName: updated.fullName,
+            }
+          : state.user,
+      }))
+   
+  },
 }))
