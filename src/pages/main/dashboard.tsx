@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import DashboardHeader from '@/components/main/dashboard/dashboard-header'
 import { cn } from '@/lib/utils'
 import Button from '@/components/ui/button'
