@@ -1,7 +1,7 @@
 import { BookMarked, BrainCircuit, Files, LayoutTemplate, NotebookPen, Timer } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { PATHS } from '@/lib/router/path'
+import { PATHS } from '@/lib/path'
 
 const features = [
   {

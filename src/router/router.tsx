@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Spinner from '@/components/ui/spinner'
-import { routes } from './routes'
+import { routes } from '@/router/routes'
 
 const router = createBrowserRouter(routes)
 

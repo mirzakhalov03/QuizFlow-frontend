@@ -2,7 +2,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { PATHS } from '@/lib/router/path'
+import { PATHS } from '@/lib/path'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/use-authstore'
 
