@@ -1,4 +1,3 @@
- 
 import DashboardHeader from '@/components/main/dashboard/dashboard-header'
 import { cn } from '@/lib/utils'
 import Button from '@/components/ui/button'
@@ -23,7 +22,7 @@ export default function Dashboard() {
         <Stat label="Avg. score" value="—" />
       </div>
       <div className="space-y-2">
-        <h1 className="text-xl font-semibold sm:text-2xl">Quizzes</h1>
+        <h2 className="text-xl font-semibold sm:text-2xl">Quizzes</h2>
         <div className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {/* {data?.data?.map((quiz: any) => {
           return <QuizCard key={quiz.id} />
@@ -40,7 +39,7 @@ export default function Dashboard() {
             <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-dashed border-current">
               <Plus className="h-5 w-5" />
             </div>
-            <span className="text-xs font-medium">New Quizz</span>
+            <span className="text-xs font-medium">New Quiz</span>
           </Button>
         </div>
       </div>
