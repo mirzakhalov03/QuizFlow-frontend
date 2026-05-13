@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, ListChecks, LogOut, Settings } from 'lucide-react'
 import { PATHS } from '@/lib/path'
@@ -23,7 +23,7 @@ export default function AppLayout() {
 
   useEffect(() => {
     fetchProfile()
-  }, [])
+  }, [fetchProfile])
 
   const onLogout = async () => {
     await logout(navigate)
@@ -36,11 +36,15 @@ export default function AppLayout() {
   const parts = user?.fullName?.trim().split(' ') ?? []
   const firstName = parts[0] || parts.at(-1) || 'there'
 
-  const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  })
+  const today = useMemo(
+    () =>
+      new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+      }),
+    []
+  )
 
   return (
     <div className="bg-background text-foreground flex min-h-screen">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Check, Link2OffIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -35,7 +35,7 @@ export default function Account() {
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
   const email = user?.email
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     await fetchProfile()
 
     const profile = useUserProfileStore.getState()
@@ -43,10 +43,10 @@ export default function Account() {
 
     setDraftBio(profile.bio ?? '')
     setDraftFullName(userState?.fullName ?? '')
-  }
+  }, [fetchProfile])
   useEffect(() => {
     loadProfile()
-  }, [])
+  }, [loadProfile])
 
   const handleSave = async () => {
     try {

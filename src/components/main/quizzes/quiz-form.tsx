@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { Settings2, Sparkles } from 'lucide-react'
 
 import { quizService } from '@/api/services/quiz.service'
@@ -12,13 +12,13 @@ import Button from '@/components/ui/button'
 import { QUIZ_ADD } from '@/constants/api-endpoints'
 import { useModal } from '@/hooks/useModal'
 import { toast } from '@/lib/toast'
-import type { ApiResponse } from '@/types/quiz'
+import type { ApiResponse, QuestionType } from '@/types/quiz'
 import { questionCounts, questionTypes } from '@/components/main/quizzes/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 
 type QuizFormValues = {
   title: string
-  type: string
+  type: QuestionType
   questionCount: string
   isTimerEnabled: boolean
   timerDuration?: number
@@ -31,7 +31,7 @@ type GenerateQuizResponse = ApiResponse<{ jobId: string; pollUrl: string }>
 type GenerateQuizPayload = {
   key: string
   title: string
-  type: string
+  type: QuestionType
   questionCount: number
   userInstructions?: string
   isTimerEnabled: boolean
@@ -54,8 +54,8 @@ export default function QuizForm() {
     },
   })
 
-  const { handleSubmit, reset, control, watch } = form
-  const timerEnabled = watch('isTimerEnabled')
+  const { handleSubmit, reset, control } = form
+  const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
 
   const onSubmit = (values: QuizFormValues) => {
     const tempId = crypto.randomUUID()
