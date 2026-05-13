@@ -16,6 +16,7 @@ export const PATHS = {
     dashboard: '/app/dashboard',
     account: '/app/account',
     quizzes: '/app/quizzes',
+    quiz: (id: string) => `/app/quizzes/${id}`,
     settings: '/app/settings',
   },
 } as const

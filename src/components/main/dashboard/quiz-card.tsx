@@ -1,28 +1,17 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Clock, Trash2 } from 'lucide-react'
+import { Clock, Play, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import { useDelete } from '@/hooks/useDelete'
 import { QUIZ_BY_ID, QUIZ_LIST } from '@/constants/api-endpoints'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from '@/lib/toast'
-import type { Quiz, QuestionType } from '@/types/quiz'
+import type { Quiz } from '@/types/quiz'
+import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
+import { PATHS } from '@/lib/path'
 
 dayjs.extend(relativeTime)
-
-const TYPE_LABELS: Record<QuestionType, string> = {
-  multiple_choice: 'Multiple Choice',
-  multi_select: 'Multi Select',
-  true_false: 'True / False',
-  open_ended: 'Open Ended',
-}
-
-const TYPE_COLORS: Record<QuestionType, string> = {
-  multiple_choice: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  multi_select: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
-  true_false: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
-  open_ended: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
-}
 
 export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const queryClient = useQueryClient()
@@ -42,7 +31,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
   return (
     <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 transition-shadow hover:shadow-sm">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="line-clamp-2 text-sm font-semibold leading-snug">{quiz.title}</h3>
+        <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{quiz.title}</h3>
         <button
           onClick={handleDelete}
           disabled={isPending}
@@ -69,7 +58,15 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         )}
       </div>
 
-      <p className="text-muted-foreground mt-auto text-xs">{dayjs(quiz.createdAt).fromNow()}</p>
+      <div className="mt-auto flex items-center justify-between">
+        <p className="text-muted-foreground text-xs">{dayjs(quiz.createdAt).fromNow()}</p>
+        <Link to={PATHS.app.quiz(quiz.id)} onClick={(e) => e.stopPropagation()}>
+          <button className="text-primary hover:bg-primary/10 flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors">
+            <Play className="h-3 w-3" />
+            Start
+          </button>
+        </Link>
+      </div>
     </div>
   )
 }

@@ -10,7 +10,8 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "validate": "npm run format && npm run lint:fix && npm run prepare"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",

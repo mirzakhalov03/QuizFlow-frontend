@@ -4,11 +4,25 @@ import RootLayout from '@/layouts/root-layout'
 import PublicLayout from '@/layouts/public-layout'
 import AuthLayout from '@/layouts/auth-layout'
 import AppLayout from '@/layouts/app-layout'
-import { requireAuth,requireGuest } from '@/lib/guards'
+import { requireAuth, requireGuest } from '@/lib/guards'
 import { lazyPage } from '@/lib/lazy'
 import { PATHS } from '@/lib/path'
 
- 
+const Landing = lazyPage(() => import('@/pages/landing'))
+const Features = lazyPage(() => import('@/pages/landing/features'))
+const Contact = lazyPage(() => import('@/pages/landing/contact'))
+const Pricing = lazyPage(() => import('@/pages/landing/pricing'))
+
+const Login = lazyPage(() => import('@/pages/auth/login'))
+const Register = lazyPage(() => import('@/pages/auth/register'))
+
+const Dashboard = lazyPage(() => import('@/pages/main/dashboard'))
+const Account = lazyPage(() => import('@/pages/main/account'))
+const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
+const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
+const Settings = lazyPage(() => import('@/pages/main/settings'))
+
+const NotFound = lazyPage(() => import('@/pages/not-found'))
 
 export const routes: RouteObject[] = [
   {
@@ -17,10 +31,10 @@ export const routes: RouteObject[] = [
       {
         element: <PublicLayout />,
         children: [
-          { path: PATHS.landing, lazy: lazyPage(() => import('@/pages/landing')) },
-          { path: PATHS.features, lazy: lazyPage(() => import('@/pages/landing/features')) },
-          { path: PATHS.contact, lazy: lazyPage(() => import('@/pages/landing/contact')) },
-          { path: PATHS.pricing, lazy: lazyPage(() => import('@/pages/landing/pricing')) },
+          { path: PATHS.landing, lazy: Landing },
+          { path: PATHS.features, lazy: Features },
+          { path: PATHS.contact, lazy: Contact },
+          { path: PATHS.pricing, lazy: Pricing },
         ],
       },
 
@@ -30,8 +44,8 @@ export const routes: RouteObject[] = [
         loader: requireGuest,
         children: [
           { index: true, element: <Navigate to={PATHS.auth.login} replace /> },
-          { path: 'login', lazy: lazyPage(() => import('@/pages/auth/login')) },
-          { path: 'register', lazy: lazyPage(() => import('@/pages/auth/register')) },
+          { path: 'login', lazy: Login },
+          { path: 'register', lazy: Register },
         ],
       },
 
@@ -41,14 +55,15 @@ export const routes: RouteObject[] = [
         loader: requireAuth,
         children: [
           { index: true, element: <Navigate to={PATHS.app.dashboard} replace /> },
-          { path: 'dashboard', lazy: lazyPage(() => import('@/pages/main/dashboard')) },
-          { path: 'account', lazy: lazyPage(() => import('@/pages/main/account')) },
-          { path: 'quizzes', lazy: lazyPage(() => import('@/pages/main/quizzes')) },
-          { path: 'settings', lazy: lazyPage(() => import('@/pages/main/settings')) },
+          { path: 'dashboard', lazy: Dashboard },
+          { path: 'account', lazy: Account },
+          { path: 'quizzes', lazy: Quizzes },
+          { path: 'quizzes/:id', lazy: QuizSolvingUI },
+          { path: 'settings', lazy: Settings },
         ],
       },
 
-      { path: '*', lazy: lazyPage(() => import('@/pages/not-found')) },
+      { path: '*', lazy: NotFound },
     ],
   },
 ]

@@ -35,17 +35,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     }),
 
   updateUser: async (data) => {
-    
-      const updated = await userService.updateMe(data)
+    const updated = await userService.updateMe(data)
 
-      set((state) => ({
-        user: state.user
-          ? {
-              ...state.user,
-              fullName: updated.fullName,
-            }
-          : state.user,
-      }))
-   
+    set((state) => ({
+      user: state.user
+        ? {
+            ...state.user,
+            fullName: updated.fullName,
+          }
+        : state.user,
+    }))
   },
 }))
