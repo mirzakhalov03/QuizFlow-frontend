@@ -6,14 +6,18 @@ export function useQuizTimer(
   onExpire: () => void,
   enabled = true
 ): { timeRemaining: number; isRunning: boolean } {
-  const [timeRemaining, setTimeRemaining] = useState(() => {
+  const [timeRemaining, setTimeRemaining] = useState(0)
+
+  useEffect(() => {
+    if (durationSeconds <= 0) return
     const saved = localStorage.getItem(storageKey)
-    if (saved) {
-      const parsed = parseInt(saved, 10)
-      if (!isNaN(parsed) && parsed > 0) return parsed
-    }
-    return durationSeconds
-  })
+    const parsed = saved ? parseInt(saved, 10) : NaN
+    const initial = !isNaN(parsed) && parsed > 0 ? parsed : durationSeconds
+    const timeoutId = setTimeout(() => {
+      setTimeRemaining(initial)
+    }, 0)
+    return () => clearTimeout(timeoutId)
+  }, [durationSeconds, storageKey])
 
   const onExpireRef = useRef(onExpire)
 
