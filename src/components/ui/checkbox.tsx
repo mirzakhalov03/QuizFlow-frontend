@@ -12,7 +12,18 @@ type CheckboxProps = {
 }
 
 const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
-  ({ checked = false, onCheckedChange, disabled = false, className, id, required = false, ...props }, ref) => {
+  (
+    {
+      checked = false,
+      onCheckedChange,
+      disabled = false,
+      className,
+      id,
+      required = false,
+      ...props
+    },
+    ref
+  ) => {
     const handleClick = () => {
       if (!disabled) {
         onCheckedChange?.(!checked)
@@ -40,22 +51,20 @@ const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
         tabIndex={disabled ? -1 : 0}
         className={cn(
           'peer h-4 w-4 shrink-0 rounded-sm',
-          'border border-input',
-          checked 
-            ? 'bg-primary border-primary' 
-            : 'bg-background',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+          'border-input border',
+          checked ? 'bg-primary border-primary' : 'bg-background',
+          'focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          !disabled && 'cursor-pointer hover:border-primary/50',
+          !disabled && 'hover:border-primary/50 cursor-pointer',
           'transition-colors duration-200',
           className
         )}
         {...props}
       >
         {checked && (
-          <Check 
+          <Check
             className={cn(
-              'h-3.5 w-3.5 text-primary-foreground',
+              'text-primary-foreground h-3.5 w-3.5',
               'transition-transform duration-200',
               checked ? 'scale-100' : 'scale-0'
             )}

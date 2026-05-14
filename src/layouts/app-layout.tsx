@@ -1,11 +1,14 @@
+import { useEffect, useMemo } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ListChecks, LogOut, Settings, UserCircle2 } from 'lucide-react'
+import { LayoutDashboard, ListChecks, LogOut, Settings } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 import { logout } from '@/functions/logOut'
+import { useAuthStore } from '@/store/use-authstore'
+import { useUserProfileStore } from '@/store/userProfileStore'
 
 const navItems = [
   { label: 'Dashboard', to: PATHS.app.dashboard, icon: LayoutDashboard },
@@ -15,6 +18,12 @@ const navItems = [
 
 export default function AppLayout() {
   const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
+  const { profilePicture, fetchProfile } = useUserProfileStore()
+
+  useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
 
   const onLogout = async () => {
     await logout(navigate)
@@ -23,6 +32,19 @@ export default function AppLayout() {
   const onOpenAccount = () => {
     navigate(PATHS.app.account)
   }
+
+  const parts = user?.fullName?.trim().split(' ') ?? []
+  const firstName = parts[0] || parts.at(-1) || 'there'
+
+  const today = useMemo(
+    () =>
+      new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+      }),
+    []
+  )
 
   return (
     <div className="bg-background text-foreground flex min-h-screen">
@@ -65,16 +87,26 @@ export default function AppLayout() {
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
         <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-4 sm:px-6">
           <Logo to={PATHS.app.dashboard} size="sm" className="lg:hidden" />
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
-            <Button
-              variant="ghost"
-              size="lg"
+            <button
               onClick={onOpenAccount}
-              leftIcon={<UserCircle2 size={20} />}
+              className="hover:bg-muted flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors"
             >
-              Account Details
-            </Button>
+              <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
+                {profilePicture ? (
+                  <img src={profilePicture} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="bg-primary text-primary-foreground flex h-full w-full items-center justify-center text-sm font-semibold">
+                    {firstName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="hidden text-left sm:block">
+                <p className="text-sm leading-tight font-semibold">Hi, {firstName}</p>
+                <p className="text-muted-foreground text-xs">{today}</p>
+              </div>
+            </button>
             <button
               type="button"
               onClick={onLogout}

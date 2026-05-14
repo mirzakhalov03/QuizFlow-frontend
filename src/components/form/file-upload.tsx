@@ -167,6 +167,7 @@ export default function FileUpload<TForm extends FieldValues>({
                 }
               }
         }
+        maxSize={maxSize}
         multiple={multiple}
         name={field.name}
         types={dropAccept}

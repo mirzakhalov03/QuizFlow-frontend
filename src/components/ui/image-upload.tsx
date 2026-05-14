@@ -60,7 +60,7 @@ export default function ImageUpload({ value, onChange, loading }: Props) {
         type="button"
         onClick={openPicker}
         className="bg-background hover:bg-accent border-border absolute right-2 bottom-2 inline-flex h-9 w-9 items-center justify-center rounded-full border shadow-sm transition-colors"
-        aria-label='Upload profile image'
+        aria-label="Upload profile image"
       >
         <Pencil size={15} />
       </button>
