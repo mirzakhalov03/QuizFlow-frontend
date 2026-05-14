@@ -9,6 +9,11 @@ import { cn } from '@/lib/utils'
 import { logout } from '@/functions/logOut'
 import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
+import { useGlobalStore } from '@/store/global-store'
+import QuizTimer from '@/components/main/quiz-solving/quiz-timer'
+import QuizProgress from '@/components/main/quiz-solving/quiz-progress'
+import type { QuizSolvingHeader } from '@/pages/main/quizSolvingUI'
+import { QUIZ_SOLVING_HEADER_KEY } from '@/pages/main/quizSolvingUI'
 
 const navItems = [
   { label: 'Dashboard', to: PATHS.app.dashboard, icon: LayoutDashboard },
@@ -33,6 +38,10 @@ export default function AppLayout() {
     navigate(PATHS.app.account)
   }
 
+  const quizHeader = useGlobalStore(
+    (s) => s.dataMap[QUIZ_SOLVING_HEADER_KEY] as QuizSolvingHeader | undefined
+  )
+
   const parts = user?.fullName?.trim().split(' ') ?? []
   const firstName = parts[0] || parts.at(-1) || 'there'
 
@@ -48,7 +57,7 @@ export default function AppLayout() {
 
   return (
     <div className="bg-background text-foreground flex min-h-screen">
-      <aside className="border-border bg-background hidden w-70 shrink-0 flex-col gap-4 border-r p-4 lg:flex">
+      <aside className="border-border bg-background sticky top-0 hidden h-screen w-70 shrink-0 flex-col gap-4 border-r p-4 lg:flex">
         <Logo to={PATHS.app.dashboard} size="lg" className="mt-1 flex justify-center" />
 
         <nav className="mt-5 flex flex-col gap-1">
@@ -84,9 +93,25 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+      <main className="flex min-w-0 flex-1 flex-col h-screen">
         <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-4 sm:px-6">
           <Logo to={PATHS.app.dashboard} size="sm" className="lg:hidden" />
+          {quizHeader && (
+            <div className="hidden min-w-0 flex-1 items-center gap-4 lg:flex">
+              <p className="text-sm font-semibold whitespace-nowrap">{quizHeader.title}</p>
+              <div className="min-w-0 flex-1 overflow-x-auto">
+                <QuizProgress
+                  questions={quizHeader.questions}
+                  answers={quizHeader.answers}
+                  activeIndex={quizHeader.activeIndex}
+                  onSelect={quizHeader.onSelect}
+                />
+              </div>
+              {quizHeader.isTimerEnabled && (
+                <QuizTimer timeRemaining={quizHeader.timeRemaining} />
+              )}
+            </div>
+          )}
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
             <button
@@ -117,7 +142,7 @@ export default function AppLayout() {
             </button>
           </div>
         </div>
-        <div className="bg-secondary/15 flex-1 p-4 pb-20 sm:p-6 sm:pb-24 lg:pb-6">
+        <div className="bg-secondary/15 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 sm:pb-24 lg:pb-6">
           <Outlet />
         </div>
       </main>
