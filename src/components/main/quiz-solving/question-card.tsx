@@ -15,13 +15,13 @@ export default function QuestionCard({ question, index, value, onChange }: Props
   return (
     <div
       id={`question-${index}`}
-      className="bg-card border-border flex flex-col gap-4 rounded-xl border p-5 shadow-sm scroll-mt-16"
+      className="bg-card border-border flex scroll-mt-16 flex-col gap-4 rounded-xl border p-5 shadow-sm"
     >
       <div className="flex items-start gap-3">
         <span className="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium">
           {index + 1}
         </span>
-        <p className="pt-0.5 text-sm font-bold leading-relaxed">{question.text}</p>
+        <p className="pt-0.5 text-sm leading-relaxed font-bold">{question.text}</p>
       </div>
 
       <div className="pl-9">
@@ -47,10 +47,7 @@ export default function QuestionCard({ question, index, value, onChange }: Props
           />
         )}
         {question.type === 'open_ended' && (
-          <OpenEnded
-            value={(value as string) ?? ''}
-            onChange={onChange as (v: string) => void}
-          />
+          <OpenEnded value={(value as string) ?? ''} onChange={onChange as (v: string) => void} />
         )}
       </div>
     </div>

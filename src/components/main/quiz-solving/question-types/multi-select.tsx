@@ -24,7 +24,7 @@ export default function MultiSelect({ options, value, onChange }: Props) {
           onClick={() => toggle(option.id)}
           className={`flex items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
             value.includes(option.id)
-              ? 'border-primary bg-primary/10 font-medium text-foreground'
+              ? 'border-primary bg-primary/10 text-foreground font-medium'
               : 'border-border hover:border-primary/50 hover:bg-muted/50'
           }`}
         >

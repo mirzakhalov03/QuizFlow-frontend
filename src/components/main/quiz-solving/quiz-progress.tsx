@@ -24,7 +24,7 @@ export default function QuizProgress({ questions, answers, activeIndex, onSelect
             key={q.id}
             onClick={() => onSelect(i)}
             className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors ${
-              active ? 'border-2 border-primary' : ''
+              active ? 'border-primary border-2' : ''
             } ${
               answered
                 ? 'bg-primary text-primary-foreground'

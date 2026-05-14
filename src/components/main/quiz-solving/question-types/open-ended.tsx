@@ -14,7 +14,7 @@ export default function OpenEnded({ value, onChange }: Props) {
         placeholder="Type your answer here..."
         rows={4}
         maxLength={MAX_CHARS}
-        className="border-border focus:border-primary focus:ring-primary/20 w-full resize-none rounded-lg border bg-transparent p-3 text-sm outline-none transition-colors focus:ring-2"
+        className="border-border focus:border-primary focus:ring-primary/20 w-full resize-none rounded-lg border bg-transparent p-3 text-sm transition-colors outline-none focus:ring-2"
       />
       <p className="text-muted-foreground text-right text-xs">
         {value.length}/{MAX_CHARS}

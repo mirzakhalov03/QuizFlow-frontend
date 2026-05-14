@@ -93,7 +93,7 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col h-screen">
+      <main className="flex h-screen min-w-0 flex-1 flex-col">
         <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-4 sm:px-6">
           <Logo to={PATHS.app.dashboard} size="sm" className="lg:hidden" />
           {quizHeader && (
@@ -107,9 +107,7 @@ export default function AppLayout() {
                   onSelect={quizHeader.onSelect}
                 />
               </div>
-              {quizHeader.isTimerEnabled && (
-                <QuizTimer timeRemaining={quizHeader.timeRemaining} />
-              )}
+              {quizHeader.isTimerEnabled && <QuizTimer timeRemaining={quizHeader.timeRemaining} />}
             </div>
           )}
           <div className="ml-auto flex items-center gap-2">

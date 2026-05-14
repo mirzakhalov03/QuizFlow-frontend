@@ -15,8 +15,6 @@ export default function QuizTimer({ timeRemaining }: Props) {
         : 'text-foreground'
 
   return (
-    <span className={`font-mono text-sm font-semibold tabular-nums ${colorClass}`}>
-      {display}
-    </span>
+    <span className={`font-mono text-sm font-semibold tabular-nums ${colorClass}`}>{display}</span>
   )
 }
