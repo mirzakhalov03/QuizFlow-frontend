@@ -32,6 +32,32 @@ export type QuizJob = {
   updatedAt: string
 }
 
+export type QuestionOption = {
+  id: string
+  questionId: string
+  text: string
+  explanation: string | null
+  isCorrect: boolean
+  position: number
+  createdAt: string
+  updatedAt: string
+}
+
+export type Question = {
+  id: string
+  quizId: string
+  text: string
+  type: QuestionType
+  position: number
+  options: QuestionOption[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type QuizWithQuestions = Quiz & {
+  questions: Question[]
+}
+
 export type ApiResponse<T> = {
   success: boolean
   data: T
