@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { ArrowUpDown, Check, SlidersHorizontal } from 'lucide-react'
 
 import Button from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { SortOption } from '@/hooks/useQuizListControls'
+import { useClickOutside } from '@/hooks/useClickOutside'
 import { cn } from '@/lib/utils'
 import type { QuestionType } from '@/types/quiz'
 import { questionTypes } from '@/components/main/quizzes/utils'
@@ -36,15 +37,7 @@ export function QuizToolbar({ sort, onSortChange, filterTypes, onToggleFilter }:
 
 function SortDropdown({ sort, onChange }: { sort: SortOption; onChange: (s: SortOption) => void }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  const ref = useClickOutside<HTMLDivElement>(() => setOpen(false))
 
   const currentLabel = SORT_OPTIONS.find((o) => o.value === sort)?.label ?? 'Sort'
 
@@ -89,15 +82,7 @@ function FilterDropdown({
   onToggle: (t: QuestionType) => void
 }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  const ref = useClickOutside<HTMLDivElement>(() => setOpen(false))
 
   const isActive = filterTypes.length > 0
 

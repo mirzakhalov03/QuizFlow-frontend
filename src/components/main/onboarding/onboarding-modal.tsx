@@ -46,7 +46,7 @@ function compileBio(answers: Answers): string {
 }
 
 export default function OnboardingModal() {
-  const { isOnboarded, loading, updateProfile } = useUserProfileStore()
+  const { isOnboarded, loading, updating, updateProfile } = useUserProfileStore()
   const addToast = useToastStore((s) => s.add)
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [filledUpTo, setFilledUpTo] = useState(0)
@@ -56,7 +56,6 @@ export default function OnboardingModal() {
     otherField: '',
     background: '',
   })
-  const [saving, setSaving] = useState(false)
 
   if (isOnboarded !== false || loading) return null
 
@@ -66,24 +65,18 @@ export default function OnboardingModal() {
   }
 
   const handleSkip = async () => {
-    setSaving(true)
     try {
       await updateProfile({ isOnboarded: true })
     } catch {
       addToast({ type: 'error', title: 'Something went wrong', description: 'Could not save your preferences. Please try again.' })
-    } finally {
-      setSaving(false)
     }
   }
 
   const handleFinish = async () => {
-    setSaving(true)
     try {
       await updateProfile({ bio: compileBio(answers), isOnboarded: true })
     } catch {
       addToast({ type: 'error', title: 'Something went wrong', description: 'Could not save your preferences. Please try again.' })
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -92,6 +85,11 @@ export default function OnboardingModal() {
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm dark:bg-black/70" />
 
       <div className="relative z-50 w-full max-w-lg rounded-lg border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+        <div className="mb-4 text-center">
+          <h2 className="text-lg font-semibold">Let's personalize your experience!</h2>
+          <p className="text-muted-foreground mt-1 text-sm">A few quick questions so we can tailor your quizzes.</p>
+        </div>
+
         <div className="mb-6 flex justify-center gap-2">
           {([1, 2, 3] as const).map((s) => (
             <div key={s} className="bg-muted h-2 w-20 overflow-hidden rounded-full">
@@ -137,7 +135,7 @@ export default function OnboardingModal() {
         <div className="mt-6 flex items-center justify-between">
           <button
             onClick={handleSkip}
-            disabled={saving}
+            disabled={updating}
             className="text-muted-foreground text-sm hover:underline disabled:opacity-50"
           >
             Skip for now
@@ -149,7 +147,7 @@ export default function OnboardingModal() {
                 variant="outline"
                 size="sm"
                 onClick={() => setStep((s) => (s - 1) as 1 | 2 | 3)}
-                disabled={saving}
+                disabled={updating}
               >
                 Back
               </Button>
@@ -161,7 +159,7 @@ export default function OnboardingModal() {
                 disabled={
                   (step === 1 && !answers.purpose) ||
                   (step === 2 && answers.fields.length === 0) ||
-                  saving
+                  updating
                 }
               >
                 Next
@@ -171,8 +169,8 @@ export default function OnboardingModal() {
               <Button
                 size="sm"
                 onClick={handleFinish}
-                disabled={!answers.background || saving}
-                loading={saving}
+                disabled={!answers.background || updating}
+                loading={updating}
               >
                 Finish
               </Button>

@@ -18,6 +18,7 @@ type UserProfileState = {
   profilePicture: string | null
   isOnboarded: boolean | null
   loading: boolean
+  updating: boolean
 
   setProfile: (data: ProfileData) => void
   setBio: (bio: string | null) => void
@@ -32,6 +33,7 @@ export const useUserProfileStore = create<UserProfileState>((set) => ({
   profilePicture: null,
   isOnboarded: null,
   loading: false,
+  updating: false,
 
   setBio: (bio) => set({ bio }),
 
@@ -59,11 +61,16 @@ export const useUserProfileStore = create<UserProfileState>((set) => ({
   },
 
   updateProfile: async (data) => {
-    const updated = await userProfileService.updateMe(data)
-    set({
-      bio: updated.bio,
-      profilePicture: updated.profilePicture,
-      isOnboarded: updated.isOnboarded,
-    })
+    set({ updating: true })
+    try {
+      const updated = await userProfileService.updateMe(data)
+      set({
+        bio: updated.bio,
+        profilePicture: updated.profilePicture,
+        isOnboarded: updated.isOnboarded,
+      })
+    } finally {
+      set({ updating: false })
+    }
   },
 }))
