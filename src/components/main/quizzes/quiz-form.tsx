@@ -13,7 +13,7 @@ import { QUIZ_ADD } from '@/constants/api-endpoints'
 import { useModal } from '@/hooks/useModal'
 import { toast } from '@/lib/toast'
 import type { ApiResponse, QuestionType } from '@/types/quiz'
-import { questionCounts, questionTypes } from '@/components/main/quizzes/utils'
+import { aiModels, questionCounts, questionTypes } from '@/components/main/quizzes/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 
 type QuizFormValues = {
@@ -24,6 +24,7 @@ type QuizFormValues = {
   timerDuration?: number
   file: File
   userInstructions?: string
+  model: string
 }
 
 type GenerateQuizResponse = ApiResponse<{ jobId: string; pollUrl: string }>
@@ -36,6 +37,7 @@ type GenerateQuizPayload = {
   userInstructions?: string
   isTimerEnabled: boolean
   timerDuration?: number
+  model: string
 }
 
 export default function QuizForm() {
@@ -51,6 +53,7 @@ export default function QuizForm() {
       questionCount: '5',
       isTimerEnabled: false,
       userInstructions: '',
+      model: 'google/gemini-2.0-flash-001',
     },
   })
 
@@ -76,6 +79,7 @@ export default function QuizForm() {
           userInstructions: values.userInstructions || undefined,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
+          model: values.model,
         })
 
         setJobReady(tempId, res.data.jobId)
@@ -131,6 +135,8 @@ export default function QuizForm() {
             required
           />
         </div>
+
+        <FormSelect label="AI Model" options={aiModels} name="model" control={control} required />
 
         <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
 
