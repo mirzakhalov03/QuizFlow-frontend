@@ -1,11 +1,3 @@
-
-
-
-export default function QuizCard(){
-    return (
-        <div>
-
-            {/* quiz card */}
-        </div>
-    )
+export default function QuizCard() {
+  return <div>{/* quiz card */}</div>
 }

@@ -4,7 +4,7 @@ import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { PATHS } from '@/lib/path'
 import { cn } from '@/lib/utils'
-import { useAuthStore } from '@/hooks/use-authstore'
+import { useAuthStore } from '@/store/use-authstore'
 
 const links = [
   { label: 'Home', to: PATHS.landing },
