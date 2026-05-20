@@ -1,3 +1,5 @@
+import type { QuestionType } from '@/types/quiz'
+
 export const questionTypes = [
   { label: 'Multiple Choice', value: 'multiple_choice' },
   { label: 'True/False', value: 'true_false' },
@@ -11,8 +13,23 @@ export const questionCounts = [
   { label: '15 Questions', value: '15' },
   { label: '20 Questions', value: '20' },
 ]
+
 export const difficulties = [
-    { label: 'Easy', value: 'easy' },
-    { label: 'Medium', value: 'medium' },
-    { label: 'Hard', value: 'hard' },
-  ]
+  { label: 'Easy', value: 'easy' },
+  { label: 'Medium', value: 'medium' },
+  { label: 'Hard', value: 'hard' },
+]
+
+export const TYPE_LABELS: Record<QuestionType, string> = {
+  multiple_choice: 'Multiple Choice',
+  multi_select: 'Multi Select',
+  true_false: 'True / False',
+  open_ended: 'Open Ended',
+}
+
+export const TYPE_COLORS: Record<QuestionType, string> = {
+  multiple_choice: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  multi_select: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+  true_false: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+  open_ended: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+}
