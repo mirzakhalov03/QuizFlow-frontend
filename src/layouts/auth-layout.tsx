@@ -2,16 +2,17 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
+import { API_URL } from '@/lib/config'
 import googleLogo from '@/assets/googleLogo.png'
 
-const OAUTH_PATHS = [PATHS.auth.login, PATHS.auth.register]
+const OAUTH_PATHS: string[] = [PATHS.auth.login, PATHS.auth.register]
 
 export default function AuthLayout() {
   const { pathname } = useLocation()
   const showGoogle = OAUTH_PATHS.includes(pathname)
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/google'
+    window.location.href = `${API_URL}/auth/google`
   }
 
   return (

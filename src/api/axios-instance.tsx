@@ -1,20 +1,23 @@
 import axios from 'axios'
 import { authEvents } from '@/functions/AuthEvents'
+import { API_URL } from '@/lib/config'
 
 export const api = axios.create({
-  baseURL: 'http://localhost:3000/',
+  baseURL: API_URL,
   withCredentials: true,
 })
+
+const SKIP_RETRY_URLS = ['/auth/refresh', '/auth/login', '/auth/register']
+
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config
 
-    const skipRetryUrls = ['/auth/refresh', '/auth/login', '/auth/register']
     if (
       err.response?.status === 401 &&
       !originalRequest._retry &&
-      !skipRetryUrls.includes(originalRequest.url)
+      !SKIP_RETRY_URLS.includes(originalRequest.url)
     ) {
       originalRequest._retry = true
 

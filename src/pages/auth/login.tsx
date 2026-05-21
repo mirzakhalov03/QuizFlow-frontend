@@ -28,26 +28,20 @@ export default function Login() {
         email: form.get('email') as string,
         password: form.get('password') as string,
       })
-    } catch (err: unknown) {
-      // A 4xx from /auth/login means bad credentials — stop here
-      const e = err as { response?: { data?: { message?: string; detail?: string }; status?: number } }
-      if (e?.response?.status && e.response.status < 500) {
-        const msg = e?.response?.data?.message ?? e?.response?.data?.detail ?? 'Invalid email or password'
-        toast.error(msg)
-        setLoading(false)
-        return
-      }
-      // Non-4xx (e.g. CORS noise from the server-side redirect) — cookies are already set, continue
-    }
 
-    try {
       const me = await authService.me()
       const user = me?.user ?? me?.data ?? me
       setUser(user)
+
       const from = searchParams.get('from')
       navigate(from && from.startsWith('/app') ? from : PATHS.app.dashboard, { replace: true })
-    } catch {
-      toast.error('Invalid email or password')
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string; detail?: string }; status?: number } }
+      const msg =
+        e?.response?.data?.message ??
+        e?.response?.data?.detail ??
+        (e?.response?.status ? 'Invalid email or password' : 'Something went wrong. Please try again.')
+      toast.error(msg)
     } finally {
       setLoading(false)
     }

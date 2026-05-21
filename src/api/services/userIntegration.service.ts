@@ -1,9 +1,8 @@
-import { api } from '@/api/axios-instance'
+import { API_URL } from '@/lib/config'
 import type { IntegrationProvider } from '@/types/integration'
 
 export const userIntegrationService = {
   startConnect(provider: IntegrationProvider) {
-    const baseURL = api.defaults.baseURL?.replace(/\/$/, '') ?? ''
-    window.location.href = `${baseURL}/auth/${provider}`
+    window.location.href = `${API_URL}/auth/${provider}`
   },
 }
