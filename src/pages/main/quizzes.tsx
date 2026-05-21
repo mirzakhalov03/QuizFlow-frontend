@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import Modal from '@/components/custom/modal'
 import QuizCard from '@/components/main/dashboard/quiz-card'
 import QuizHeader from '@/components/main/quizzes/header'
-import QuizForm from '@/components/main/quizzes/quiz-form'
+import QuizFormWrapper from '@/components/main/quizzes/quiz-form-wrapper'
 import { PendingQuizCard } from '@/components/main/quizzes/pending-quiz-card'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
@@ -59,8 +59,8 @@ export default function Quizzes() {
         </div>
       )}
 
-      <Modal size="max-w-3xl" modalKey="quiz-add" title="Add new quiz">
-        <QuizForm />
+      <Modal size="max-w-3xl" modalKey="quiz-add" title="Create New Quiz">
+        <QuizFormWrapper />
       </Modal>
     </div>
   )

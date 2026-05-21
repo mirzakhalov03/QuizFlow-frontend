@@ -1,17 +1,17 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import googleLogo from '@/assets/googleLogo.png'
-import notionLogo from '@/assets/notionLogo.png'
+
+const OAUTH_PATHS = [PATHS.auth.login, PATHS.auth.register]
 
 export default function AuthLayout() {
+  const { pathname } = useLocation()
+  const showGoogle = OAUTH_PATHS.includes(pathname)
+
   const handleGoogleLogin = () => {
     window.location.href = 'http://localhost:3000/auth/google'
-  }
-
-  const handleNotionLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/notion'
   }
 
   return (
@@ -24,23 +24,21 @@ export default function AuthLayout() {
           <ArrowLeft size={14} /> Back to home
         </Link>
         <Outlet />
-        <div>
-          <p className="text-muted-foreground text-center text-sm"> or continue with </p>
-
+        {showGoogle && (
           <div className="mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              className="mb-2 w-full p-2"
-              onClick={handleGoogleLogin}
-            >
-              <img src={googleLogo} alt="Google" className="h-5 w-5" /> Google
-            </Button>
-            <Button variant="outline" size="sm" className="w-full p-2" onClick={handleNotionLogin}>
-              <img src={notionLogo} alt="Notion" className="h-5 w-5" /> Notion
-            </Button>
+            <p className="text-muted-foreground text-center text-sm">or continue with</p>
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="mb-2 w-full p-2"
+                onClick={handleGoogleLogin}
+              >
+                <img src={googleLogo} alt="Google" className="h-5 w-5" /> Google
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

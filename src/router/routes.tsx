@@ -15,12 +15,16 @@ const Pricing = lazyPage(() => import('@/pages/landing/pricing'))
 
 const Login = lazyPage(() => import('@/pages/auth/login'))
 const Register = lazyPage(() => import('@/pages/auth/register'))
+const ForgotPassword = lazyPage(() => import('@/pages/auth/forgot-password'))
+const ResetPassword = lazyPage(() => import('@/pages/auth/reset-password'))
 
 const Dashboard = lazyPage(() => import('@/pages/main/dashboard'))
 const Account = lazyPage(() => import('@/pages/main/account'))
 const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
 const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
 const Settings = lazyPage(() => import('@/pages/main/settings'))
+
+const IntegrationSuccess = lazyPage(() => import('@/pages/integrations/success'))
 
 const NotFound = lazyPage(() => import('@/pages/not-found'))
 
@@ -46,6 +50,8 @@ export const routes: RouteObject[] = [
           { index: true, element: <Navigate to={PATHS.auth.login} replace /> },
           { path: 'login', lazy: Login },
           { path: 'register', lazy: Register },
+          { path: 'forgot-password', lazy: ForgotPassword },
+          { path: 'reset-password', lazy: ResetPassword },
         ],
       },
 
@@ -62,6 +68,8 @@ export const routes: RouteObject[] = [
           { path: 'settings', lazy: Settings },
         ],
       },
+
+      { path: 'integrations/success', lazy: IntegrationSuccess },
 
       { path: '*', lazy: NotFound },
     ],

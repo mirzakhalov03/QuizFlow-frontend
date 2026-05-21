@@ -1,67 +1,52 @@
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
 
-import { quizService } from '@/api/services/quiz.service'
-import { postRequest } from '@/hooks/usePost'
-import FileUpload from '@/components/form/file-upload'
-import { FormCheckbox } from '@/components/form/form-checkbox'
-import FormInput from '@/components/form/input'
+import { notionService } from '@/api/services/notion.service'
 import { FormSelect } from '@/components/form/form-select'
+import FormInput from '@/components/form/input'
 import FormTextarea from '@/components/form/textarea'
 import Button from '@/components/ui/button'
-import { QUIZ_ADD } from '@/constants/api-endpoints'
-import { useModal } from '@/hooks/useModal'
+import Spinner from '@/components/ui/spinner'
 import { toast } from '@/lib/toast'
-import type { ApiResponse, QuestionType } from '@/types/quiz'
+import type { QuestionType } from '@/types/quiz'
 import { questionCounts, questionTypes } from '@/components/main/quizzes/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
+import { useModal } from '@/hooks/useModal'
+import { useNotionPages } from '@/hooks/useNotionPages'
 
-type QuizFormValues = {
+type NotionFormValues = {
+  pageId: string
   title: string
   type: QuestionType
   questionCount: string
-  isTimerEnabled: boolean
-  timerDuration?: number
-  file: File
   userInstructions?: string
 }
 
-type GenerateQuizResponse = ApiResponse<{ jobId: string; pollUrl: string }>
-
-type GenerateQuizPayload = {
-  key: string
-  title: string
-  type: QuestionType
-  questionCount: number
-  userInstructions?: string
-  isTimerEnabled: boolean
-  timerDuration?: number
-}
-
-interface QuizFormProps {
+interface NotionQuizFormProps {
   onBack: () => void
 }
 
-export default function QuizForm({ onBack }: QuizFormProps) {
+export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
   const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
 
-  const form = useForm<QuizFormValues>({
+  const { pages, loading, error, refetch } = useNotionPages()
+
+  const form = useForm<NotionFormValues>({
     defaultValues: {
+      pageId: '',
       title: '',
       type: 'multiple_choice',
       questionCount: '5',
-      isTimerEnabled: false,
       userInstructions: '',
     },
   })
 
   const { handleSubmit, reset, control } = form
-  const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
 
-  const onSubmit = (values: QuizFormValues) => {
+  const onSubmit = (values: NotionFormValues) => {
     const tempId = crypto.randomUUID()
 
     closeModal()
@@ -70,29 +55,68 @@ export default function QuizForm({ onBack }: QuizFormProps) {
 
     ;(async () => {
       try {
-        const { uploadUrl, key } = await quizService.getPresignedUrl(values.file)
-        await quizService.uploadToS3(uploadUrl, values.file)
-
-        const res: GenerateQuizResponse = await postRequest<GenerateQuizPayload>(QUIZ_ADD, {
-          key,
+        const result = await notionService.createQuizFromPage({
+          pageId: values.pageId,
           title: values.title,
           type: values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
-          isTimerEnabled: values.isTimerEnabled,
-          timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
+          isTimerEnabled: false,
+          timerDuration: undefined,
         })
 
-        setJobReady(tempId, res.data.jobId)
-      } catch {
-        markJobFailed(tempId, 'Generation failed. Please try again.')
-        toast.error('Quiz generation failed. Please try again.')
+        setJobReady(tempId, result.jobId)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Generation failed'
+        markJobFailed(tempId, message)
+        toast.error(message)
       }
     })()
   }
 
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <div className="bg-destructive/10 text-destructive rounded-lg p-4 text-sm">{error}</div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={onBack} leftIcon={<ChevronLeft size={16} />}>
+            Back
+          </Button>
+          <Button onClick={refetch} variant="outline">
+            Retry
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  const pageOptions = pages.map((page) => ({
+    label: page.icon ? `${page.icon} ${page.title}` : page.title,
+    value: page.id,
+  }))
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <FormSelect
+          label="Select Notion Page"
+          options={pageOptions}
+          name="pageId"
+          control={control}
+          required
+          placeholder="Choose a page..."
+        />
+        <p className="text-muted-foreground mt-1 text-xs">Select the page to generate quiz from</p>
+      </div>
+
       <FormInput
         name="title"
         methods={form}
@@ -100,19 +124,6 @@ export default function QuizForm({ onBack }: QuizFormProps) {
         placeholder="e.g. Chapter 5 Review"
         required
       />
-
-      <div className="space-y-1">
-        <FileUpload
-          label="Source Document"
-          control={control}
-          name="file"
-          required
-          maxSize={25}
-          hideError={false}
-          dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD']}
-        />
-        <p className="text-muted-foreground text-xs">PDF, Word, TXT or Markdown · max 25 MB</p>
-      </div>
 
       <div className="bg-muted/40 space-y-3 rounded-xl p-3">
         <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
@@ -136,30 +147,13 @@ export default function QuizForm({ onBack }: QuizFormProps) {
             required
           />
         </div>
-
-        <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
-
-        {timerEnabled && (
-          <FormInput
-            name="timerDuration"
-            methods={form}
-            label="Timer (minutes)"
-            type="number"
-            registerOptions={{
-              min: { value: 1, message: 'Minimum 1 minute' },
-              max: { value: 180, message: 'Maximum 180 minutes' },
-              valueAsNumber: true,
-            }}
-            required
-          />
-        )}
       </div>
 
       <FormTextarea
         label="Custom Instructions"
         methods={form}
         name="userInstructions"
-        placeholder="e.g. Focus on chapter 3, make questions harder, only ask about dates… (optional)"
+        placeholder="e.g. Focus on important sections, make questions harder… (optional)"
       />
 
       <div className="flex gap-2">

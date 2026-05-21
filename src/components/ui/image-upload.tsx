@@ -45,7 +45,7 @@ export default function ImageUpload({ value, onChange, loading }: Props) {
   return (
     <div className="border-border bg-muted/30 relative h-40 w-40 overflow-hidden rounded-2xl border">
       {imageSrc ? (
-        <img src={imageSrc} alt="Profile" className="h-full w-full object-cover" />
+        <img src={imageSrc} alt="Profile" key={imageSrc} className="h-full w-full object-cover" />
       ) : (
         <div className="text-muted-foreground flex h-full w-full items-center justify-center">
           <UserCircle2 size={56} />

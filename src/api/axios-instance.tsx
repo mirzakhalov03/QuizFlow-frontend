@@ -10,10 +10,11 @@ api.interceptors.response.use(
   async (err) => {
     const originalRequest = err.config
 
+    const skipRetryUrls = ['/auth/refresh', '/auth/login', '/auth/register']
     if (
       err.response?.status === 401 &&
       !originalRequest._retry &&
-      originalRequest.url !== '/auth/refresh'
+      !skipRetryUrls.includes(originalRequest.url)
     ) {
       originalRequest._retry = true
 

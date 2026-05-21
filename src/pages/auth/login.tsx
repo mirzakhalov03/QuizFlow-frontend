@@ -1,8 +1,11 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/path'
 import { cn } from '@/lib/utils'
+import { authService } from '@/api/services/auth.service'
+import { useAuthStore } from '@/store/use-authstore'
+import { toast } from '@/lib/toast'
 
 const inputClass = cn(
   'w-full h-10 px-3 rounded-md border border-border bg-background text-sm',
@@ -11,10 +14,43 @@ const inputClass = cn(
 
 export default function Login() {
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const setUser = useAuthStore((s) => s.setUser)
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
+    const form = new FormData(e.currentTarget)
+
+    try {
+      await authService.login({
+        email: form.get('email') as string,
+        password: form.get('password') as string,
+      })
+    } catch (err: unknown) {
+      // A 4xx from /auth/login means bad credentials — stop here
+      const e = err as { response?: { data?: { message?: string; detail?: string }; status?: number } }
+      if (e?.response?.status && e.response.status < 500) {
+        const msg = e?.response?.data?.message ?? e?.response?.data?.detail ?? 'Invalid email or password'
+        toast.error(msg)
+        setLoading(false)
+        return
+      }
+      // Non-4xx (e.g. CORS noise from the server-side redirect) — cookies are already set, continue
+    }
+
+    try {
+      const me = await authService.me()
+      const user = me?.user ?? me?.data ?? me
+      setUser(user)
+      const from = searchParams.get('from')
+      navigate(from && from.startsWith('/app') ? from : PATHS.app.dashboard, { replace: true })
+    } catch {
+      toast.error('Invalid email or password')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -43,7 +79,10 @@ export default function Login() {
           <label htmlFor="password" className="text-sm font-medium">
             Password
           </label>
-          <Link to="#" className="text-muted-foreground hover:text-foreground text-xs">
+          <Link
+            to={PATHS.auth.forgotPassword}
+            className="text-muted-foreground hover:text-foreground text-xs"
+          >
             Forgot?
           </Link>
         </div>

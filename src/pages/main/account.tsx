@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import ImageUpload from '@/components/ui/image-upload'
 import ConnectedApps from '@/components/main/account/connected-apps'
+import SetPassword from '@/components/main/account/set-password'
 
 import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
@@ -108,9 +109,10 @@ export default function Account() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN — Connected apps */}
+        {/* RIGHT COLUMN — Connected apps + password setup */}
         <div className="space-y-6">
           <ConnectedApps />
+          <SetPassword />
         </div>
       </section>
     </div>
