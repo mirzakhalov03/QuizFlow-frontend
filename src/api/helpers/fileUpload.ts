@@ -5,6 +5,7 @@ export const getMimeType = (file: File): string => {
     pdf: 'application/pdf',
     doc: 'application/msword',
     docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     txt: 'text/plain',
     md: 'text/markdown',
   }
