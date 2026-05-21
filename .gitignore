@@ -26,3 +26,5 @@ docs
 *.sw?
 .env.development
 .env.production
+.env
+.env.example
