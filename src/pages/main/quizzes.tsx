@@ -5,11 +5,13 @@ import QuizCard from '@/components/main/dashboard/quiz-card'
 import QuizHeader from '@/components/main/quizzes/header'
 import QuizFormWrapper from '@/components/main/quizzes/quiz-form-wrapper'
 import { PendingQuizCard } from '@/components/main/quizzes/pending-quiz-card'
+import { QuizToolbar } from '@/components/main/quizzes/quiz-toolbar'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
 import { QUIZ_LIST } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
 import { useModal } from '@/hooks/useModal'
+import { useQuizListControls } from '@/hooks/useQuizListControls'
 import { cn } from '@/lib/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 import type { PaginatedResponse, Quiz } from '@/types/quiz'
@@ -22,13 +24,20 @@ export default function Quizzes() {
     options: { staleTime: 0 },
   })
 
-  const quizzes = [...(data?.data?.items ?? [])].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  const { processed, sort, setSort, filterTypes, toggleFilterType } = useQuizListControls(
+    data?.data?.items ?? []
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <QuizHeader />
+
+      <QuizToolbar
+        sort={sort}
+        onSortChange={setSort}
+        filterTypes={filterTypes}
+        onToggleFilter={toggleFilterType}
+      />
 
       {isLoading ? (
         <div className="flex justify-center py-16">
@@ -36,12 +45,6 @@ export default function Quizzes() {
         </div>
       ) : (
         <div className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {pendingJobs.map((job) => (
-            <PendingQuizCard key={job.jobId} {...job} />
-          ))}
-          {quizzes.map((quiz) => (
-            <QuizCard key={quiz.id} quiz={quiz} />
-          ))}
           <Button
             onClick={openModal}
             className={cn(
@@ -56,6 +59,14 @@ export default function Quizzes() {
             </div>
             <span className="text-xs font-medium">New Quiz</span>
           </Button>
+
+          {pendingJobs.map((job) => (
+            <PendingQuizCard key={job.jobId} {...job} />
+          ))}
+
+          {processed.map((quiz) => (
+            <QuizCard key={quiz.id} quiz={quiz} />
+          ))}
         </div>
       )}
 

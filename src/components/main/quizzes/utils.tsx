@@ -12,6 +12,15 @@ export const questionCounts = [
   { label: '10 Questions', value: '10' },
   { label: '15 Questions', value: '15' },
   { label: '20 Questions', value: '20' },
+  { label: '25 Questions', value: '25' },
+  { label: '30 Questions', value: '30' },
+]
+
+export const aiModels = [
+  { label: 'Gemini 2.0 Flash', value: 'google/gemini-2.0-flash-001' },
+  { label: 'GPT-4o Mini', value: 'openai/gpt-4o-mini' },
+  { label: 'DeepSeek V3', value: 'deepseek/deepseek-chat-v3' },
+  { label: 'Llama 3.3 70B', value: 'meta-llama/llama-3.3-70b-instruct' },
 ]
 
 export const difficulties = [

@@ -13,29 +13,32 @@ import { QUIZ_ADD } from '@/constants/api-endpoints'
 import { useModal } from '@/hooks/useModal'
 import { toast } from '@/lib/toast'
 import type { ApiResponse, QuestionType } from '@/types/quiz'
-import { questionCounts, questionTypes } from '@/components/main/quizzes/utils'
+import { aiModels, difficulties, questionCounts, questionTypes } from '@/components/main/quizzes/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 
 type QuizFormValues = {
   title: string
   type: QuestionType
   questionCount: string
+  difficulty: string
   isTimerEnabled: boolean
   timerDuration?: number
-  file: File
+  files: File[]
   userInstructions?: string
+  model: string
 }
 
 type GenerateQuizResponse = ApiResponse<{ jobId: string; pollUrl: string }>
 
 type GenerateQuizPayload = {
-  key: string
+  keys: string[]
   title: string
   type: QuestionType
   questionCount: number
   userInstructions?: string
   isTimerEnabled: boolean
   timerDuration?: number
+  model: string
 }
 
 interface QuizFormProps {
@@ -53,8 +56,10 @@ export default function QuizForm({ onBack }: QuizFormProps) {
       title: '',
       type: 'multiple_choice',
       questionCount: '5',
+      difficulty: 'medium',
       isTimerEnabled: false,
       userInstructions: '',
+      model: 'google/gemini-2.0-flash-001',
     },
   })
 
@@ -70,17 +75,26 @@ export default function QuizForm({ onBack }: QuizFormProps) {
 
     ;(async () => {
       try {
-        const { uploadUrl, key } = await quizService.getPresignedUrl(values.file)
-        await quizService.uploadToS3(uploadUrl, values.file)
+        const keys = await Promise.all(
+          values.files.map(async (file) => {
+            const { uploadUrl, key } = await quizService.getPresignedUrl(file)
+            await quizService.uploadToS3(uploadUrl, file)
+            return key
+          }),
+        )
+
+        const difficultyNote = `Generate ${values.difficulty} difficulty questions.`
+        const userInstructions = [difficultyNote, values.userInstructions].filter(Boolean).join(' ')
 
         const res: GenerateQuizResponse = await postRequest<GenerateQuizPayload>(QUIZ_ADD, {
-          key,
+          keys,
           title: values.title,
           type: values.type,
           questionCount: parseInt(values.questionCount, 10),
-          userInstructions: values.userInstructions || undefined,
+          userInstructions,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
+          model: values.model,
         })
 
         setJobReady(tempId, res.data.jobId)
@@ -103,15 +117,17 @@ export default function QuizForm({ onBack }: QuizFormProps) {
 
       <div className="space-y-1">
         <FileUpload
-          label="Source Document"
+          label="Source Documents"
           control={control}
-          name="file"
+          name="files"
           required
+          multiple
           maxSize={25}
+          maxLength={5}
           hideError={false}
-          dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD']}
+          dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
         />
-        <p className="text-muted-foreground text-xs">PDF, Word, TXT or Markdown · max 25 MB</p>
+        <p className="text-muted-foreground text-xs">PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files</p>
       </div>
 
       <div className="bg-muted/40 space-y-3 rounded-xl p-3">
@@ -137,6 +153,17 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           />
         </div>
 
+        <div className="grid grid-cols-2 gap-3">
+          <FormSelect
+            label="Difficulty"
+            options={difficulties}
+            name="difficulty"
+            control={control}
+            required
+          />
+          <FormSelect label="AI Model" options={aiModels} name="model" control={control} required />
+        </div>
+
         <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
 
         {timerEnabled && (
@@ -159,7 +186,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
         label="Custom Instructions"
         methods={form}
         name="userInstructions"
-        placeholder="e.g. Focus on chapter 3, make questions harder, only ask about dates… (optional)"
+        placeholder="e.g. Focus on chapter 3, only ask about dates… (optional)"
       />
 
       <div className="flex gap-2">

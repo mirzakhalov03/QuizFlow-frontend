@@ -5,11 +5,14 @@ import DashboardHeader from '@/components/main/dashboard/dashboard-header'
 import QuizCard from '@/components/main/dashboard/quiz-card'
 import { PendingQuizCard } from '@/components/main/quizzes/pending-quiz-card'
 import QuizFormWrapper from '@/components/main/quizzes/quiz-form-wrapper'
+import QuizForm from '@/components/main/quizzes/quiz-form'
+import { QuizToolbar } from '@/components/main/quizzes/quiz-toolbar'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
 import { QUIZ_LIST } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
 import { useModal } from '@/hooks/useModal'
+import { useQuizListControls } from '@/hooks/useQuizListControls'
 import { cn } from '@/lib/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 import type { PaginatedResponse, Quiz } from '@/types/quiz'
@@ -22,8 +25,8 @@ export default function Dashboard() {
     options: { staleTime: 0 },
   })
 
-  const quizzes = [...(data?.data?.items ?? [])].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  const { processed, sort, setSort, filterTypes, toggleFilterType } = useQuizListControls(
+    data?.data?.items ?? []
   )
   const total = data?.data?.pagination?.count ?? 0
 
@@ -37,8 +40,15 @@ export default function Dashboard() {
         <Stat label="Avg. score" value="—" />
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <h2 className="text-xl font-semibold sm:text-2xl">Quizzes</h2>
+
+        <QuizToolbar
+          sort={sort}
+          onSortChange={setSort}
+          filterTypes={filterTypes}
+          onToggleFilter={toggleFilterType}
+        />
 
         {isLoading ? (
           <div className="flex justify-center py-10">
@@ -46,14 +56,6 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {pendingJobs.map((job) => (
-              <PendingQuizCard key={job.jobId} {...job} />
-            ))}
-
-            {quizzes.map((quiz) => (
-              <QuizCard key={quiz.id} quiz={quiz} />
-            ))}
-
             <Button
               onClick={openModal}
               className={cn(
@@ -68,6 +70,14 @@ export default function Dashboard() {
               </div>
               <span className="text-xs font-medium">New Quiz</span>
             </Button>
+
+            {pendingJobs.map((job) => (
+              <PendingQuizCard key={job.jobId} {...job} />
+            ))}
+
+            {processed.map((quiz) => (
+              <QuizCard key={quiz.id} quiz={quiz} />
+            ))}
           </div>
         )}
       </div>

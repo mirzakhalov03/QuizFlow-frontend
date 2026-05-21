@@ -4,6 +4,7 @@ export type UserProfile = {
   userId: string
   bio: string | null
   profilePicture: string | null
+  isOnboarded: boolean | null
 }
 
 export const userProfileService = {
@@ -15,6 +16,7 @@ export const userProfileService = {
   async updateMe(payload: {
     bio?: string | null
     profilePicture?: string | null
+    isOnboarded?: boolean
   }): Promise<UserProfile> {
     const { data } = await api.put('/userProfile/me', payload)
     return data
