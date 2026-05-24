@@ -7,10 +7,19 @@ export function useQuizTimer(
   enabled = true
 ): { timeRemaining: number; isRunning: boolean } {
   const [timeRemaining, setTimeRemaining] = useState(() => {
+    if (typeof window === 'undefined') return 0
     const saved = localStorage.getItem(storageKey)
     const parsed = saved ? parseInt(saved, 10) : NaN
     return !isNaN(parsed) && parsed > 0 ? parsed : durationSeconds
   })
+
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey)
+    const parsed = saved ? parseInt(saved, 10) : NaN
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setTimeRemaining(!isNaN(parsed) && parsed > 0 ? parsed : durationSeconds)
+  }, [durationSeconds, storageKey])
 
   const onExpireRef = useRef(onExpire)
 
@@ -21,7 +30,7 @@ export function useQuizTimer(
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
-    if (!enabled || durationSeconds <= 0) return
+    if (!enabled || timeRemaining <= 0) return
 
     intervalRef.current = setInterval(() => {
       setTimeRemaining((prev) => {
@@ -40,7 +49,7 @@ export function useQuizTimer(
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [enabled, storageKey, durationSeconds])
+  }, [enabled, storageKey])
 
   return { timeRemaining, isRunning: enabled && timeRemaining > 0 }
 }
