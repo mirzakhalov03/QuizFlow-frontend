@@ -12,6 +12,7 @@ export type Quiz = {
   title: string
   userId: string
   type: QuestionType | null
+  difficulty: string | null
   isTimerEnabled: boolean
   timerDuration: number | null
   userInstructions: string | null

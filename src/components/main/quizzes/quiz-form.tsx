@@ -13,7 +13,12 @@ import { QUIZ_ADD } from '@/constants/api-endpoints'
 import { useModal } from '@/hooks/useModal'
 import { toast } from '@/lib/toast'
 import type { ApiResponse, QuestionType } from '@/types/quiz'
-import { aiModels, difficulties, questionCounts, questionTypes } from '@/components/main/quizzes/utils'
+import {
+  aiModels,
+  difficulties,
+  questionCounts,
+  questionTypes,
+} from '@/components/main/quizzes/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 
 type QuizFormValues = {
@@ -34,6 +39,7 @@ type GenerateQuizPayload = {
   keys: string[]
   title: string
   type: QuestionType
+  difficulty: string
   questionCount: number
   userInstructions?: string
   isTimerEnabled: boolean
@@ -72,7 +78,6 @@ export default function QuizForm({ onBack }: QuizFormProps) {
     closeModal()
     reset()
     addJob({ jobId: tempId, title: values.title, type: values.type })
-
     ;(async () => {
       try {
         const keys = await Promise.all(
@@ -80,18 +85,16 @@ export default function QuizForm({ onBack }: QuizFormProps) {
             const { uploadUrl, key } = await quizService.getPresignedUrl(file)
             await quizService.uploadToS3(uploadUrl, file)
             return key
-          }),
+          })
         )
-
-        const difficultyNote = `Generate ${values.difficulty} difficulty questions.`
-        const userInstructions = [difficultyNote, values.userInstructions].filter(Boolean).join(' ')
 
         const res: GenerateQuizResponse = await postRequest<GenerateQuizPayload>(QUIZ_ADD, {
           keys,
           title: values.title,
           type: values.type,
           questionCount: parseInt(values.questionCount, 10),
-          userInstructions,
+          userInstructions: values.userInstructions || undefined,
+          difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
           model: values.model,
@@ -127,7 +130,9 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           hideError={false}
           dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
         />
-        <p className="text-muted-foreground text-xs">PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files</p>
+        <p className="text-muted-foreground text-xs">
+          PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files
+        </p>
       </div>
 
       <div className="bg-muted/40 space-y-3 rounded-xl p-3">
