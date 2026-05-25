@@ -8,7 +8,6 @@ export const deleteRequest = (url: string, config?: AxiosRequestConfig) =>
   axiosInstance.delete(`${url}`, config).then((res) => res.data)
 
 export const useDelete = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options?: Partial<UseMutationOptions<any, any, string>>,
   config?: AxiosRequestConfig
 ) => {
