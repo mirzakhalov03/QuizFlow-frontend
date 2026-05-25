@@ -4,6 +4,7 @@ import Modal from '@/components/custom/modal'
 import DashboardHeader from '@/components/main/dashboard/dashboard-header'
 import QuizCard from '@/components/main/dashboard/quiz-card'
 import { PendingQuizCard } from '@/components/main/quizzes/pending-quiz-card'
+import QuizFormWrapper from '@/components/main/quizzes/quiz-form-wrapper'
 import QuizForm from '@/components/main/quizzes/quiz-form'
 import { QuizToolbar } from '@/components/main/quizzes/quiz-toolbar'
 import Button from '@/components/ui/button'
@@ -82,7 +83,7 @@ export default function Dashboard() {
       </div>
 
       <Modal size="max-w-3xl" modalKey="quiz-add" title="Add new quiz">
-        <QuizForm />
+        <QuizFormWrapper />
       </Modal>
     </div>
   )

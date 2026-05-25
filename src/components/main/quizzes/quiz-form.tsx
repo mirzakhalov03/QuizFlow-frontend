@@ -1,5 +1,5 @@
 import { useForm, useWatch } from 'react-hook-form'
-import { Settings2, Sparkles } from 'lucide-react'
+import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
 
 import { quizService } from '@/api/services/quiz.service'
 import { postRequest } from '@/hooks/usePost'
@@ -41,7 +41,11 @@ type GenerateQuizPayload = {
   model: string
 }
 
-export default function QuizForm() {
+interface QuizFormProps {
+  onBack: () => void
+}
+
+export default function QuizForm({ onBack }: QuizFormProps) {
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
@@ -68,6 +72,7 @@ export default function QuizForm() {
     closeModal()
     reset()
     addJob({ jobId: tempId, title: values.title, type: values.type })
+
     ;(async () => {
       try {
         const keys = await Promise.all(
@@ -184,9 +189,20 @@ export default function QuizForm() {
         placeholder="e.g. Focus on chapter 3, only ask about dates… (optional)"
       />
 
-      <Button type="submit" className="w-full" rightIcon={<Sparkles className="h-4 w-4" />}>
-        Generate Quiz
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          leftIcon={<ChevronLeft size={16} />}
+          className="flex-1"
+        >
+          Back
+        </Button>
+        <Button type="submit" className="flex-1" rightIcon={<Sparkles className="h-4 w-4" />}>
+          Generate Quiz
+        </Button>
+      </div>
     </form>
   )
 }

@@ -13,6 +13,7 @@ dist-ssr
 *.local
 claude.md
 docs
+.claude
 
 # Editor directories and files
 .vscode/*
@@ -25,3 +26,5 @@ docs
 *.sw?
 .env.development
 .env.production
+.env
+.env.example

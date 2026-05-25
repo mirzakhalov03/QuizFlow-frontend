@@ -14,7 +14,8 @@ export const AuthInitializer = ({ children }: { children: React.ReactNode }) => 
 
       try {
         const { data } = await api.get('/auth/me')
-        setUser(data)
+        const user = data?.user ?? data?.data ?? data
+        setUser(user?.id ? user : null)
       } catch {
         setUser(null)
       } finally {

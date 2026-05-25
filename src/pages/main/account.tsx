@@ -1,52 +1,31 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Check, Link2OffIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import ImageUpload from '@/components/ui/image-upload'
-
-import NotionLogo from '@/assets/notionLogo.png'
-import GoogleLogo from '@/assets/googleLogo.png'
+import ConnectedApps from '@/components/main/account/connected-apps'
+import SetPassword from '@/components/main/account/set-password'
 
 import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
 
 import { imageUploadService } from '@/api/services/userProfile.service'
 
-const connectedApps = [
-  {
-    name: 'Notion',
-    description: 'Sync notes, templates, and study material directly from your workspace.',
-    status: 'Connected',
-    icon: NotionLogo,
-  },
-  {
-    name: 'Google',
-    description: 'Use Google sign-in and keep your account secure across devices.',
-    status: 'Connected',
-    icon: GoogleLogo,
-  },
-]
-
 export default function Account() {
   const { user, updateUser } = useAuthStore()
   const [uploading, setUploading] = useState(false)
 
-  const { profilePicture, fetchProfile, updateProfile, updating } = useUserProfileStore()
+  const { profilePicture, updateProfile, bio } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
   const email = user?.email
-  const loadProfile = useCallback(async () => {
-    await fetchProfile()
 
-    const profile = useUserProfileStore.getState()
-    const userState = useAuthStore.getState().user
-
-    setDraftBio(profile.bio ?? '')
-    setDraftFullName(userState?.fullName ?? '')
-  }, [fetchProfile])
   useEffect(() => {
-    loadProfile()
-  }, [loadProfile])
+    if (user?.fullName) setDraftFullName(user.fullName)
+  }, [user?.fullName])
+
+  useEffect(() => {
+    setDraftBio(bio ?? '')
+  }, [bio])
 
   const handleSave = async () => {
     try {
@@ -77,6 +56,7 @@ export default function Account() {
       </header>
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        {/* LEFT COLUMN — Personal details */}
         <div className="space-y-6">
           <div className="border-border bg-background rounded-2xl border p-5 shadow-sm sm:p-6">
             <div className="flex items-start gap-4">
@@ -129,50 +109,10 @@ export default function Account() {
           </div>
         </div>
 
+        {/* RIGHT COLUMN — Connected apps + password setup */}
         <div className="space-y-6">
-          <div className="border-border bg-background rounded-2xl border p-5 shadow-sm sm:p-6">
-            <h2 className="text-lg font-semibold">Connected apps</h2>
-
-            <p className="text-muted-foreground mt-1 text-sm">
-              Manage external services tied to your account.
-            </p>
-
-            <div className="mt-5 space-y-4">
-              {connectedApps.map((app) => (
-                <article key={app.name} className="border-border rounded-xl border p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-primary inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-semibold">
-                        {app.icon ? (
-                          <img src={app.icon} alt={`${app.name}+logo`} className="h-6 w-6" />
-                        ) : (
-                          <span>{app.name.charAt(0)}</span>
-                        )}
-                      </span>
-
-                      <h3 className="font-semibold">{app.name}</h3>
-                    </div>
-
-                    <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold">
-                      <Check size={12} />
-                      {app.status}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      leftIcon={<Link2OffIcon size={14} />}
-                    >
-                      Disconnect
-                    </Button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
+          <ConnectedApps />
+          <SetPassword />
         </div>
       </section>
     </div>

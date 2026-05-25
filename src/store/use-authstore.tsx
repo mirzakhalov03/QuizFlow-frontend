@@ -5,6 +5,7 @@ type User = {
   id: string
   email: string
   fullName: string
+  hasPassword: boolean
 }
 
 type AuthState = {
