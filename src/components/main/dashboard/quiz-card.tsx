@@ -43,13 +43,12 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        {
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[quiz.type ?? 'mixed']}`}
-          >
-            {TYPE_LABELS[quiz.type ?? 'mixed']}
-          </span>
-        }
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[quiz.type ?? 'mixed']}`}
+        >
+          {TYPE_LABELS[quiz.type ?? 'mixed']}
+        </span>
+
         {quiz.isTimerEnabled && quiz.timerDuration && (
           <span className="text-muted-foreground flex items-center gap-1 text-xs">
             <Clock className="h-3 w-3" />
