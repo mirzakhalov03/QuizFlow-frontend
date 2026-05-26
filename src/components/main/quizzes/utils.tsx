@@ -5,6 +5,7 @@ export const questionTypes = [
   { label: 'True/False', value: 'true_false' },
   { label: 'Multi Select', value: 'multi_select' },
   { label: 'Open Ended', value: 'open_ended' },
+  { label: 'Mixed (Auto)', value: 'mixed' },
 ]
 
 export const questionCounts = [
@@ -34,6 +35,7 @@ export const TYPE_LABELS: Record<QuestionType, string> = {
   multi_select: 'Multi Select',
   true_false: 'True / False',
   open_ended: 'Open Ended',
+  mixed: 'Mixed (Auto)',
 }
 
 export const TYPE_COLORS: Record<QuestionType, string> = {
@@ -41,4 +43,5 @@ export const TYPE_COLORS: Record<QuestionType, string> = {
   multi_select: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
   true_false: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
   open_ended: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  mixed: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
 }

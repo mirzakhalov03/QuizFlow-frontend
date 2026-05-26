@@ -38,7 +38,7 @@ type GenerateQuizResponse = ApiResponse<{ jobId: string; pollUrl: string }>
 type GenerateQuizPayload = {
   keys: string[]
   title: string
-  type: QuestionType
+  type?: QuestionType
   difficulty: string
   questionCount: number
   userInstructions?: string
@@ -91,7 +91,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
         const res: GenerateQuizResponse = await postRequest<GenerateQuizPayload>(QUIZ_ADD, {
           keys,
           title: values.title,
-          type: values.type,
+          type: values.type === 'mixed' ? undefined : values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,
