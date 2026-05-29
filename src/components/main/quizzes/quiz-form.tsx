@@ -65,7 +65,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
             const { uploadUrl, key } = await quizService.getPresignedUrl(file)
             await quizService.uploadToS3(uploadUrl, file)
             return key
-          }),
+          })
         )
 
         const difficultyNote = `Generate ${values.difficulty} difficulty questions.`
@@ -74,9 +74,10 @@ export default function QuizForm({ onBack }: QuizFormProps) {
         const result = await quizService.createQuiz('file', {
           keys,
           title: values.title,
-          type: values.type,
+          type: values.type === 'mixed' ? undefined : values.type,
           questionCount: parseInt(values.questionCount, 10),
-          userInstructions,
+          userInstructions: values.userInstructions || undefined,
+          difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
           model: values.model,
@@ -112,7 +113,9 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           hideError={false}
           dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
         />
-        <p className="text-muted-foreground text-xs">PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files</p>
+        <p className="text-muted-foreground text-xs">
+          PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files
+        </p>
       </div>
 
       <div className="bg-muted/40 space-y-3 rounded-xl p-3">
