@@ -29,8 +29,6 @@ export default function Register() {
         password: form.get('password') as string,
       })
 
-      // Backend sets cookies and returns { user } — log the user in directly
-      // hasPassword is not in the register response but is always true for email signups
       const extracted = res?.data?.user ?? res?.user ?? res
       setUser({ ...extracted, hasPassword: true })
       navigate(PATHS.app.dashboard, { replace: true })

@@ -1,8 +1,9 @@
-import { useForm } from 'react-hook-form'
-import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
+import { useForm, useController } from 'react-hook-form'
+import { Settings2, Sparkles, ChevronLeft, X } from 'lucide-react'
 
-import { notionService } from '@/api/services/notion.service'
+import { quizService } from '@/api/services/quiz.service'
 import { FormSelect } from '@/components/form/form-select'
+import FieldLabel from '@/components/form/form-label'
 import FormInput from '@/components/form/input'
 import FormTextarea from '@/components/form/textarea'
 import Button from '@/components/ui/button'
@@ -15,7 +16,7 @@ import { useModal } from '@/hooks/useModal'
 import { useNotionPages } from '@/hooks/useNotionPages'
 
 type NotionFormValues = {
-  pageId: string
+  pageIds: string[]
   title: string
   type: QuestionType
   questionCount: string
@@ -36,7 +37,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
 
   const form = useForm<NotionFormValues>({
     defaultValues: {
-      pageId: '',
+      pageIds: [],
       title: '',
       type: 'multiple_choice',
       questionCount: '5',
@@ -45,6 +46,11 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   })
 
   const { handleSubmit, reset, control } = form
+  const { field: pageIdsField } = useController({
+    control,
+    name: 'pageIds',
+    rules: { validate: (v) => v.length > 0 || 'Select at least one page' },
+  })
 
   const onSubmit = (values: NotionFormValues) => {
     const tempId = crypto.randomUUID()
@@ -55,14 +61,12 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
 
     ;(async () => {
       try {
-        const result = await notionService.createQuizFromPage({
-          pageId: values.pageId,
+        const result = await quizService.createQuiz('notion', {
+          pageIds: values.pageIds,
           title: values.title,
           type: values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
-          isTimerEnabled: false,
-          timerDuration: undefined,
         })
 
         setJobReady(tempId, result.jobId)
@@ -98,23 +102,55 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
     )
   }
 
-  const pageOptions = pages.map((page) => ({
-    label: page.icon ? `${page.icon} ${page.title}` : page.title,
-    value: page.id,
-  }))
+  const selectedIds: string[] = pageIdsField.value
+  const unselectedPages = pages.filter((p) => !selectedIds.includes(p.id))
+  const selectedPages = pages.filter((p) => selectedIds.includes(p.id))
+
+  const removePage = (id: string) => {
+    pageIdsField.onChange(selectedIds.filter((pid) => pid !== id))
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <FormSelect
-          label="Select Notion Page"
-          options={pageOptions}
-          name="pageId"
-          control={control}
-          required
-          placeholder="Choose a page..."
-        />
-        <p className="text-muted-foreground mt-1 text-xs">Select the page to generate quiz from</p>
+      <div className="space-y-2">
+        <FieldLabel required>Add Notion Pages</FieldLabel>
+        <select
+          className="border-border bg-background w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
+          value=""
+          disabled={unselectedPages.length === 0}
+          onChange={(e) => {
+            const id = e.target.value
+            if (id) pageIdsField.onChange([...selectedIds, id])
+          }}
+        >
+          <option value="" disabled>
+            {unselectedPages.length ? 'Choose a page…' : 'All pages selected'}
+          </option>
+          {unselectedPages.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.icon ? `${p.icon} ${p.title}` : p.title}
+            </option>
+          ))}
+        </select>
+        {selectedPages.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {selectedPages.map((p) => (
+              <span
+                key={p.id}
+                className="bg-primary/10 text-primary flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+              >
+                {p.icon && <span>{p.icon}</span>}
+                {p.title}
+                <button type="button" onClick={() => removePage(p.id)} className="hover:text-primary/70 ml-0.5">
+                  <X size={11} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+        {selectedIds.length === 0 && (
+          <p className="text-destructive text-xs">Select at least one page</p>
+        )}
       </div>
 
       <FormInput

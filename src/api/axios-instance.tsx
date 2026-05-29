@@ -9,6 +9,8 @@ export const api = axios.create({
 
 const SKIP_RETRY_URLS = ['/auth/refresh', '/auth/login', '/auth/register']
 
+let refreshPromise: Promise<void> | null = null
+
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
@@ -21,11 +23,24 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true
 
+      if (!refreshPromise) {
+        refreshPromise = api
+          .post('/auth/refresh')
+          .then(() => {})
+          .catch((refreshErr) => {
+            authEvents.emit('SESSION_EXPIRED')
+            throw refreshErr
+          })
+          .finally(() => {
+            refreshPromise = null
+          })
+      }
+
       try {
-        await api.post('/auth/refresh')
+        await refreshPromise
         return api(originalRequest)
       } catch {
-        authEvents.emit('SESSION_EXPIRED')
+        return Promise.reject(err)
       }
     }
 

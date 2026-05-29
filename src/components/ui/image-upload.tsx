@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Pencil, UserCircle2 } from 'lucide-react'
+import { toast } from '@/lib/toast'
+
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const MAX_SIZE_MB = 15
 
 type Props = {
   value?: string | null
@@ -26,8 +30,19 @@ export default function ImageUpload({ value, onChange, loading }: Props) {
 
   const onSelectImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+    event.target.value = ''
 
-    if (!file || !file.type.startsWith('image/')) return
+    if (!file) return
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error('Only JPEG, PNG, WebP and GIF images are allowed.')
+      return
+    }
+
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      toast.error(`Image must be smaller than ${MAX_SIZE_MB} MB.`)
+      return
+    }
 
     if (localPreview?.startsWith('blob:')) {
       URL.revokeObjectURL(localPreview)
@@ -68,7 +83,7 @@ export default function ImageUpload({ value, onChange, loading }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept={ALLOWED_TYPES.join(',')}
         className="sr-only"
         onChange={onSelectImage}
       />

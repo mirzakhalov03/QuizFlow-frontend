@@ -13,6 +13,7 @@ import { imageUploadService } from '@/api/services/userProfile.service'
 export default function Account() {
   const { user, updateUser } = useAuthStore()
   const [uploading, setUploading] = useState(false)
+  const [updating, setUpdating] = useState(false)
 
   const { profilePicture, updateProfile, bio } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
@@ -28,10 +29,13 @@ export default function Account() {
   }, [bio])
 
   const handleSave = async () => {
+    setUpdating(true)
     try {
       await Promise.all([updateUser({ fullName: draftFullName }), updateProfile({ bio: draftBio })])
     } catch (error) {
       console.error('Failed to update profile', error)
+    } finally {
+      setUpdating(false)
     }
   }
 
