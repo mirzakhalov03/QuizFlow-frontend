@@ -58,7 +58,6 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
     closeModal()
     reset()
     addJob({ jobId: tempId, title: values.title, type: values.type })
-
     ;(async () => {
       try {
         const result = await quizService.createQuiz('notion', {
@@ -119,7 +118,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
       <div className="space-y-2">
         <FieldLabel required>Add Notion Pages</FieldLabel>
         <select
-          className="border-border bg-background w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
+          className="border-border bg-background focus:ring-primary/40 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none disabled:opacity-50"
           value=""
           disabled={unselectedPages.length === 0}
           onChange={(e) => {
@@ -145,7 +144,11 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
               >
                 {p.icon && <span>{p.icon}</span>}
                 {p.title}
-                <button type="button" onClick={() => removePage(p.id)} className="hover:text-primary/70 ml-0.5">
+                <button
+                  type="button"
+                  onClick={() => removePage(p.id)}
+                  className="hover:text-primary/70 ml-0.5"
+                >
                   <X size={11} />
                 </button>
               </span>

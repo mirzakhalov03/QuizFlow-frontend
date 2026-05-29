@@ -24,13 +24,13 @@ export default function Account() {
     if (user?.fullName) setDraftFullName(user.fullName)
   }, [user?.fullName])
 
-useEffect(() => {
-  fetchProfile()
-}, [fetchProfile])
+  useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
 
-useEffect(() => {
-  setDraftBio(bio ?? '')
-}, [bio])
+  useEffect(() => {
+    setDraftBio(bio ?? '')
+  }, [bio])
 
   const handleSave = async () => {
     setUpdating(true)

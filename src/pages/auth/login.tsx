@@ -36,11 +36,15 @@ export default function Login() {
       const from = searchParams.get('from')
       navigate(from && from.startsWith('/app') ? from : PATHS.app.dashboard, { replace: true })
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { message?: string; detail?: string }; status?: number } }
+      const e = err as {
+        response?: { data?: { message?: string; detail?: string }; status?: number }
+      }
       const msg =
         e?.response?.data?.message ??
         e?.response?.data?.detail ??
-        (e?.response?.status ? 'Invalid email or password' : 'Something went wrong. Please try again.')
+        (e?.response?.status
+          ? 'Invalid email or password'
+          : 'Something went wrong. Please try again.')
       toast.error(msg)
     } finally {
       setLoading(false)

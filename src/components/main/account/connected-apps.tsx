@@ -72,8 +72,7 @@ export default function ConnectedApps() {
         {INTEGRATION_PROVIDERS.map((provider) => {
           const meta = PROVIDER_META[provider]
           const isConnected = connected.has(provider)
-          const isPendingThis =
-            isDisconnecting && pendingUrl === INTEGRATION_BY_PROVIDER(provider)
+          const isPendingThis = isDisconnecting && pendingUrl === INTEGRATION_BY_PROVIDER(provider)
 
           return (
             <article key={provider} className="border-border rounded-xl border p-4">

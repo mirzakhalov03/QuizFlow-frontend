@@ -11,7 +11,12 @@ import Button from '@/components/ui/button'
 import { useModal } from '@/hooks/useModal'
 import { toast } from '@/lib/toast'
 import type { QuestionType } from '@/types/quiz'
-import { aiModels, difficulties, questionCounts, questionTypes } from '@/components/main/quizzes/utils'
+import {
+  aiModels,
+  difficulties,
+  questionCounts,
+  questionTypes,
+} from '@/components/main/quizzes/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 
 type QuizFormValues = {
@@ -57,7 +62,6 @@ export default function QuizForm({ onBack }: QuizFormProps) {
     closeModal()
     reset()
     addJob({ jobId: tempId, title: values.title, type: values.type })
-
     ;(async () => {
       try {
         const keys = await Promise.all(

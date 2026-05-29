@@ -25,7 +25,10 @@ export default function ForgotPassword() {
       setSent(true)
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string; detail?: string } } }
-      const msg = e?.response?.data?.message ?? e?.response?.data?.detail ?? 'Something went wrong. Please try again.'
+      const msg =
+        e?.response?.data?.message ??
+        e?.response?.data?.detail ??
+        'Something went wrong. Please try again.'
       toast.error(msg)
     } finally {
       setLoading(false)
@@ -37,7 +40,7 @@ export default function ForgotPassword() {
       <div className="space-y-4">
         <div>
           <h1 className="text-xl font-semibold">Check your email</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             We sent a password reset link to your email address. Follow the link to set a new
             password.
           </p>

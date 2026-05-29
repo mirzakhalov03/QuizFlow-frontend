@@ -34,7 +34,10 @@ export default function Register() {
       navigate(PATHS.app.dashboard, { replace: true })
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string; detail?: string } } }
-      const msg = e?.response?.data?.message ?? e?.response?.data?.detail ?? 'Registration failed. Please try again.'
+      const msg =
+        e?.response?.data?.message ??
+        e?.response?.data?.detail ??
+        'Registration failed. Please try again.'
       toast.error(msg)
     } finally {
       setLoading(false)
