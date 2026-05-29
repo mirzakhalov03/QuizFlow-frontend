@@ -84,9 +84,14 @@ export default function QuizForm({ onBack }: QuizFormProps) {
         })
 
         setJobReady(tempId, result.jobId)
-      } catch {
-        markJobFailed(tempId, 'Generation failed. Please try again.')
-        toast.error('Quiz generation failed. Please try again.')
+      } catch (err: unknown) {
+        const e = err as { response?: { data?: { message?: string; detail?: string } } }
+        const message =
+          e?.response?.data?.message ??
+          e?.response?.data?.detail ??
+          (err instanceof Error ? err.message : 'Generation failed. Please try again.')
+        markJobFailed(tempId, message)
+        toast.error(message)
       }
     })()
   }

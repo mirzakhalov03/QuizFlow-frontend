@@ -15,7 +15,7 @@ export default function Account() {
   const [uploading, setUploading] = useState(false)
   const [updating, setUpdating] = useState(false)
 
-  const { profilePicture, updateProfile, bio } = useUserProfileStore()
+  const { profilePicture, updateProfile, bio, fetchProfile } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
   const email = user?.email
@@ -24,9 +24,13 @@ export default function Account() {
     if (user?.fullName) setDraftFullName(user.fullName)
   }, [user?.fullName])
 
-  useEffect(() => {
-    setDraftBio(bio ?? '')
-  }, [bio])
+useEffect(() => {
+  fetchProfile()
+}, [fetchProfile])
+
+useEffect(() => {
+  setDraftBio(bio ?? '')
+}, [bio])
 
   const handleSave = async () => {
     setUpdating(true)

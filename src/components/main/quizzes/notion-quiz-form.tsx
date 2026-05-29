@@ -70,8 +70,12 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
         })
 
         setJobReady(tempId, result.jobId)
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Generation failed'
+      } catch (err: unknown) {
+        const e = err as { response?: { data?: { message?: string; detail?: string } } }
+        const message =
+          e?.response?.data?.message ??
+          e?.response?.data?.detail ??
+          (err instanceof Error ? err.message : 'Generation failed. Please try again.')
         markJobFailed(tempId, message)
         toast.error(message)
       }

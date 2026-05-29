@@ -19,7 +19,7 @@ api.interceptors.response.use(
     if (
       err.response?.status === 401 &&
       !originalRequest._retry &&
-      !SKIP_RETRY_URLS.includes(originalRequest.url)
+      !SKIP_RETRY_URLS.some((url) => originalRequest.url?.includes(url))
     ) {
       originalRequest._retry = true
 
