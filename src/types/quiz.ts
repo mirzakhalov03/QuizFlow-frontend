@@ -5,6 +5,7 @@ export const QUESTION_TYPES = [
   'multi_select',
   'open_ended',
   'true_false',
+  'mixed',
 ] as const
 
 export type QuestionType = (typeof QUESTION_TYPES)[number]
@@ -14,6 +15,7 @@ export type Quiz = {
   title: string
   userId: string
   type: QuestionType | null
+  difficulty: string | null
   isTimerEnabled: boolean
   timerDuration: number | null
   userInstructions: string | null
