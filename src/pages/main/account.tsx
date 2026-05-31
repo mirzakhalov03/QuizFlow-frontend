@@ -14,7 +14,7 @@ export default function Account() {
   const { user, updateUser } = useAuthStore()
   const [uploading, setUploading] = useState(false)
 
-  const { profilePicture, updateProfile, bio } = useUserProfileStore()
+  const { profilePicture, updateProfile, bio, updating } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
   const email = user?.email
@@ -102,7 +102,7 @@ export default function Account() {
             </div>
 
             <div className="mt-6 flex justify-end">
-              <Button type="button" onClick={handleSave} loading={uploading} disabled={uploading}>
+              <Button type="button" onClick={handleSave} loading={updating} disabled={updating}>
                 Save changes
               </Button>
             </div>
