@@ -102,7 +102,7 @@ export default function Account() {
             </div>
 
             <div className="mt-6 flex justify-end">
-              <Button type="button" onClick={handleSave} loading={updating} disabled={updating}>
+              <Button type="button" onClick={handleSave} loading={uploading} disabled={uploading}>
                 Save changes
               </Button>
             </div>
