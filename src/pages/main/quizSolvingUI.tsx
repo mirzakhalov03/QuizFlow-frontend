@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/path'
+import { toast } from '@/lib/toast'
 import { useGet } from '@/hooks/useGet'
+import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
-import { QUIZ_BY_ID } from '@/constants/api-endpoints'
-import type { ApiResponse, Question, QuizWithQuestions } from '@/types/quiz'
+import { buildSubmitAnswers, hasUngradableQuestions } from '@/lib/quiz-submit'
+import { QUIZ_BY_ID, QUIZ_SUBMIT } from '@/constants/api-endpoints'
+import type { Question, QuizResult, QuizWithQuestions, SubmitAnswer } from '@/types/quiz'
+import type { ApiResponse } from '@/types/api'
 import { useGlobalStore } from '@/store/global-store'
 
 import QuizIntro from '@/components/main/quiz-solving/quiz-intro'
@@ -57,31 +60,81 @@ export default function QuizPage() {
     id ? loadSavedAnswers(id) : {}
   )
   const [activeIndex, setActiveIndex] = useState(0)
+  const [result, setResult] = useState<QuizResult | null>(null)
 
-  const handleSubmit = useCallback(() => {
+  const { mutate: submit, isPending } = usePost<
+    { answers: SubmitAnswer[] },
+    ApiResponse<QuizResult>
+  >()
+
+  const clearSavedState = useCallback(() => {
     if (!id) return
     localStorage.removeItem(answersKey(id))
     localStorage.removeItem(timerKey(id))
-    setPhase('submitted')
-    // TODO: POST /quizzes/:id/submit when backend endpoint is ready
-    // Payload shape:
-    // {
-    //   answers: quiz.questions.map(q => ({
-    //     questionId: q.id,
-    //     selectedOptionIds: q.type !== 'open_ended'
-    //       ? (Array.isArray(answers[q.id]) ? answers[q.id] : answers[q.id] ? [answers[q.id]] : [])
-    //       : undefined,
-    //     textAnswer: q.type === 'open_ended' ? answers[q.id] : undefined,
-    //   }))
-    // }
   }, [id])
+
+  const submitAnswers = useCallback(
+    (payload: SubmitAnswer[]) => {
+      if (!id) return
+      submit(
+        QUIZ_SUBMIT(id),
+        { answers: payload },
+        {
+          onSuccess: (res) => {
+            clearSavedState()
+            setResult(res.data ?? null)
+            setPhase('submitted')
+          },
+          // Errors surface via handleFormError (toast); stay on the solving phase
+          // so the user keeps their answers and can retry.
+        }
+      )
+    },
+    [id, submit, clearSavedState]
+  )
+
+  // Manual submit: require at least one gradable answer, otherwise nudge.
+  const handleSubmit = useCallback(() => {
+    if (!id || !quiz || isPending) return
+    const payload = buildSubmitAnswers(quiz.questions, answers)
+    if (payload.length === 0) {
+      toast.error('Answer at least one question before submitting.')
+      return
+    }
+    submitAnswers(payload)
+  }, [id, quiz, answers, isPending, submitAnswers])
+
+  // Timer expiry: submit whatever has been answered; if nothing, just finish.
+  const handleAutoSubmit = useCallback(() => {
+    if (!id || !quiz) return
+    const payload = buildSubmitAnswers(quiz.questions, answers)
+    if (payload.length === 0) {
+      clearSavedState()
+      setResult(null)
+      setPhase('submitted')
+      return
+    }
+    submitAnswers(payload)
+  }, [id, quiz, answers, submitAnswers, clearSavedState])
 
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
     id ? timerKey(id) : 'quiz-timer-none',
-    handleSubmit,
+    handleAutoSubmit,
     phase === 'solving' && !!quiz?.isTimerEnabled
   )
+
+  const containsMultiSelect = quiz ? hasUngradableQuestions(quiz.questions) : false
+
+  const handleRetake = useCallback(() => {
+    if (!id) return
+    localStorage.removeItem(answersKey(id))
+    localStorage.removeItem(timerKey(id))
+    setAnswers({})
+    setResult(null)
+    setActiveIndex(0)
+    setPhase('intro')
+  }, [id])
 
   const handleAnswerChange = (questionId: string, value: string | string[]) => {
     const updated = { ...answers, [questionId]: value }
@@ -125,7 +178,15 @@ export default function QuizPage() {
   }
 
   if (phase === 'submitted') {
-    return <QuizSubmitted quizTitle={quiz.title} />
+    return (
+      <QuizSubmitted
+        quizTitle={quiz.title}
+        result={result}
+        questions={quiz.questions}
+        answers={answers}
+        onRetake={handleRetake}
+      />
+    )
   }
 
   if (phase === 'intro') {
@@ -154,8 +215,15 @@ export default function QuizPage() {
         />
       ))}
 
-      <div className="flex justify-end pb-8">
-        <Button onClick={handleSubmit}>Submit Quiz</Button>
+      <div className="flex flex-col items-end gap-2 pb-8">
+        {containsMultiSelect && (
+          <p className="text-muted-foreground text-sm">
+            Multi-select quizzes aren’t gradable yet — submission is disabled.
+          </p>
+        )}
+        <Button onClick={handleSubmit} disabled={containsMultiSelect || isPending}>
+          {isPending ? 'Submitting…' : 'Submit Quiz'}
+        </Button>
       </div>
     </div>
   )

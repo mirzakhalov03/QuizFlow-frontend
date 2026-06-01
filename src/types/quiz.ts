@@ -1,4 +1,4 @@
- 
+export type { ApiResponse, PaginatedResponse } from './api'
 
 export const QUESTION_TYPES = [
   'multiple_choice',
@@ -60,4 +60,19 @@ export type Question = {
 
 export type QuizWithQuestions = Quiz & {
   questions: Question[]
+}
+
+export type SubmitAnswer = {
+  questionId: string
+  selectedOptionId?: string
+  textAnswer?: string
+}
+
+export type QuizResult = {
+  id: string
+  userId: string
+  quizId: string
+  totalQuestions: number
+  correctAnswers: number
+  wrongAnswers: number
 }

@@ -9,15 +9,9 @@ type ByokKeyCardProps = {
   isDeleting: boolean
 }
 
-export function ByokKeyCard({
-  apiKey,
-  icon,
-  onEdit,
-  onDelete,
-  isDeleting,
-}: ByokKeyCardProps) {
+export function ByokKeyCard({ apiKey, icon, onEdit, onDelete, isDeleting }: ByokKeyCardProps) {
   return (
-    <article className="border-border bg-card hover:border-primary/40 flex flex-col justify-between rounded-xl border p-4 transition-all shadow-sm">
+    <article className="border-border bg-card hover:border-primary/40 flex flex-col justify-between rounded-xl border p-4 shadow-sm transition-all">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <div className="bg-primary/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
@@ -28,10 +22,10 @@ export function ByokKeyCard({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-sm font-semibold text-foreground" title={apiKey.keyName}>
+            <h3 className="text-foreground truncate text-sm font-semibold" title={apiKey.keyName}>
               {apiKey.keyName}
             </h3>
-            <p className="text-muted-foreground text-[11px] font-medium uppercase tracking-wider">
+            <p className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
               {apiKey.provider}
             </p>
           </div>
@@ -58,7 +52,7 @@ export function ByokKeyCard({
 
       <div className="mt-4">
         <div className="bg-muted/40 border-border/50 rounded-lg border px-3 py-2">
-          <code className="text-muted-foreground break-all font-mono text-[11px] tracking-tight">
+          <code className="text-muted-foreground font-mono text-[11px] tracking-tight break-all">
             {apiKey.maskedKey}
           </code>
         </div>
