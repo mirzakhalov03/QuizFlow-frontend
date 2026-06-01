@@ -16,7 +16,6 @@ export default function SetPassword() {
   const [resetSent, setResetSent] = useState(false)
   const { user, setUser } = useAuthStore()
 
-  // User has no password yet — let them set one directly
   if (!user?.hasPassword) {
     const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault()
@@ -69,7 +68,6 @@ export default function SetPassword() {
     )
   }
 
-  // User already has a password — send a reset link to their email automatically
   const sendResetLink = async () => {
     setLoading(true)
     try {

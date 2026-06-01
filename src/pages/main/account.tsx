@@ -14,9 +14,9 @@ import { imageUploadService } from '@/api/services/userProfile.service'
 export default function Account() {
   const { user, updateUser } = useAuthStore()
   const [uploading, setUploading] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const [updating, setUpdating] = useState(false)
 
-  const { profilePicture, updateProfile, bio } = useUserProfileStore()
+  const { profilePicture, updateProfile, bio, fetchProfile } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
   const email = user?.email
@@ -26,17 +26,22 @@ export default function Account() {
   }, [user?.fullName])
 
   useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
+
+  useEffect(() => {
     setDraftBio(bio ?? '')
   }, [bio])
 
   const handleSave = async () => {
+    setUpdating(true)
     try {
       setSaving(true)
       await Promise.all([updateUser({ fullName: draftFullName }), updateProfile({ bio: draftBio })])
     } catch (error) {
       console.error('Failed to update profile', error)
     } finally {
-      setSaving(false)
+      setUpdating(false)
     }
   }
 
