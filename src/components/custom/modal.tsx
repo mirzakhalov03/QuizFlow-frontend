@@ -1,6 +1,7 @@
 import { useModal } from '@/hooks/useModal'
 import { cn } from '@/lib/utils'
 import { ReactNode, useCallback, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { ClassNameValue } from 'tailwind-merge'
 import { X } from 'lucide-react'
 
@@ -77,7 +78,7 @@ const Modal = ({
 
   if (!isOpen) return null
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
@@ -131,7 +132,8 @@ const Modal = ({
 
         <div className={title || description ? 'mt-4' : ''}>{children}</div>
       </div>
-    </div>
+    </div>,
+    document.getElementById('modal-root') || document.body
   )
 }
 

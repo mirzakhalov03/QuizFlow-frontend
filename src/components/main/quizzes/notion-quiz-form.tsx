@@ -22,7 +22,7 @@ type NotionFormValues = {
   userInstructions?: string
 }
 
-interface NotionQuizFormProps {
+type NotionQuizFormProps = {
   onBack: () => void
 }
 

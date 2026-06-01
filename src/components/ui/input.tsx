@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { Eye, EyeOff, Search } from 'lucide-react'
 import { ClassNameValue } from 'tailwind-merge'
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   fullWidth?: boolean
   suffix?: React.ReactNode
   prefixIcon?: React.ReactNode

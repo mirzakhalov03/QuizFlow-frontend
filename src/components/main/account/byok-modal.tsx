@@ -8,44 +8,42 @@ import { usePost } from '@/hooks/usePost'
 import { toast } from '@/lib/toast'
 import { ByokKey } from '@/types/byok'
 import { useGlobalStore } from '@/store/global-store'
-import { BYOK } from '@/constants/api-endpoints'
+import { BYOK_BY_ID, BYOK } from '@/constants/api-endpoints'
+
+const PROVIDER_OPTIONS = [
+  { value: 'openai', label: 'OpenAI' },
+  { value: 'anthropic', label: 'Anthropic' },
+  { value: 'google', label: 'Google' },
+  { value: 'openrouter', label: 'OpenRouter' },
+  { value: 'other', label: 'Other' },
+]
 
 export default function ByokModal() {
   const queryClient = useQueryClient()
-    const {getData} = useGlobalStore()
+  const { getData } = useGlobalStore()
   const item = getData<ByokKey>(BYOK)
   const form = useForm<ByokKey>({
-    defaultValues:{
-      ...item
-    }
+    defaultValues: {
+      ...item,
+    },
   })
-  const {handleSubmit,reset,control} = form
+  const { handleSubmit, reset, control } = form
 
-  const onSuccess = ()=>{
-    queryClient.invalidateQueries({queryKey:[]})
-    toast.success("New key added!")
+  const onSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: [BYOK] })
+    toast.success(item ? 'Key updated successfully!' : 'New key added!')
     reset()
   }
-  const {mutate:editMutate,isPending:isUpdating} = usePatch({onSuccess})
-  const {mutate:addMutate,isPending:isCreating} = usePost({onSuccess})
+  const { mutate: editMutate, isPending: isUpdating } = usePatch({ onSuccess })
+  const { mutate: addMutate, isPending: isCreating } = usePost({ onSuccess })
 
-  
-  const PROVIDER_OPTIONS = [
-    { value: 'openai', label: 'OpenAI' },
-    { value: 'anthropic', label: 'Anthropic' },
-    { value: 'google', label: 'Google' },
-    { value: 'openrouter', label: 'OpenRouter' },
-    { value: 'other', label: 'Other' },
-  ]
-
-  const onSubmit=(value:ByokKey)=>{
-    if(item){
-     editMutate(`BYOK/${item?.id}`, value)
-    }else{
-      addMutate(BYOK,value)
+  const onSubmit = (value: ByokKey) => {
+    if (item) {
+      editMutate(BYOK_BY_ID(item.id), value)
+    } else {
+      addMutate(BYOK, value)
     }
   }
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
       <FormInput
@@ -62,17 +60,11 @@ export default function ByokModal() {
         label="Provider"
         options={PROVIDER_OPTIONS}
         required
-        labelKey='label'
-        valueKey='value'
+        labelKey="label"
+        valueKey="value"
       />
 
-      <FormInput
-        methods={form}
-        name="keyValue"
-        label="API Key"
-        type="password"
-        required={!item}
-      />
+      <FormInput methods={form} name="keyValue" label="API Key" type="password" required={!item} />
       {item?.id && (
         <p className="text-muted-foreground text-xs italic">Leave blank to keep current key.</p>
       )}

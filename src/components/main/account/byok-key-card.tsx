@@ -1,7 +1,7 @@
 import { Edit3, Key, Trash2 } from 'lucide-react'
 import { ByokKey } from '@/types/byok'
 
-interface ByokKeyCardProps {
+type ByokKeyCardProps = {
   apiKey: ByokKey
   icon: string | null
   onEdit: (key: ByokKey) => void

@@ -11,11 +11,10 @@ import { useModal } from '@/hooks/useModal'
 import ByokModal from './byok-modal'
 import { ByokKeyCard } from './byok-key-card'
 import { ByokSkeleton } from './byok-skeleton'
-
 import { useGlobalStore } from '@/store/global-store'
 import { PaginatedResponse } from '@/types/api'
 
-const PROVIDER_ICONS: Record<string, string | null> = {
+const PROVIDER_ICONS = {
   openai: 'https://www.google.com/s2/favicons?domain=openai.com&sz=128',
   anthropic: 'https://www.google.com/s2/favicons?domain=anthropic.com&sz=128',
   google: 'https://www.google.com/s2/favicons?domain=google.com&sz=128',
@@ -25,7 +24,7 @@ const PROVIDER_ICONS: Record<string, string | null> = {
 export default function ByokSection() {
   const queryClient = useQueryClient()
   const { openModal } = useModal('byok-modal')
-  const { setData, getData,clearKey } = useGlobalStore()
+  const { setData, getData, clearKey } = useGlobalStore()
   const { data: byokResponse, isLoading } = useGet<PaginatedResponse<ByokKey>>(BYOK)
   const byokKeys = byokResponse?.data?.items || []
   const {
@@ -42,10 +41,9 @@ export default function ByokSection() {
     setData(BYOK, value)
     openModal()
   }
-  const handleAdd = ()=>{
+  const handleAdd = () => {
     clearKey(BYOK)
     openModal()
-    
   }
   const item = getData(BYOK)
 
@@ -58,7 +56,7 @@ export default function ByokSection() {
             Use your own API keys for quiz generation.
           </p>
         </div>
-        <Button size="sm" onClick={() => handleAdd()} leftIcon={<Plus size={16} />}>
+        <Button size="sm" onClick={handleAdd} leftIcon={<Plus size={16} />}>
           Add Key
         </Button>
       </div>
@@ -76,14 +74,14 @@ export default function ByokSection() {
               <Key size={28} className="text-muted-foreground/50" />
             </div>
             <h3 className="text-base font-semibold">No API keys yet</h3>
-            <p className="text-muted-foreground mx-auto mt-2 max-w-[300px] text-sm">
+            <p className="text-muted-foreground mx-auto mt-2 max-w-75 text-sm">
               Add your first AI provider key to start generating quizzes using your own credits.
             </p>
             <Button
               variant="outline"
               size="sm"
               className="mt-6"
-              onClick={() => handleAdd()}
+              onClick={handleAdd}
               leftIcon={<Plus size={16} />}
             >
               Add Your First Key

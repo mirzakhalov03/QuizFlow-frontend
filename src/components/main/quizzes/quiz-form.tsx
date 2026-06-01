@@ -47,7 +47,7 @@ type GenerateQuizPayload = {
   model: string
 }
 
-interface QuizFormProps {
+type QuizFormProps = {
   onBack: () => void
 }
 
