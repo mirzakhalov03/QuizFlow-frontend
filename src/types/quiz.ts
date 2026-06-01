@@ -1,3 +1,5 @@
+ 
+
 export const QUESTION_TYPES = [
   'multiple_choice',
   'multi_select',
@@ -59,13 +61,3 @@ export type Question = {
 export type QuizWithQuestions = Quiz & {
   questions: Question[]
 }
-
-export type ApiResponse<T> = {
-  success: boolean
-  data: T
-}
-
-export type PaginatedResponse<T> = ApiResponse<{
-  items: T[]
-  pagination: { limit: number; offset: number; count: number }
-}>

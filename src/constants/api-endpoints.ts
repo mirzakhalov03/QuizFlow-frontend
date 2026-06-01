@@ -7,3 +7,6 @@ export const PRESIGNED_URL = '/upload/presigned-url'
 
 export const INTEGRATIONS = '/integrations'
 export const INTEGRATION_BY_PROVIDER = (provider: string) => `/integrations/${provider}`
+
+export const BYOK = '/byok'
+export const BYOK_BY_ID = (id: string) => `/byok/${id}`

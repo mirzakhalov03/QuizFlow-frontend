@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import ImageUpload from '@/components/ui/image-upload'
 import ConnectedApps from '@/components/main/account/connected-apps'
 import SetPassword from '@/components/main/account/set-password'
+import ByokSection from '@/components/main/account/byok-section'
 
 import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
@@ -35,6 +36,7 @@ export default function Account() {
   const handleSave = async () => {
     setUpdating(true)
     try {
+      setSaving(true)
       await Promise.all([updateUser({ fullName: draftFullName }), updateProfile({ bio: draftBio })])
     } catch (error) {
       console.error('Failed to update profile', error)
@@ -110,19 +112,23 @@ export default function Account() {
             </div>
 
             <div className="mt-6 flex justify-end">
-              <Button type="button" onClick={handleSave} loading={updating} disabled={updating}>
+              <Button type="button" onClick={handleSave} loading={saving} disabled={saving}>
                 Save changes
               </Button>
             </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN — Connected apps + password setup */}
+         
         <div className="space-y-6">
           <ConnectedApps />
-          <SetPassword />
         </div>
       </section>
+ 
+      <ByokSection />
+
+     
+      <SetPassword />
     </div>
   )
 }
