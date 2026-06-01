@@ -19,7 +19,7 @@ const PROVIDER_ICONS = {
   anthropic: 'https://www.google.com/s2/favicons?domain=anthropic.com&sz=128',
   google: 'https://www.google.com/s2/favicons?domain=google.com&sz=128',
   openrouter: 'https://www.google.com/s2/favicons?domain=openrouter.ai&sz=128',
-}
+} 
 
 export default function ByokSection() {
   const queryClient = useQueryClient()
@@ -89,16 +89,19 @@ export default function ByokSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {byokKeys.map((key) => (
-              <ByokKeyCard
-                key={key.id}
-                apiKey={key}
-                icon={PROVIDER_ICONS[key.provider.toLowerCase()] || null}
-                onEdit={handleEdit}
-                onDelete={(id) => deleteKey(BYOK_BY_ID(id))}
-                isDeleting={isDeleting && deletingId === BYOK_BY_ID(key.id)}
-              />
-            ))}
+            {byokKeys.map((key) => {
+              const provider = key.provider.toLowerCase() as keyof typeof PROVIDER_ICONS
+              return (
+                <ByokKeyCard
+                  key={key.id}
+                  apiKey={key}
+                  icon={PROVIDER_ICONS[provider] ?? null}
+                  onEdit={handleEdit}
+                  onDelete={(id) => deleteKey(BYOK_BY_ID(id))}
+                  isDeleting={isDeleting && deletingId === BYOK_BY_ID(key.id)}
+                />
+              )
+            })}
           </div>
         )}
       </div>
