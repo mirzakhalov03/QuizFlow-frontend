@@ -67,6 +67,8 @@ export default function QuizPage() {
     ApiResponse<QuizResult>
   >()
 
+  const containsMultiSelect = quiz ? hasUngradableQuestions(quiz.questions) : false
+
   const clearSavedState = useCallback(() => {
     if (!id) return
     localStorage.removeItem(answersKey(id))
@@ -104,10 +106,12 @@ export default function QuizPage() {
     submitAnswers(payload)
   }, [id, quiz, answers, isPending, submitAnswers])
 
-  // Timer expiry: submit whatever has been answered; if nothing, just finish.
+  // Timer expiry: submit whatever has been answered. Multi-select quizzes can't
+  // be graded yet (manual submit is disabled), so go straight to the unscored
+  // review rather than POST a partial, misleadingly-low score.
   const handleAutoSubmit = useCallback(() => {
     if (!id || !quiz) return
-    const payload = buildSubmitAnswers(quiz.questions, answers)
+    const payload = containsMultiSelect ? [] : buildSubmitAnswers(quiz.questions, answers)
     if (payload.length === 0) {
       clearSavedState()
       setResult(null)
@@ -115,7 +119,7 @@ export default function QuizPage() {
       return
     }
     submitAnswers(payload)
-  }, [id, quiz, answers, submitAnswers, clearSavedState])
+  }, [id, quiz, answers, containsMultiSelect, submitAnswers, clearSavedState])
 
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
@@ -123,8 +127,6 @@ export default function QuizPage() {
     handleAutoSubmit,
     phase === 'solving' && !!quiz?.isTimerEnabled
   )
-
-  const containsMultiSelect = quiz ? hasUngradableQuestions(quiz.questions) : false
 
   const handleRetake = useCallback(() => {
     if (!id) return
