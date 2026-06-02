@@ -64,7 +64,7 @@ export default function Account() {
         <h1 className="text-primary text-2xl font-semibold sm:text-3xl">Account Details</h1>
       </header>
 
-      <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         {/* LEFT COLUMN — Personal details */}
         <div className="space-y-6">
           <div className="border-border bg-background rounded-2xl border p-5 shadow-sm sm:p-6">
@@ -81,29 +81,29 @@ export default function Account() {
             </div>
 
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <label className="grid gap-1.5 text-sm sm:col-span-1">
+              <label className="grid min-w-0 gap-1.5 text-sm sm:col-span-1">
                 Full name
                 <input
-                  className="border-border bg-background h-11 rounded-md border px-3"
+                  className="border-border bg-background h-11 w-full min-w-0 rounded-md border px-3"
                   value={draftFullName}
                   onChange={(e) => setDraftFullName(e.target.value)}
                 />
               </label>
 
-              <label className="grid gap-1.5 text-sm sm:col-span-1">
+              <label className="grid min-w-0 gap-1.5 text-sm sm:col-span-1">
                 Email
                 <input
                   type="email"
                   value={email ?? ''}
                   disabled
-                  className="border-border bg-background h-11 rounded-md border px-3 opacity-70"
+                  className="border-border bg-background h-11 w-full min-w-0 rounded-md border px-3 opacity-70"
                 />
               </label>
 
-              <label className="grid gap-1.5 text-sm sm:col-span-2">
+              <label className="grid min-w-0 gap-1.5 text-sm sm:col-span-2">
                 Bio
                 <textarea
-                  className="border-border bg-background rounded-md border px-3 py-2"
+                  className="border-border bg-background w-full min-w-0 rounded-md border px-3 py-2"
                   value={draftBio}
                   onChange={(e) => setDraftBio(e.target.value)}
                 />
