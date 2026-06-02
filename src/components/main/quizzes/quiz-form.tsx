@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
 
@@ -9,11 +10,15 @@ import { FormSelect } from '@/components/form/form-select'
 import FormTextarea from '@/components/form/textarea'
 import Button from '@/components/ui/button'
 import { useModal } from '@/hooks/useModal'
+import { useByokKeys } from '@/hooks/useByokKeys'
 import { toast } from '@/lib/toast'
 import type { QuestionType } from '@/types/quiz'
 import {
   aiModels,
+  buildByokOptionValue,
+  DEFAULT_MODEL,
   difficulties,
+  parseModelSelection,
   questionCounts,
   questionTypes,
 } from '@/components/main/quizzes/utils'
@@ -41,6 +46,8 @@ export default function QuizForm({ onBack }: QuizFormProps) {
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
   const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
 
+  const { keys: byokKeys } = useByokKeys()
+
   const form = useForm<QuizFormValues>({
     defaultValues: {
       title: '',
@@ -49,15 +56,39 @@ export default function QuizForm({ onBack }: QuizFormProps) {
       difficulty: 'medium',
       isTimerEnabled: false,
       userInstructions: '',
-      model: 'google/gemini-2.0-flash-001',
+      model: DEFAULT_MODEL,
     },
   })
 
-  const { handleSubmit, reset, control } = form
+  const { handleSubmit, reset, control, setValue } = form
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
+
+  // Surface the user's BYOK keys as a separate group above the built-in models.
+  const modelOptions = useMemo<{ label: string; value: string; group?: string }[]>(() => {
+    if (byokKeys.length === 0) return aiModels
+    return [
+      ...byokKeys.map((key) => ({
+        label: `${key.keyName} (${key.provider})`,
+        value: buildByokOptionValue(key.id),
+        group: 'Your Keys (BYOK)',
+      })),
+      ...aiModels.map((model) => ({ ...model, group: 'Models' })),
+    ]
+  }, [byokKeys])
+
+  // Default to the user's first key when they have one, but never override a
+  // manual change.
+  const byokDefaultApplied = useRef(false)
+  useEffect(() => {
+    if (!byokDefaultApplied.current && byokKeys.length > 0) {
+      setValue('model', buildByokOptionValue(byokKeys[0].id))
+      byokDefaultApplied.current = true
+    }
+  }, [byokKeys, setValue])
 
   const onSubmit = (values: QuizFormValues) => {
     const tempId = crypto.randomUUID()
+    const { model, apiKeyId } = parseModelSelection(values.model)
 
     closeModal()
     reset()
@@ -81,7 +112,8 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
-          model: values.model,
+          model,
+          apiKeyId,
         })
 
         setJobReady(tempId, result.jobId)
@@ -114,6 +146,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           name="files"
           required
           multiple
+          isPaste={false}
           maxSize={25}
           maxLength={5}
           hideError={false}
@@ -130,7 +163,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           Quiz Settings
         </p>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormSelect
             label="Question Type"
             options={questionTypes}
@@ -147,7 +180,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormSelect
             label="Difficulty"
             options={difficulties}
@@ -155,7 +188,14 @@ export default function QuizForm({ onBack }: QuizFormProps) {
             control={control}
             required
           />
-          <FormSelect label="AI Model" options={aiModels} name="model" control={control} required />
+          <FormSelect
+            label="AI Model"
+            options={modelOptions}
+            groupKey="group"
+            name="model"
+            control={control}
+            required
+          />
         </div>
 
         <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
@@ -183,7 +223,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
         placeholder="e.g. Focus on chapter 3, only ask about dates… (optional)"
       />
 
-      <div className="flex gap-2">
+      <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">
         <Button
           type="button"
           variant="outline"

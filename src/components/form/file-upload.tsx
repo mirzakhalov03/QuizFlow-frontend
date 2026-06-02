@@ -181,7 +181,12 @@ export default function FileUpload<TForm extends FieldValues>({
             <Spinner />
           </div>
         )}
-        <div className={fileArray.length ? 'pb-3' : ''}>
+        <div
+          className={cn(
+            fileArray.length &&
+              'border-border max-h-40 space-y-1 overflow-y-auto rounded-lg border p-1.5'
+          )}
+        >
           {fileArray.map((file, index) => {
             if (!(file instanceof File)) {
               return null
@@ -190,9 +195,12 @@ export default function FileUpload<TForm extends FieldValues>({
             if (!url) return null
 
             return (
-              <main key={index} className="flex items-center justify-between gap-4">
+              <main
+                key={index}
+                className="hover:bg-muted/50 flex items-center justify-between gap-4 rounded-md px-2 py-1"
+              >
                 <a
-                  className="inline-block truncate text-blue-500"
+                  className="inline-block truncate text-sm text-blue-500"
                   target="_blank"
                   href={url}
                   rel="noreferrer noopener"
