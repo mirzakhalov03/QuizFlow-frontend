@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Check, Clock, Copy, Play, Share2, Trash2 } from 'lucide-react'
+import { Check, Clock, Copy, Play, Share2, Trash2, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { useDelete } from '@/hooks/useDelete'
@@ -116,6 +116,21 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
           <span className="text-muted-foreground flex items-center gap-1 text-xs">
             <Clock className="h-3 w-3" />
             {Math.round(quiz.timerDuration / 60)} min
+          </span>
+        )}
+
+        {quiz.tokenUsage && (
+          <span
+            className="text-muted-foreground flex items-center gap-1 text-xs"
+            title={
+              'Prompt: ' +
+              quiz.tokenUsage.prompt_tokens.toLocaleString() +
+              ', Completion: ' +
+              quiz.tokenUsage.completion_tokens.toLocaleString()
+            }
+          >
+            <Zap className="h-3 w-3 text-amber-500" />
+            {quiz.tokenUsage.total_tokens.toLocaleString()}
           </span>
         )}
       </div>
