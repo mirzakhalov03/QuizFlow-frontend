@@ -37,22 +37,22 @@ export default function PublicQuizView() {
       <div className="mb-12 border-b pb-8">
         <h1 className="text-3xl font-bold md:text-4xl">{quiz.title}</h1>
         {quiz.userInstructions && (
-          <p className="text-muted-foreground mt-4 whitespace-pre-wrap leading-relaxed">
+          <p className="text-muted-foreground mt-4 leading-relaxed whitespace-pre-wrap">
             {quiz.userInstructions}
           </p>
         )}
       </div>
 
       <div className="space-y-16">
-        {quiz.questions.map((question, index) => (
+        {quiz.questions?.map((question, index) => (
           <div key={question.id} className="space-y-6">
-            <h3 className="flex items-start text-xl font-semibold leading-snug">
+            <h3 className="flex items-start text-xl leading-snug font-semibold">
               <span className="text-primary mr-3 shrink-0">Q{index + 1}.</span>
               {question.text}
             </h3>
 
             <div className="grid gap-3 pl-0 md:pl-10">
-              {question.options.map((option) => (
+              {question.options?.map((option) => (
                 <div
                   key={option.id}
                   className="bg-card border-border rounded-xl border p-4 text-sm md:text-base"

@@ -76,10 +76,17 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
   }, [shareToken])
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(publicUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-    toast.success('Link copied to clipboard')
+    if (!publicUrl) return
+    navigator.clipboard
+      .writeText(publicUrl)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+        toast.success('Link copied to clipboard')
+      })
+      .catch(() => {
+        toast.error('Failed to copy link')
+      })
   }
 
   return (
