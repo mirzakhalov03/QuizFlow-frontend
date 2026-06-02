@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import ImageUpload from '@/components/ui/image-upload'
 import ConnectedApps from '@/components/main/account/connected-apps'
 import SetPassword from '@/components/main/account/set-password'
+import ByokSection from '@/components/main/account/byok-section'
 
 import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
@@ -13,8 +14,9 @@ import { imageUploadService } from '@/api/services/userProfile.service'
 export default function Account() {
   const { user, updateUser } = useAuthStore()
   const [uploading, setUploading] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  const { profilePicture, updateProfile, bio } = useUserProfileStore()
+  const { profilePicture, updateProfile, bio, fetchProfile } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
   const email = user?.email
@@ -24,14 +26,21 @@ export default function Account() {
   }, [user?.fullName])
 
   useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
+
+  useEffect(() => {
     setDraftBio(bio ?? '')
   }, [bio])
 
   const handleSave = async () => {
     try {
+      setSaving(true)
       await Promise.all([updateUser({ fullName: draftFullName }), updateProfile({ bio: draftBio })])
     } catch (error) {
       console.error('Failed to update profile', error)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -102,19 +111,21 @@ export default function Account() {
             </div>
 
             <div className="mt-6 flex justify-end">
-              <Button type="button" onClick={handleSave} loading={updating} disabled={updating}>
+              <Button type="button" onClick={handleSave} loading={saving} disabled={saving}>
                 Save changes
               </Button>
             </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN — Connected apps + password setup */}
         <div className="space-y-6">
           <ConnectedApps />
-          <SetPassword />
         </div>
       </section>
+
+      <ByokSection />
+
+      <SetPassword />
     </div>
   )
 }

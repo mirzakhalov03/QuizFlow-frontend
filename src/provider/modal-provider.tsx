@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom'
 import { createContext, FC, ReactNode, useCallback, useContext, useState } from 'react'
 
-interface ModalContextType {
+type ModalContextType = {
   modals: Record<string, boolean>
   openModal: (key: string) => void
   closeModal: (key: string) => void

@@ -4,7 +4,7 @@ import { Input } from '../ui/input'
 import FieldError from './form-error'
 import FieldLabel from './form-label'
 
-interface Props<IForm extends FieldValues> {
+type Props<IForm extends FieldValues> = {
   methods: UseFormReturn<IForm>
   name: Path<IForm>
   label?: string

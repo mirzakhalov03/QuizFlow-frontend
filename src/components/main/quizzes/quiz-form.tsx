@@ -2,17 +2,15 @@ import { useForm, useWatch } from 'react-hook-form'
 import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
 
 import { quizService } from '@/api/services/quiz.service'
-import { postRequest } from '@/hooks/usePost'
 import FileUpload from '@/components/form/file-upload'
 import { FormCheckbox } from '@/components/form/form-checkbox'
 import FormInput from '@/components/form/input'
 import { FormSelect } from '@/components/form/form-select'
 import FormTextarea from '@/components/form/textarea'
 import Button from '@/components/ui/button'
-import { QUIZ_ADD } from '@/constants/api-endpoints'
 import { useModal } from '@/hooks/useModal'
 import { toast } from '@/lib/toast'
-import type { ApiResponse, QuestionType } from '@/types/quiz'
+import type { QuestionType } from '@/types/quiz'
 import {
   aiModels,
   difficulties,
@@ -30,20 +28,6 @@ type QuizFormValues = {
   timerDuration?: number
   files: File[]
   userInstructions?: string
-  model: string
-}
-
-type GenerateQuizResponse = ApiResponse<{ jobId: string; pollUrl: string }>
-
-type GenerateQuizPayload = {
-  keys: string[]
-  title: string
-  type?: QuestionType
-  difficulty: string
-  questionCount: number
-  userInstructions?: string
-  isTimerEnabled: boolean
-  timerDuration?: number
   model: string
 }
 
@@ -88,7 +72,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           })
         )
 
-        const res: GenerateQuizResponse = await postRequest<GenerateQuizPayload>(QUIZ_ADD, {
+        const result = await quizService.createQuiz('file', {
           keys,
           title: values.title,
           type: values.type === 'mixed' ? undefined : values.type,
@@ -100,10 +84,15 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           model: values.model,
         })
 
-        setJobReady(tempId, res.data.jobId)
-      } catch {
-        markJobFailed(tempId, 'Generation failed. Please try again.')
-        toast.error('Quiz generation failed. Please try again.')
+        setJobReady(tempId, result.jobId)
+      } catch (err: unknown) {
+        const e = err as { response?: { data?: { message?: string; detail?: string } } }
+        const message =
+          e?.response?.data?.message ??
+          e?.response?.data?.detail ??
+          (err instanceof Error ? err.message : 'Generation failed. Please try again.')
+        markJobFailed(tempId, message)
+        toast.error(message)
       }
     })()
   }

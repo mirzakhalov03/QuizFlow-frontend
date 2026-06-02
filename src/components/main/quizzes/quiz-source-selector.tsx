@@ -3,7 +3,7 @@ import NotionLogo from '@/assets/notionLogo.png'
 
 type Source = 'file' | 'notion'
 
-interface QuizSourceSelectorProps {
+type QuizSourceSelectorProps = {
   onSelect: (source: Source) => void
 }
 

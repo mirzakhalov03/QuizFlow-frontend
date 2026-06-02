@@ -5,7 +5,7 @@ import FieldError from './form-error'
 import { cn } from '@/lib/utils'
 import { ClassNameValue } from 'tailwind-merge'
 
-interface thisProps<TForm extends FieldValues> {
+type thisProps<TForm extends FieldValues> = {
   name: Path<TForm>
   label?: string
   disabled?: boolean

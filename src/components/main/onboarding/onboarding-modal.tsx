@@ -68,7 +68,11 @@ export default function OnboardingModal() {
     try {
       await updateProfile({ isOnboarded: true })
     } catch {
-      addToast({ type: 'error', title: 'Something went wrong', description: 'Could not save your preferences. Please try again.' })
+      addToast({
+        type: 'error',
+        title: 'Something went wrong',
+        description: 'Could not save your preferences. Please try again.',
+      })
     }
   }
 
@@ -76,7 +80,11 @@ export default function OnboardingModal() {
     try {
       await updateProfile({ bio: compileBio(answers), isOnboarded: true })
     } catch {
-      addToast({ type: 'error', title: 'Something went wrong', description: 'Could not save your preferences. Please try again.' })
+      addToast({
+        type: 'error',
+        title: 'Something went wrong',
+        description: 'Could not save your preferences. Please try again.',
+      })
     }
   }
 
@@ -87,7 +95,9 @@ export default function OnboardingModal() {
       <div className="relative z-50 w-full max-w-lg rounded-lg border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
         <div className="mb-4 text-center">
           <h2 className="text-lg font-semibold">Let's personalize your experience!</h2>
-          <p className="text-muted-foreground mt-1 text-sm">A few quick questions so we can tailor your quizzes.</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            A few quick questions so we can tailor your quizzes.
+          </p>
         </div>
 
         <div className="mb-6 flex justify-center gap-2">

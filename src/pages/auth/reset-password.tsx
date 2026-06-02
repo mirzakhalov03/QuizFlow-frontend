@@ -36,7 +36,10 @@ export default function ResetPassword() {
       navigate(PATHS.auth.login, { replace: true })
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string; detail?: string } } }
-      const msg = e?.response?.data?.message ?? e?.response?.data?.detail ?? 'Reset failed. The link may have expired.'
+      const msg =
+        e?.response?.data?.message ??
+        e?.response?.data?.detail ??
+        'Reset failed. The link may have expired.'
       toast.error(msg)
     } finally {
       setLoading(false)
@@ -48,7 +51,7 @@ export default function ResetPassword() {
       <div className="space-y-4">
         <div>
           <h1 className="text-xl font-semibold">Invalid link</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             This reset link is missing or invalid. Please request a new one.
           </p>
         </div>
