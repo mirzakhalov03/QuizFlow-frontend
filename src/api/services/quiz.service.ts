@@ -21,6 +21,8 @@ type BaseQuizPayload = {
 export type FileQuizPayload = BaseQuizPayload & {
   keys: string[]
   model: string
+  /** Optional stored BYOK key to generate with. Backend support pending. */
+  apiKeyId?: string
 }
 
 export type NotionQuizPayload = BaseQuizPayload & {
