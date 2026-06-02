@@ -7,6 +7,7 @@ import { X } from 'lucide-react'
 
 type Props = {
   modalKey?: string
+  isOpen?: boolean
   title?: ReactNode
   description?: ReactNode
   children?: ReactNode
@@ -34,6 +35,7 @@ const Modal = ({
   description,
   children,
   modalKey = 'default',
+  isOpen: controlledIsOpen,
   classNameTitle,
   classNameIcon,
   className = '',
@@ -41,7 +43,8 @@ const Modal = ({
   onClose,
   closable = true,
 }: Props) => {
-  const { isOpen, closeModal } = useModal(modalKey)
+  const { isOpen: contextIsOpen, closeModal } = useModal(modalKey)
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : contextIsOpen
   const overlayRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
