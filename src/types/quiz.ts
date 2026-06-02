@@ -23,6 +23,7 @@ export type Quiz = {
   createdAt: string
   updatedAt: string
   uploadedAt: string | null
+  shareToken?: string | null
 }
 
 export type QuizJob = {
