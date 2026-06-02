@@ -156,6 +156,13 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
             <div className="flex h-20 items-center justify-center">
               <Spinner size="md" />
             </div>
+          ) : !shareToken ? (
+            <div className="flex flex-col items-center gap-3 py-4 text-center">
+              <p className="text-destructive text-sm">Failed to generate share link.</p>
+              <Button size="sm" onClick={() => enableShare(QUIZ_SHARE_ENABLE(quiz.id), {})}>
+                Retry
+              </Button>
+            </div>
           ) : (
             <>
               <div className="flex gap-2">
