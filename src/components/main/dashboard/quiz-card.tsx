@@ -59,10 +59,10 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         {quiz.tokenUsage && (
           <span
             className="text-muted-foreground flex items-center gap-1 text-xs"
-            title={`Prompt: ${quiz.tokenUsage.prompt_tokens}, Completion: ${quiz.tokenUsage.completion_tokens}`}
+            title={"Prompt: " + quiz.tokenUsage.prompt_tokens.toLocaleString() + ", Completion: " + quiz.tokenUsage.completion_tokens.toLocaleString()}
           >
             <Zap className="h-3 w-3 text-amber-500" />
-            {quiz.tokenUsage.total_tokens}
+            {quiz.tokenUsage.total_tokens.toLocaleString()}
           </span>
         )}
       </div>
