@@ -104,7 +104,7 @@ export function CustomSelect({
           ) : hasGroups ? (
             groupOrder.map((group, index) => (
               <div key={group || index}>
-                {group && (
+                {group ? (
                   <div
                     className={`text-muted-foreground px-3 pt-2 pb-1 text-xs font-medium tracking-wide uppercase ${
                       index > 0 ? 'border-border mt-1 border-t' : ''
@@ -112,6 +112,8 @@ export function CustomSelect({
                   >
                     {group}
                   </div>
+                ) : (
+                  index > 0 && <div className="border-border my-1 border-t" />
                 )}
                 {grouped[group].map(renderOption)}
               </div>

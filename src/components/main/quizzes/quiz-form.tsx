@@ -60,7 +60,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
     },
   })
 
-  const { handleSubmit, reset, control, setValue } = form
+  const { handleSubmit, reset, control, setValue, getValues } = form
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
 
   // Surface the user's BYOK keys as a separate group above the built-in models.
@@ -81,10 +81,13 @@ export default function QuizForm({ onBack }: QuizFormProps) {
   const byokDefaultApplied = useRef(false)
   useEffect(() => {
     if (!byokDefaultApplied.current && byokKeys.length > 0) {
-      setValue('model', buildByokOptionValue(byokKeys[0].id))
+      // Don't clobber a manual change made while the keys were still loading.
+      if (getValues('model') === DEFAULT_MODEL) {
+        setValue('model', buildByokOptionValue(byokKeys[0].id))
+      }
       byokDefaultApplied.current = true
     }
-  }, [byokKeys, setValue])
+  }, [byokKeys, setValue, getValues])
 
   const onSubmit = (values: QuizFormValues) => {
     const tempId = crypto.randomUUID()
