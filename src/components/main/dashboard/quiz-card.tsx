@@ -38,7 +38,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       const token = data.data.shareToken
       setShareToken(token)
       // Update the quiz list cache with the new token
-      queryClient.setQueryData<PaginatedResponse<Quiz>>([QUIZ_LIST], (old) => {
+      queryClient.setQueriesData<PaginatedResponse<Quiz>>({ queryKey: [QUIZ_LIST] }, (old) => {
         if (!old) return old
         return {
           ...old,
