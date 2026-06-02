@@ -35,7 +35,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {type === 'search' && (
           <Search
             size={16}
-            className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2"
+            className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2"
           />
         )}
         {!!prefixIcon && <span className={prefixIconClassnames}>{prefixIcon}</span>}
@@ -64,7 +64,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {!!suffix && (
           <span
             className={cn(
-              'text-muted-foreground absolute right-3 top-1/2 z-10 -translate-y-1/2 text-xs font-medium',
+              'text-muted-foreground absolute top-1/2 right-3 z-10 -translate-y-1/2 text-xs font-medium',
               props.disabled && 'pointer-events-none opacity-50'
             )}
           >

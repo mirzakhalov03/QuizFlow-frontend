@@ -72,9 +72,6 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           })
         )
 
-        const difficultyNote = `Generate ${values.difficulty} difficulty questions.`
-        const userInstructions = [difficultyNote, values.userInstructions].filter(Boolean).join(' ')
-
         const result = await quizService.createQuiz('file', {
           keys,
           title: values.title,

@@ -19,7 +19,7 @@ const PROVIDER_ICONS = {
   anthropic: 'https://www.google.com/s2/favicons?domain=anthropic.com&sz=128',
   google: 'https://www.google.com/s2/favicons?domain=google.com&sz=128',
   openrouter: 'https://www.google.com/s2/favicons?domain=openrouter.ai&sz=128',
-} 
+}
 
 export default function ByokSection() {
   const queryClient = useQueryClient()

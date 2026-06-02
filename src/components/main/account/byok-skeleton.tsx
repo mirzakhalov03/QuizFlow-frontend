@@ -1,6 +1,6 @@
 export function ByokSkeleton() {
   return (
-    <div className="border-border flex flex-col justify-between rounded-xl border p-4 shadow-sm animate-pulse">
+    <div className="border-border flex animate-pulse flex-col justify-between rounded-xl border p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="bg-muted h-10 w-10 shrink-0 rounded-full" />
