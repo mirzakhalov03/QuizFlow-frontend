@@ -3,8 +3,9 @@ import { Plus, Key } from 'lucide-react'
 import Button from '@/components/ui/button'
 import { useGet } from '@/hooks/useGet'
 import { useDelete } from '@/hooks/useDelete'
+import { usePut } from '@/hooks/usePut'
 import { toast } from '@/lib/toast'
-import { BYOK, BYOK_BY_ID } from '@/constants/api-endpoints'
+import { BYOK, BYOK_BY_ID, BYOK_ACTIVE } from '@/constants/api-endpoints'
 import { ByokKey } from '@/types/byok'
 import Modal from '@/components/custom/modal'
 import { useModal } from '@/hooks/useModal'
@@ -12,6 +13,7 @@ import ByokModal from './byok-modal'
 import { ByokKeyCard } from './byok-key-card'
 import { ByokSkeleton } from './byok-skeleton'
 import { useGlobalStore } from '@/store/global-store'
+import { useAuthStore } from '@/store/use-authstore'
 import { PaginatedResponse } from '@/types/api'
 
 const PROVIDER_ICONS = {
@@ -23,20 +25,24 @@ const PROVIDER_ICONS = {
 
 export default function ByokSection() {
   const queryClient = useQueryClient()
+  const { user, setUser } = useAuthStore()
   const { openModal } = useModal('byok-modal')
   const { setData, getData, clearKey } = useGlobalStore()
   const { data: byokResponse, isLoading } = useGet<PaginatedResponse<ByokKey>>(BYOK)
   const byokKeys = byokResponse?.data?.items || []
+
   const {
     mutate: deleteKey,
     isPending: isDeleting,
     variables: deletingId,
-  } = useDelete({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [BYOK] })
-      toast.success('API key deleted')
-    },
-  })
+  } = useDelete()
+
+  const {
+    mutate: activateKey,
+    isPending: isActivating,
+    variables: activatingVariables,
+  } = usePut()
+
   const handleEdit = (value: ByokKey) => {
     setData(BYOK, value)
     openModal()
@@ -46,6 +52,33 @@ export default function ByokSection() {
     openModal()
   }
   const item = getData(BYOK)
+
+  const handleActivate = (id: string) => {
+    activateKey(
+      BYOK_ACTIVE(id),
+      {},
+      {
+        onSuccess: () => {
+          if (user) {
+            setUser({ ...user, activeApiKeyId: id })
+          }
+          toast.success('API key activated')
+        },
+      }
+    )
+  }
+
+  const handleDelete = (id: string) => {
+    deleteKey(BYOK_BY_ID(id), {
+      onSuccess: () => {
+        if (user?.activeApiKeyId === id) {
+          setUser({ ...user, activeApiKeyId: null })
+        }
+        queryClient.invalidateQueries({ queryKey: [BYOK] })
+        toast.success('API key deleted')
+      },
+    })
+  }
 
   return (
     <div className="border-border bg-background rounded-2xl border p-5 shadow-sm sm:p-6">
@@ -96,9 +129,12 @@ export default function ByokSection() {
                   key={key.id}
                   apiKey={key}
                   icon={PROVIDER_ICONS[provider] ?? null}
+                  isActive={user?.activeApiKeyId === key.id}
+                  onActivate={handleActivate}
                   onEdit={handleEdit}
-                  onDelete={(id) => deleteKey(BYOK_BY_ID(id))}
+                  onDelete={handleDelete}
                   isDeleting={isDeleting && deletingId === BYOK_BY_ID(key.id)}
+                  isActivating={isActivating && activatingVariables?.url === BYOK_ACTIVE(key.id)}
                 />
               )
             })}

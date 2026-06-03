@@ -9,6 +9,8 @@ import { toast } from '@/lib/toast'
 import { ByokKey } from '@/types/byok'
 import { useGlobalStore } from '@/store/global-store'
 import { BYOK_BY_ID, BYOK } from '@/constants/api-endpoints'
+import { useAuthStore } from '@/store/use-authstore'
+import { ApiResponse, PaginatedResponse } from '@/types/api'
 
 const PROVIDER_OPTIONS = [
   { value: 'openai', label: 'OpenAI' },
@@ -20,6 +22,7 @@ const PROVIDER_OPTIONS = [
 
 export default function ByokModal() {
   const queryClient = useQueryClient()
+  const { user, setUser } = useAuthStore()
   const { getData } = useGlobalStore()
   const item = getData<ByokKey>(BYOK)
   const form = useForm<ByokKey>({
@@ -29,9 +32,19 @@ export default function ByokModal() {
   })
   const { handleSubmit, reset, control } = form
 
-  const onSuccess = () => {
+  const onSuccess = (data: ApiResponse<ByokKey>) => {
+    const existingKeys =
+      queryClient.getQueryData<PaginatedResponse<ByokKey>>([BYOK])?.data?.items || []
+
     queryClient.invalidateQueries({ queryKey: [BYOK] })
     toast.success(item ? 'Key updated successfully!' : 'New key added!')
+
+    // If it's the first key being added, the backend sets it as active.
+    // We update the local state to reflect this.
+    if (!item && existingKeys.length === 0 && data?.data?.id && user) {
+      setUser({ ...user, activeApiKeyId: data.data.id })
+    }
+
     reset()
   }
   const { mutate: editMutate, isPending: isUpdating } = usePatch({ onSuccess })

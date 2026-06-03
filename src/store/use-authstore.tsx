@@ -6,6 +6,7 @@ type User = {
   email: string
   fullName: string
   hasPassword: boolean
+  activeApiKeyId: string | null
 }
 
 type AuthState = {
@@ -16,7 +17,7 @@ type AuthState = {
   setUser: (user: User | null) => void
   setLoading: (loading: boolean) => void
 
-  updateUser: (data: { fullName?: string }) => Promise<void>
+  updateUser: (data: { fullName?: string; activeApiKeyId?: string | null }) => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -43,6 +44,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         ? {
             ...state.user,
             fullName: updated.fullName,
+            activeApiKeyId: updated.activeApiKeyId,
           }
         : state.user,
     }))
