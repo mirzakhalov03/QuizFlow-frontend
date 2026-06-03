@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ListChecks, LogOut, Settings } from 'lucide-react'
+import { BarChart3, LayoutDashboard, ListChecks, LogOut, Settings } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import Logo from '@/components/ui/logo'
@@ -19,6 +19,7 @@ import OnboardingModal from '@/components/main/onboarding/onboarding-modal'
 const navItems = [
   { label: 'Dashboard', to: PATHS.app.dashboard, icon: LayoutDashboard },
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
+  { label: 'Analytics', to: PATHS.app.analytics, icon: BarChart3 },
   { label: 'Settings', to: PATHS.app.settings, icon: Settings },
 ]
 

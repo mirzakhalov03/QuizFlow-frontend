@@ -22,6 +22,7 @@ const Dashboard = lazyPage(() => import('@/pages/main/dashboard'))
 const Account = lazyPage(() => import('@/pages/main/account'))
 const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
 const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
+const Analytics = lazyPage(() => import('@/pages/main/analytics'))
 const Settings = lazyPage(() => import('@/pages/main/settings'))
 
 const IntegrationSuccess = lazyPage(() => import('@/pages/integrations/success'))
@@ -65,6 +66,7 @@ export const routes: RouteObject[] = [
           { path: 'account', lazy: Account },
           { path: 'quizzes', lazy: Quizzes },
           { path: 'quizzes/:id', lazy: QuizSolvingUI },
+          { path: 'analytics', lazy: Analytics },
           { path: 'settings', lazy: Settings },
         ],
       },
