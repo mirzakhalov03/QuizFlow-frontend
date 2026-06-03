@@ -22,6 +22,7 @@ import {
   questionCounts,
   questionTypes,
 } from '@/components/main/quizzes/utils'
+import { useAuthStore } from '@/store/use-authstore'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 
 type QuizFormValues = {
@@ -42,6 +43,7 @@ interface QuizFormProps {
 
 export default function QuizForm({ onBack }: QuizFormProps) {
   const { closeModal } = useModal('quiz-add')
+  const { user } = useAuthStore()
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
   const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
@@ -76,18 +78,19 @@ export default function QuizForm({ onBack }: QuizFormProps) {
     ]
   }, [byokKeys])
 
-  // Default to the user's first key when they have one, but never override a
-  // manual change.
+  // Default to the user's active key when they have one, otherwise the first key.
   const byokDefaultApplied = useRef(false)
   useEffect(() => {
     if (!byokDefaultApplied.current && byokKeys.length > 0) {
       // Don't clobber a manual change made while the keys were still loading.
       if (getValues('model') === DEFAULT_MODEL) {
-        setValue('model', buildByokOptionValue(byokKeys[0].id))
+        const activeKey =
+          byokKeys.find((k) => k.id === user?.activeApiKeyId) || byokKeys[0]
+        setValue('model', buildByokOptionValue(activeKey.id))
       }
       byokDefaultApplied.current = true
     }
-  }, [byokKeys, setValue, getValues])
+  }, [byokKeys, setValue, getValues, user?.activeApiKeyId])
 
   const onSubmit = (values: QuizFormValues) => {
     const tempId = crypto.randomUUID()
