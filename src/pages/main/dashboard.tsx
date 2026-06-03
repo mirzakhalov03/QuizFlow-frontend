@@ -8,26 +8,28 @@ import QuizFormWrapper from '@/components/main/quizzes/quiz-form-wrapper'
 import { QuizToolbar } from '@/components/main/quizzes/quiz-toolbar'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
-import { QUIZ_LIST } from '@/constants/api-endpoints'
-import { useGet } from '@/hooks/useGet'
 import { useModal } from '@/hooks/useModal'
 import { useQuizListControls } from '@/hooks/useQuizListControls'
 import { cn } from '@/lib/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
-import type { PaginatedResponse, Quiz } from '@/types/quiz'
 
 export default function Dashboard() {
   const { openModal } = useModal('quiz-add')
   const pendingJobs = usePendingJobsStore((s) => s.jobs)
 
-  const { data, isLoading } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
-    options: { staleTime: 0 },
-  })
+  const {
+    items,
+    total,
+    isLoading,
+    search,
+    setSearch,
+    sort,
+    setSort,
+    filterTypes,
+    toggleFilterType,
+  } = useQuizListControls()
 
-  const { processed, sort, setSort, filterTypes, toggleFilterType } = useQuizListControls(
-    data?.data?.items ?? []
-  )
-  const total = data?.data?.pagination?.count ?? 0
+  const isFiltering = search.trim().length > 0 || filterTypes.length > 0
 
   return (
     <div className="space-y-6">
@@ -43,6 +45,8 @@ export default function Dashboard() {
         <h2 className="text-xl font-semibold sm:text-2xl">Quizzes</h2>
 
         <QuizToolbar
+          search={search}
+          onSearchChange={setSearch}
           sort={sort}
           onSortChange={setSort}
           filterTypes={filterTypes}
@@ -74,9 +78,15 @@ export default function Dashboard() {
               <PendingQuizCard key={job.jobId} {...job} />
             ))}
 
-            {processed.map((quiz) => (
+            {items.map((quiz) => (
               <QuizCard key={quiz.id} quiz={quiz} />
             ))}
+
+            {isFiltering && items.length === 0 && (
+              <p className="text-muted-foreground col-span-full py-10 text-center text-sm">
+                No quizzes match your search or filters.
+              </p>
+            )}
           </div>
         )}
       </div>
