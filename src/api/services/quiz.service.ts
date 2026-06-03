@@ -11,8 +11,9 @@ type PresignedUrlResult = {
 
 type BaseQuizPayload = {
   title: string
-  type: QuestionType
+  type?: QuestionType
   questionCount: number
+  difficulty?: string
   userInstructions?: string
   isTimerEnabled?: boolean
   timerDuration?: number
