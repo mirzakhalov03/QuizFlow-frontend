@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { keepPreviousData } from '@tanstack/react-query'
 import { QUIZ_LIST } from '@/constants/api-endpoints'
 import { useDebounce } from '@/hooks/useDebounce'
@@ -7,7 +7,6 @@ import type { PaginatedResponse, Quiz, QuestionType } from '@/types/quiz'
 export type SortOption = 'newest' | 'oldest'
 
 const SEARCH_DEBOUNCE_MS = 300
-
 
 export function useQuizListControls() {
   const [search, setSearch] = useState('')
@@ -41,6 +40,8 @@ export function useQuizListControls() {
     total: data?.data?.pagination?.count ?? 0,
     isLoading,
     isFetching,
+    isError,
+    isFiltering: debouncedSearch.length > 0 || filterTypes.length > 0,
     search,
     setSearch,
     sort,

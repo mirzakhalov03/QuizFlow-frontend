@@ -17,10 +17,19 @@ export default function Quizzes() {
   const { openModal } = useModal('quiz-add')
   const pendingJobs = usePendingJobsStore((s) => s.jobs)
 
-  const { items, isLoading, search, setSearch, sort, setSort, filterTypes, toggleFilterType } =
-    useQuizListControls()
-
-  const isFiltering = search.trim().length > 0 || filterTypes.length > 0
+  const {
+    items,
+    isLoading,
+    isFetching,
+    isError,
+    isFiltering,
+    search,
+    setSearch,
+    sort,
+    setSort,
+    filterTypes,
+    toggleFilterType,
+  } = useQuizListControls()
 
   return (
     <div className="space-y-4">
@@ -40,7 +49,12 @@ export default function Quizzes() {
           <Spinner />
         </div>
       ) : (
-        <div className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div
+          className={cn(
+            'grid grid-cols-1 items-stretch gap-3 transition-opacity sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+            isFetching && 'opacity-60'
+          )}
+        >
           <Button
             onClick={openModal}
             className={cn(
@@ -64,7 +78,13 @@ export default function Quizzes() {
             <QuizCard key={quiz.id} quiz={quiz} />
           ))}
 
-          {isFiltering && items.length === 0 && (
+          {isError && items.length === 0 && (
+            <p className="text-destructive col-span-full py-10 text-center text-sm">
+              Couldn&apos;t load quizzes. Please try again.
+            </p>
+          )}
+
+          {!isError && isFiltering && items.length === 0 && (
             <p className="text-muted-foreground col-span-full py-10 text-center text-sm">
               No quizzes match your search or filters.
             </p>
