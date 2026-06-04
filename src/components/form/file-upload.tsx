@@ -53,39 +53,42 @@ export default function FileUpload<TForm extends FieldValues>({
     defaultValue: multiple ? [] : undefined,
     rules: {
       validate: (val) => {
-        let err = ''
-        let valid = true
-
-        if (required && (!val || (multiple && val.length === 0))) {
-          err = 'This field is required'
-          valid = false
+        // 1. Required Check
+        if (required && (!val || (multiple && Array.isArray(val) && val.length === 0))) {
+          return 'This field is required'
         }
 
-        if (multiple && val) {
-          const totalSize = val?.reduce(
-            (prev: number, current: File) => prev + (current?.size || 0),
-            0
-          )
+        // 2. Multi-file Checks
+        if (multiple && Array.isArray(val)) {
           if (val.length > maxLength) {
-            err = `Maximum ${maxLength} files allowed`
-            valid = false
+            return `Maximum ${maxLength} files allowed`
           }
-          if (totalSize > maxS) {
-            err = isCompressed
-              ? `Total file size after compression exceeds ${maxSize} MB`
-              : `Total file size exceeds ${maxSize} MB`
-            valid = false
+
+          let totalSize = 0
+          const sizeLimitMessage = isCompressed
+            ? `Total file size after compression exceeds ${maxSize} MB`
+            : `Total file size exceeds ${maxSize} MB`
+
+          for (let i = 0; i < val.length; i++) {
+            totalSize += val[i]?.size || 0
+
+            // As soon as the threshold is breached, bail out immediately with the string!
+            if (totalSize > maxS) {
+              return sizeLimitMessage
+            }
           }
         }
 
-        if (!multiple && val && val.size > maxS) {
-          err = isCompressed
-            ? `File size after compression exceeds ${maxSize} MB`
-            : `File size exceeds ${maxSize} MB`
-          valid = false
+        // 3. Single File Check
+        if (!multiple && val) {
+          if (val.size > maxS) {
+            return isCompressed
+              ? `File size after compression exceeds ${maxSize} MB`
+              : `File size exceeds ${maxSize} MB`
+          }
         }
 
-        return valid || err
+        return true
       },
     },
   })
