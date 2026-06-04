@@ -25,7 +25,7 @@ export function useQuizListControls() {
     [debouncedSearch, filterTypes, sort]
   )
 
-  const { data, isLoading, isFetching } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
+  const { data, isLoading, isFetching, isError } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
     params,
     options: { staleTime: 0, placeholderData: keepPreviousData },
   })
