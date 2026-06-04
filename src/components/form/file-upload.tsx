@@ -54,7 +54,7 @@ export default function FileUpload<TForm extends FieldValues>({
     rules: {
       validate: (val) => {
         // 1. Required Check
-        if (required && (!val || (multiple && Array.isArray(val) && val.length === 0))) {
+        if (required && (!val || (Array.isArray(val) && val.length === 0))) {
           return 'This field is required'
         }
 
