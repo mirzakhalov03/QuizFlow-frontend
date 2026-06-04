@@ -202,7 +202,13 @@ export default function QuizPage() {
       </div>
     )
   }
-
+  if (quiz.questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-muted-foreground">This quiz has no questions.</p>
+      </div>
+    )
+  }
   const currentQuestion = quiz.questions[activeIndex]
   const isLastQuestion = activeIndex === quiz.questions.length - 1
 
@@ -240,7 +246,9 @@ export default function QuizPage() {
               {isPending ? 'Submitting…' : 'Submit Quiz'}
             </Button>
           ) : (
-            <Button onClick={() => setActiveIndex((p) => Math.min(quiz.questions.length - 1, p + 1))}>
+            <Button
+              onClick={() => setActiveIndex((p) => Math.min(quiz.questions.length - 1, p + 1))}
+            >
               Next
             </Button>
           )}
