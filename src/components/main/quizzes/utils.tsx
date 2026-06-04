@@ -24,7 +24,7 @@ export const aiModels = [
   { label: 'Llama 3.3 70B', value: 'meta-llama/llama-3.3-70b-instruct' },
 ]
 
-export const DEFAULT_MODEL = aiModels[0].value
+export const DEFAULT_MODEL = aiModels[3].value
 
 /**
  * The model selector mixes built-in models with the user's BYOK keys. BYOK
