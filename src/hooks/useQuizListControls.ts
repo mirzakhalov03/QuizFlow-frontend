@@ -30,11 +30,11 @@ export function useQuizListControls() {
     options: { staleTime: 0, placeholderData: keepPreviousData },
   })
 
-  const toggleFilterType = (type: QuestionType) => {
+  const toggleFilterType = useCallback((type: QuestionType) => {
     setFilterTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     )
-  }
+  }, [])
 
   return {
     items: data?.data?.items ?? [],
