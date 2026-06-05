@@ -24,6 +24,8 @@ const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
 const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
 const Settings = lazyPage(() => import('@/pages/main/settings'))
 
+const PublicQuizView = lazyPage(() => import('@/pages/public/quiz-view'))
+
 const IntegrationSuccess = lazyPage(() => import('@/pages/integrations/success'))
 
 const NotFound = lazyPage(() => import('@/pages/not-found'))
@@ -39,6 +41,7 @@ export const routes: RouteObject[] = [
           { path: PATHS.features, lazy: Features },
           { path: PATHS.contact, lazy: Contact },
           { path: PATHS.pricing, lazy: Pricing },
+          { path: 'public/quizzes/:shareToken', lazy: PublicQuizView },
         ],
       },
 

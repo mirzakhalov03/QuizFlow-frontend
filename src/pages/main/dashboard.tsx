@@ -81,7 +81,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <Modal size="max-w-3xl" modalKey="quiz-add" title="Add new quiz">
+      <Modal size="max-w-3xl" modalKey="quiz-add" title="Add new quiz" className="pb-0 sm:pb-0">
         <QuizFormWrapper />
       </Modal>
     </div>

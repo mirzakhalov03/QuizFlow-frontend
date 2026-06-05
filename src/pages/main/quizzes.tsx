@@ -70,7 +70,7 @@ export default function Quizzes() {
         </div>
       )}
 
-      <Modal size="max-w-3xl" modalKey="quiz-add" title="Create New Quiz">
+      <Modal size="max-w-3xl" modalKey="quiz-add" title="Create New Quiz" className="pb-0 sm:pb-0">
         <QuizFormWrapper />
       </Modal>
     </div>

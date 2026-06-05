@@ -21,4 +21,8 @@ export const PATHS = {
     quiz: (id: string) => `/app/quizzes/${id}`,
     settings: '/app/settings',
   },
+
+  public: {
+    quiz: (token: string) => `/public/quizzes/${token}`,
+  },
 } as const

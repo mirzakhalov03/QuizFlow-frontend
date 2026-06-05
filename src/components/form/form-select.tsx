@@ -22,6 +22,7 @@ type FormSelectProps<
   hideError?: boolean
   valueKey?: keyof T
   labelKey?: keyof T
+  groupKey?: keyof T
   renderOption?: (item: T) => ReactNode
   placeholder?: string
   className?: string
@@ -41,6 +42,7 @@ export function FormSelect<
   setValue,
   valueKey = 'value' as keyof T,
   labelKey = 'label' as keyof T,
+  groupKey,
   hideError = false,
   renderOption,
   placeholder,
@@ -51,6 +53,7 @@ export function FormSelect<
   const selectOptions: SelectOption[] = options.map((option) => ({
     label: String(option[labelKey] ?? ''),
     value: String(option[valueKey] ?? ''),
+    ...(groupKey && option[groupKey] != null && { group: String(option[groupKey]) }),
     ...(renderOption && {
       customRender: () => renderOption(option),
     }),
