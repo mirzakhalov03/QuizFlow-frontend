@@ -17,7 +17,6 @@ export function useQuizTimer(
     const saved = localStorage.getItem(storageKey)
     const parsed = saved ? parseInt(saved, 10) : NaN
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     setTimeRemaining(!isNaN(parsed) && parsed > 0 ? parsed : durationSeconds)
   }, [durationSeconds, storageKey])
 
@@ -49,6 +48,8 @@ export function useQuizTimer(
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
+  // timeRemaining intentionally omitted — adding it would restart the interval every second
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, storageKey])
 
   return { timeRemaining, isRunning: enabled && timeRemaining > 0 }

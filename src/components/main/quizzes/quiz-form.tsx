@@ -80,7 +80,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           title: values.title,
           type: values.type === 'mixed' ? undefined : values.type,
           questionCount: parseInt(values.questionCount, 10),
-          userInstructions: values.userInstructions || undefined,
+          userInstructions: userInstructions || undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
