@@ -72,15 +72,12 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           })
         )
 
-        const difficultyNote = `Generate ${values.difficulty} difficulty questions.`
-        const userInstructions = [difficultyNote, values.userInstructions].filter(Boolean).join(' ')
-
         const result = await quizService.createQuiz('file', {
           keys,
           title: values.title,
           type: values.type === 'mixed' ? undefined : values.type,
           questionCount: parseInt(values.questionCount, 10),
-          userInstructions: userInstructions || undefined,
+          userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,

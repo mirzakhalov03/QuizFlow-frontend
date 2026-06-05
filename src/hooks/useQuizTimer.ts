@@ -1,24 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
 
+function readInitialTime(storageKey: string, durationSeconds: number): number {
+  if (typeof window === 'undefined') return 0
+  const saved = localStorage.getItem(storageKey)
+  const parsed = saved ? parseInt(saved, 10) : NaN
+  return !isNaN(parsed) && parsed > 0 ? parsed : durationSeconds
+}
+
 export function useQuizTimer(
   durationSeconds: number,
   storageKey: string,
   onExpire: () => void,
   enabled = true
 ): { timeRemaining: number; isRunning: boolean } {
-  const [timeRemaining, setTimeRemaining] = useState(() => {
-    if (typeof window === 'undefined') return 0
-    const saved = localStorage.getItem(storageKey)
-    const parsed = saved ? parseInt(saved, 10) : NaN
-    return !isNaN(parsed) && parsed > 0 ? parsed : durationSeconds
-  })
+  const [timeRemaining, setTimeRemaining] = useState(() =>
+    readInitialTime(storageKey, durationSeconds)
+  )
 
-  useEffect(() => {
-    const saved = localStorage.getItem(storageKey)
-    const parsed = saved ? parseInt(saved, 10) : NaN
-
-    setTimeRemaining(!isNaN(parsed) && parsed > 0 ? parsed : durationSeconds)
-  }, [durationSeconds, storageKey])
+  // Re-sync when the quiz/duration changes (e.g. the quiz finishes loading and
+  // durationSeconds goes from 0 to its real value). Done during render via a
+  // tracked key instead of an effect, which avoids a cascading re-render.
+  // https://react.dev/learn/you-might-not-need-an-effect
+  const syncKey = `${storageKey}:${durationSeconds}`
+  const [syncedKey, setSyncedKey] = useState(syncKey)
+  if (syncedKey !== syncKey) {
+    setSyncedKey(syncKey)
+    setTimeRemaining(readInitialTime(storageKey, durationSeconds))
+  }
 
   const onExpireRef = useRef(onExpire)
 
@@ -48,8 +56,9 @@ export function useQuizTimer(
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  // timeRemaining intentionally omitted — adding it would restart the interval every second
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // timeRemaining is intentionally omitted: the interval reads it via the
+    // functional updater, so re-subscribing every tick would reset the timer.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, storageKey])
 
   return { timeRemaining, isRunning: enabled && timeRemaining > 0 }

@@ -31,7 +31,7 @@ export default function ResetPassword() {
     setLoading(true)
 
     try {
-      await authService.resetPassword({ token, password })
+      await authService.resetPassword({ email: form.get('email') as string, token, password })
       toast.success('Password updated. Please sign in.')
       navigate(PATHS.auth.login, { replace: true })
     } catch (err: unknown) {
