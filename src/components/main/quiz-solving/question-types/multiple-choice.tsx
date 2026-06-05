@@ -29,7 +29,7 @@ export default function MultipleChoice({ options, value, onChange }: Props) {
             >
               {selected && <div className="bg-primary h-2 w-2 rounded-full" />}
             </div>
-            <MarkdownText text={option.text} className="flex-1" />
+            <MarkdownText text={option.text} className="flex-1" as="span" />
           </button>
         )
       })}
