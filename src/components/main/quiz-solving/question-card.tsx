@@ -3,6 +3,7 @@ import MultipleChoice from './question-types/multiple-choice'
 import MultiSelect from './question-types/multi-select'
 import TrueFalse from './question-types/true-false'
 import OpenEnded from './question-types/open-ended'
+import MarkdownText from './markdown-text'
 
 type Props = {
   question: Question
@@ -21,7 +22,7 @@ export default function QuestionCard({ question, index, value, onChange }: Props
         <span className="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium">
           {index + 1}
         </span>
-        <p className="pt-0.5 text-sm leading-relaxed font-bold">{question.text}</p>
+        <MarkdownText text={question.text} className="flex-1 pt-0.5 text-sm leading-relaxed font-bold" />
       </div>
 
       <div className="pl-9">

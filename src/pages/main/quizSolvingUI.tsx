@@ -87,31 +87,36 @@ export default function QuizPage() {
             setResult(res.data ?? null)
             setPhase('submitted')
           },
-          // Errors surface via handleFormError (toast); stay on the solving phase
-          // so the user keeps their answers and can retry.
+         
         }
       )
     },
     [id, submit, clearSavedState]
   )
 
-  // Manual submit: require at least one gradable answer, otherwise nudge.
+ 
   const handleSubmit = useCallback(() => {
     if (!id || !quiz || isPending) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
+
     if (payload.length === 0) {
+      const answeredCount = Object.keys(answers).length
+      if (answeredCount > 0) {
+        clearSavedState()
+        setResult(null)
+        setPhase('submitted')
+        return
+      }
       toast.error('Answer at least one question before submitting.')
       return
     }
     submitAnswers(payload)
-  }, [id, quiz, answers, isPending, submitAnswers])
+  }, [id, quiz, answers, isPending, submitAnswers, clearSavedState])
 
-  // Timer expiry: submit whatever has been answered. Multi-select quizzes can't
-  // be graded yet (manual submit is disabled), so go straight to the unscored
-  // review rather than POST a partial, misleadingly-low score.
+   
   const handleAutoSubmit = useCallback(() => {
     if (!id || !quiz) return
-    const payload = containsMultiSelect ? [] : buildSubmitAnswers(quiz.questions, answers)
+    const payload = buildSubmitAnswers(quiz.questions, answers)
     if (payload.length === 0) {
       clearSavedState()
       setResult(null)
@@ -119,7 +124,7 @@ export default function QuizPage() {
       return
     }
     submitAnswers(payload)
-  }, [id, quiz, answers, containsMultiSelect, submitAnswers, clearSavedState])
+  }, [id, quiz, answers, submitAnswers, clearSavedState])
 
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
@@ -219,11 +224,9 @@ export default function QuizPage() {
 
       <div className="flex flex-col items-end gap-2 pb-8">
         {containsMultiSelect && (
-          <p className="text-muted-foreground text-sm">
-            Multi-select quizzes aren’t gradable yet — submission is disabled.
-          </p>
+          <p className="text-muted-foreground text-sm">Note: Multi-select questions won't be scored.</p>
         )}
-        <Button onClick={handleSubmit} disabled={containsMultiSelect || isPending}>
+        <Button onClick={handleSubmit} disabled={isPending}>
           {isPending ? 'Submitting…' : 'Submit Quiz'}
         </Button>
       </div>
