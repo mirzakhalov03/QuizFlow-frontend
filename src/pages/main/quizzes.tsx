@@ -8,31 +8,36 @@ import { PendingQuizCard } from '@/components/main/quizzes/pending-quiz-card'
 import { QuizToolbar } from '@/components/main/quizzes/quiz-toolbar'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
-import { QUIZ_LIST } from '@/constants/api-endpoints'
-import { useGet } from '@/hooks/useGet'
 import { useModal } from '@/hooks/useModal'
 import { useQuizListControls } from '@/hooks/useQuizListControls'
 import { cn } from '@/lib/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
-import type { PaginatedResponse, Quiz } from '@/types/quiz'
 
 export default function Quizzes() {
   const { openModal } = useModal('quiz-add')
   const pendingJobs = usePendingJobsStore((s) => s.jobs)
 
-  const { data, isLoading } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
-    options: { staleTime: 0 },
-  })
-
-  const { processed, sort, setSort, filterTypes, toggleFilterType } = useQuizListControls(
-    data?.data?.items ?? []
-  )
+  const {
+    items,
+    isLoading,
+    isFetching,
+    isError,
+    isFiltering,
+    search,
+    setSearch,
+    sort,
+    setSort,
+    filterTypes,
+    toggleFilterType,
+  } = useQuizListControls()
 
   return (
     <div className="space-y-4">
       <QuizHeader />
 
       <QuizToolbar
+        search={search}
+        onSearchChange={setSearch}
         sort={sort}
         onSortChange={setSort}
         filterTypes={filterTypes}
@@ -44,7 +49,12 @@ export default function Quizzes() {
           <Spinner />
         </div>
       ) : (
-        <div className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div
+          className={cn(
+            'grid grid-cols-1 items-stretch gap-3 transition-opacity sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+            isFetching && 'opacity-60'
+          )}
+        >
           <Button
             onClick={openModal}
             className={cn(
@@ -64,9 +74,21 @@ export default function Quizzes() {
             <PendingQuizCard key={job.jobId} {...job} />
           ))}
 
-          {processed.map((quiz) => (
+          {items.map((quiz) => (
             <QuizCard key={quiz.id} quiz={quiz} />
           ))}
+
+          {isError && items.length === 0 && (
+            <p className="text-destructive col-span-full py-10 text-center text-sm">
+              Couldn&apos;t load quizzes. Please try again.
+            </p>
+          )}
+
+          {!isError && isFiltering && items.length === 0 && (
+            <p className="text-muted-foreground col-span-full py-10 text-center text-sm">
+              No quizzes match your search or filters.
+            </p>
+          )}
         </div>
       )}
 
