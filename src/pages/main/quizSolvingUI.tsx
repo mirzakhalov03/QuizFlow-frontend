@@ -100,8 +100,10 @@ export default function QuizPage() {
     const payload = buildSubmitAnswers(quiz.questions, answers)
 
     if (payload.length === 0) {
-      const answeredCount = Object.keys(answers).length
-      if (answeredCount > 0) {
+      const hasAnswers = Object.values(answers).some((val) =>
+        Array.isArray(val) ? val.length > 0 : val !== undefined && val !== ''
+      )
+      if (hasAnswers) {
         clearSavedState()
         setResult(null)
         setPhase('submitted')

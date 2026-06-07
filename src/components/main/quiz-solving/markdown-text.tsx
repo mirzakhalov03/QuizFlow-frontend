@@ -6,29 +6,34 @@ import { useEffect, useState } from 'react'
 type Props = {
   text: string
   className?: string
+  as?: 'div' | 'span'
 }
 
-export default function MarkdownText({ text, className = '' }: Props) {
+export default function MarkdownText({ text, className = '', as: Component = 'div' }: Props) {
   const { theme } = useTheme()
   const [systemDark, setSystemDark] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+    () => typeof window !== 'undefined' && (window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false)
   )
 
   useEffect(() => {
     if (theme !== 'system') return
 
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const media = window.matchMedia?.('(prefers-color-scheme: dark)')
+    if (!media) return
+
     const listener = (e: MediaQueryListEvent) => setSystemDark(e.matches)
     media.addEventListener('change', listener)
     return () => media.removeEventListener('change', listener)
   }, [theme])
+
+  if (!text) return null
 
   const isDark = theme === 'dark' || (theme === 'system' && systemDark)
 
   const parts = text.split(/(```[\s\S]*?```)/g)
 
   return (
-    <div className={className}>
+    <Component className={className}>
       {parts.map((part, index) => {
         if (part.startsWith('```')) {
           const match = part.match(/```(\w*)\n?([\s\S]*?)```/)
@@ -62,6 +67,6 @@ export default function MarkdownText({ text, className = '' }: Props) {
           </span>
         )
       })}
-    </div>
+    </Component>
   )
 }
