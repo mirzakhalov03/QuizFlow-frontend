@@ -155,8 +155,8 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
             ))}
           </div>
         )}
-        {selectedIds.length === 0 && (
-          <p className="text-destructive text-xs">Select at least one page</p>
+        {fieldState.error && (
+          <p className="text-destructive text-xs">{fieldState.error.message}</p>
         )}
       </div>
 
