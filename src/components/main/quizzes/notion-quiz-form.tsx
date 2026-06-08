@@ -46,7 +46,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   })
 
   const { handleSubmit, reset, control } = form
-  const { field: pageIdsField } = useController({
+  const { field: pageIdsField, fieldState } = useController({
     control,
     name: 'pageIds',
     rules: { validate: (v) => v.length > 0 || 'Select at least one page' },
