@@ -105,7 +105,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
     )
   }
 
-  const selectedIds: string[] = pageIdsField.value
+  const selectedIds: string[] = pageIdsField.value ?? []
   const unselectedPages = pages.filter((p) => !selectedIds.includes(p.id))
   const selectedPages = pages.filter((p) => selectedIds.includes(p.id))
 
