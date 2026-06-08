@@ -22,6 +22,7 @@ export type FileQuizPayload = BaseQuizPayload & {
   keys: string[]
   model: string
   difficulty: string
+  apiKeyId?: string
 }
 
 export type NotionQuizPayload = BaseQuizPayload & {

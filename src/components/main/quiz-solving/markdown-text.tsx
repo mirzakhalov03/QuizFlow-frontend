@@ -12,7 +12,9 @@ type Props = {
 export default function MarkdownText({ text, className = '', as: Component = 'div' }: Props) {
   const { theme } = useTheme()
   const [systemDark, setSystemDark] = useState(
-    () => typeof window !== 'undefined' && (window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false)
+    () =>
+      typeof window !== 'undefined' &&
+      (window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false)
   )
 
   useEffect(() => {

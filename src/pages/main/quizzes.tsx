@@ -1,7 +1,7 @@
 import { Plus } from 'lucide-react'
 
 import Modal from '@/components/custom/modal'
-import QuizCard from '@/components/main/dashboard/quiz-card'
+import QuizCard from '@/components/main/quizzes/quiz-card'
 import QuizHeader from '@/components/main/quizzes/header'
 import QuizFormWrapper from '@/components/main/quizzes/quiz-form-wrapper'
 import { PendingQuizCard } from '@/components/main/quizzes/pending-quiz-card'

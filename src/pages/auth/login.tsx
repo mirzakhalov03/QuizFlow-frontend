@@ -35,9 +35,7 @@ export default function Login() {
 
       if (e?.response) {
         const msg =
-          e.response.data?.message ??
-          e.response.data?.detail ??
-          'Invalid email or password'
+          e.response.data?.message ?? e.response.data?.detail ?? 'Invalid email or password'
         toast.error(msg)
         setLoading(false)
         return
@@ -51,7 +49,7 @@ export default function Login() {
       setUser(user)
 
       const from = searchParams.get('from')
-      navigate(from && from.startsWith('/app') ? from : PATHS.app.dashboard, { replace: true })
+      navigate(from && from.startsWith('/app') ? from : PATHS.app.quizzes, { replace: true })
     } catch {
       toast.error('Something went wrong. Please try again.')
     } finally {
