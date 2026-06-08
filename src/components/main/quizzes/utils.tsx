@@ -18,7 +18,7 @@ export const questionCounts = [
 ]
 
 export const aiModels = [
-  { label: 'Gemini 2.0 Flash', value: 'google/gemini-2.0-flash-001' },
+  { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
   { label: 'GPT-4o Mini', value: 'openai/gpt-4o-mini' },
   { label: 'DeepSeek V3', value: 'deepseek/deepseek-chat-v3' },
   { label: 'Llama 3.3 70B', value: 'meta-llama/llama-3.3-70b-instruct' },
