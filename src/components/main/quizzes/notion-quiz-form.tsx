@@ -46,7 +46,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   })
 
   const { handleSubmit, reset, control } = form
-  const { field: pageIdsField } = useController({
+  const { field: pageIdsField, fieldState } = useController({
     control,
     name: 'pageIds',
     rules: { validate: (v) => v.length > 0 || 'Select at least one page' },
@@ -105,7 +105,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
     )
   }
 
-  const selectedIds: string[] = pageIdsField.value
+  const selectedIds: string[] = pageIdsField.value ?? []
   const unselectedPages = pages.filter((p) => !selectedIds.includes(p.id))
   const selectedPages = pages.filter((p) => selectedIds.includes(p.id))
 
@@ -155,8 +155,8 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
             ))}
           </div>
         )}
-        {selectedIds.length === 0 && (
-          <p className="text-destructive text-xs">Select at least one page</p>
+        {fieldState.error && (
+          <p className="text-destructive text-xs">{fieldState.error.message}</p>
         )}
       </div>
 

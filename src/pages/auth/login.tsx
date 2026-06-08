@@ -28,24 +28,32 @@ export default function Login() {
         email: form.get('email') as string,
         password: form.get('password') as string,
       })
+    } catch (err: unknown) {
+      const e = err as {
+        response?: { data?: { message?: string; detail?: string }; status?: number }
+      }
 
+      if (e?.response) {
+        const msg =
+          e.response.data?.message ??
+          e.response.data?.detail ??
+          'Invalid email or password'
+        toast.error(msg)
+        setLoading(false)
+        return
+      }
+      // No response = CORS error from backend redirect — cookies are set, fall through to me()
+    }
+
+    try {
       const me = await authService.me()
       const user = me?.user ?? me?.data ?? me
       setUser(user)
 
       const from = searchParams.get('from')
       navigate(from && from.startsWith('/app') ? from : PATHS.app.dashboard, { replace: true })
-    } catch (err: unknown) {
-      const e = err as {
-        response?: { data?: { message?: string; detail?: string }; status?: number }
-      }
-      const msg =
-        e?.response?.data?.message ??
-        e?.response?.data?.detail ??
-        (e?.response?.status
-          ? 'Invalid email or password'
-          : 'Something went wrong. Please try again.')
-      toast.error(msg)
+    } catch {
+      toast.error('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
