@@ -1,4 +1,5 @@
 import type { QuestionOption } from '@/types/quiz'
+import MarkdownText from '../markdown-text'
 
 type Props = {
   options: QuestionOption[]
@@ -28,7 +29,7 @@ export default function TrueFalse({ options, value, onChange }: Props) {
             >
               {selected && <div className="bg-primary h-2 w-2 rounded-full" />}
             </div>
-            {option.text}
+            <MarkdownText text={option.text} as="span" />
           </button>
         )
       })}

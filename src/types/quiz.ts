@@ -1,3 +1,5 @@
+export type { ApiResponse, PaginatedResponse } from './api'
+
 export const QUESTION_TYPES = [
   'multiple_choice',
   'multi_select',
@@ -17,10 +19,16 @@ export type Quiz = {
   isTimerEnabled: boolean
   timerDuration: number | null
   userInstructions: string | null
+  tokenUsage?: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  } | null
   completedAt: string | null
   createdAt: string
   updatedAt: string
   uploadedAt: string | null
+  shareToken?: string | null
 }
 
 export type QuizJob = {
@@ -60,12 +68,17 @@ export type QuizWithQuestions = Quiz & {
   questions: Question[]
 }
 
-export type ApiResponse<T> = {
-  success: boolean
-  data: T
+export type SubmitAnswer = {
+  questionId: string
+  selectedOptionId?: string
+  textAnswer?: string
 }
 
-export type PaginatedResponse<T> = ApiResponse<{
-  items: T[]
-  pagination: { limit: number; offset: number; count: number }
-}>
+export type QuizResult = {
+  id: string
+  userId: string
+  quizId: string
+  totalQuestions: number
+  correctAnswers: number
+  wrongAnswers: number
+}

@@ -5,7 +5,7 @@ import FieldError from './form-error'
 import { ClassNameValue } from 'tailwind-merge'
 import { getNestedValue } from './input'
 
-interface IProps<IForm extends FieldValues> {
+type IProps<IForm extends FieldValues> = {
   methods: UseFormReturn<IForm>
   name: Path<IForm>
   label?: string

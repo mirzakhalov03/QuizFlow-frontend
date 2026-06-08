@@ -1,6 +1,7 @@
 import { Clock, Hash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { QuizWithQuestions } from '@/types/quiz'
+import MarkdownText from './markdown-text'
 
 type Props = {
   quiz: QuizWithQuestions
@@ -15,7 +16,10 @@ export default function QuizIntro({ quiz, onStart }: Props) {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">{quiz.title}</h1>
         {quiz.userInstructions && (
-          <p className="text-muted-foreground text-sm leading-relaxed">{quiz.userInstructions}</p>
+          <MarkdownText
+            text={quiz.userInstructions}
+            className="text-muted-foreground text-sm leading-relaxed"
+          />
         )}
       </div>
 

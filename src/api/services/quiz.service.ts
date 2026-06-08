@@ -11,10 +11,7 @@ type PresignedUrlResult = {
 
 type BaseQuizPayload = {
   title: string
-  type: QuestionType | undefined
-type BaseQuizPayload = {
-  title: string
-  type?: QuestionType
+  type?: QuestionType | undefined
   questionCount: number
   userInstructions?: string
   isTimerEnabled?: boolean

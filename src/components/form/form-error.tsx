@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { ReactNode } from 'react'
 
-interface IProps {
+type IProps = {
   children: ReactNode
   className?: string
 }

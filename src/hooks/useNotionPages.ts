@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { notionService, type NotionPage } from '@/api/services/notion.service'
 
-interface UseNotionPagesOptions {
+type UseNotionPagesOptions = {
   autoFetch?: boolean
 }
 
-interface UseNotionPagesReturn {
+type UseNotionPagesReturn = {
   pages: NotionPage[]
   loading: boolean
   error: string | null

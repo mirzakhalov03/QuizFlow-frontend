@@ -23,7 +23,7 @@ type NotionFormValues = {
   userInstructions?: string
 }
 
-interface NotionQuizFormProps {
+type NotionQuizFormProps = {
   onBack: () => void
 }
 
@@ -91,7 +91,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
 
   if (error) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 pb-4 sm:pb-6">
         <div className="bg-destructive/10 text-destructive rounded-lg p-4 text-sm">{error}</div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onBack} leftIcon={<ChevronLeft size={16} />}>
@@ -174,7 +174,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
           Quiz Settings
         </p>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormSelect
             label="Question Type"
             options={questionTypes}
@@ -199,7 +199,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
         placeholder="e.g. Focus on important sections, make questions harder… (optional)"
       />
 
-      <div className="flex gap-2">
+      <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">
         <Button
           type="button"
           variant="outline"
