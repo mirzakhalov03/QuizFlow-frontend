@@ -5,7 +5,7 @@ type IProps = {
   children: ReactNode
   required: boolean
   htmlFor?: string
-  isError: boolean
+  isError?: boolean
   className?: string
   disabled?: boolean
   icon?: ReactNode
@@ -15,7 +15,7 @@ export default function FieldLabel({
   required,
   children,
   htmlFor,
-  isError,
+  isError = false,
   className,
   disabled,
   icon,

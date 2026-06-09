@@ -34,7 +34,7 @@ export const requireGuest = async ({ request }: LoaderFunctionArgs) => {
 
   if (user) {
     const from = new URL(request.url).searchParams.get('from')
-    throw redirect(from && from.startsWith('/app') ? from : PATHS.app.dashboard)
+    throw redirect(from && from.startsWith('/app') ? from : PATHS.app.quizzes)
   }
 
   return null

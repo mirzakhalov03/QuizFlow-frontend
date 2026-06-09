@@ -22,7 +22,10 @@ export default function QuestionCard({ question, index, value, onChange }: Props
         <span className="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium">
           {index + 1}
         </span>
-        <MarkdownText text={question.text} className="flex-1 pt-0.5 text-sm leading-relaxed font-bold" />
+        <MarkdownText
+          text={question.text}
+          className="flex-1 pt-0.5 text-sm leading-relaxed font-bold"
+        />
       </div>
 
       <div className="pl-9">
