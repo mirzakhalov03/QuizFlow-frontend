@@ -67,7 +67,7 @@ export default function ScoreOverTimeChart({ points }: Props) {
 
         {points.map((p, i) => (
           <circle
-            key={p.date}
+            key={`${p.date}-${i}`}
             cx={xFor(i)}
             cy={yFor(p.score)}
             r={3}
@@ -81,7 +81,7 @@ export default function ScoreOverTimeChart({ points }: Props) {
           if (points.length > 8 && i % Math.ceil(points.length / 8) !== 0) return null
           return (
             <text
-              key={p.date}
+              key={`${p.date}-${i}`}
               x={xFor(i)}
               y={HEIGHT - PADDING.bottom + 14}
               textAnchor="middle"
@@ -97,6 +97,8 @@ export default function ScoreOverTimeChart({ points }: Props) {
 }
 
 function formatDateLabel(iso: string) {
-  const [, month, day] = iso.split('-')
+  const datePart = iso.split('T')[0]
+  const [, month, day] = datePart.split('-')
+  if (!month || !day) return iso
   return `${month}/${day}`
 }

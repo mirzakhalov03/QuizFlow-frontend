@@ -38,8 +38,8 @@ export default function Analytics() {
       </header>
 
       <AnalyticsStats summary={summary} />
-      <ScoreOverTimeChart points={summary.scoreOverTime} />
-      <TypeBreakdownTable rows={summary.breakdownByType} />
+      <ScoreOverTimeChart points={summary.scoreOverTime ?? []} />
+      <TypeBreakdownTable rows={summary.breakdownByType ?? []} />
     </div>
   )
 }

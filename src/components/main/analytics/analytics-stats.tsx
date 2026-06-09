@@ -5,13 +5,15 @@ type Props = {
 }
 
 export default function AnalyticsStats({ summary }: Props) {
-  const bestScore = summary.scoreOverTime.reduce((max, p) => Math.max(max, p.score), 0)
+  const hasQuizzes = summary.totalQuizzesTaken > 0
+  const scorePoints = summary.scoreOverTime ?? []
+  const bestScore = scorePoints.reduce((max, p) => Math.max(max, p.score), 0)
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Stat label="Quizzes taken" value={String(summary.totalQuizzesTaken)} />
-      <Stat label="Average score" value={formatPercent(summary.averageScore)} />
-      <Stat label="Best score" value={formatPercent(bestScore)} />
+      <Stat label="Average score" value={hasQuizzes ? formatPercent(summary.averageScore) : '—'} />
+      <Stat label="Best score" value={hasQuizzes ? formatPercent(bestScore) : '—'} />
     </div>
   )
 }
@@ -26,6 +28,5 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 function formatPercent(value: number) {
-  if (value <= 0) return '—'
   return `${Math.round(value)}%`
 }
