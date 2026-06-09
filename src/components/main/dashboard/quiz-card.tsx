@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Check, Clock, Copy, Play, Share2, Trash2, Zap } from 'lucide-react'
+import { Check, Clock, Copy, FileDown, Play, Share2, Trash2, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { useDelete } from '@/hooks/useDelete'
 import { QUIZ_BY_ID, QUIZ_LIST, QUIZ_SHARE_ENABLE } from '@/constants/api-endpoints'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from '@/lib/toast'
+import { openQuizPdf } from '@/lib/quiz-pdf'
 import type { PaginatedResponse, Quiz } from '@/types/quiz'
 import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
 import { PATHS } from '@/lib/path'
@@ -25,6 +26,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const [shareToken, setShareToken] = useState<string | null>(quiz.shareToken || null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   const { mutate: deleteQuiz, isPending: isDeleting } = useDelete({
     onSuccess: () => {
@@ -71,6 +73,18 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
     }
   }
 
+  const handleExportPdf = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (isExporting) return
+
+    setIsExporting(true)
+    try {
+      await openQuizPdf(quiz.id)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   const publicUrl = useMemo(() => {
     return shareToken ? window.location.origin + PATHS.public.quiz(shareToken) : ''
   }, [shareToken])
@@ -94,6 +108,14 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       <div className="flex items-start justify-between gap-2">
         <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{quiz.title}</h3>
         <div className="flex shrink-0 items-center gap-1">
+          <button
+            onClick={handleExportPdf}
+            disabled={isExporting}
+            className="text-muted-foreground hover:text-primary mt-0.5 transition-colors disabled:opacity-40"
+            aria-label="Export quiz as PDF"
+          >
+            <FileDown className="h-4 w-4" />
+          </button>
           <button
             onClick={handleShare}
             className="text-muted-foreground hover:text-primary mt-0.5 transition-colors"
