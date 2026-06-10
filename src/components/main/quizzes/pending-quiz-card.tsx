@@ -16,6 +16,7 @@ export function PendingQuizCard({ jobId, title, type, status, error }: PendingJo
   useQuizJobPoller(status === 'generating' ? jobId : null, {
     onDone: () => {
       queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
+      queryClient.invalidateQueries({ queryKey: ['/folders'] })
       removeJob(jobId)
     },
     onFailed: (err) => {

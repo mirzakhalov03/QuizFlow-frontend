@@ -3,7 +3,7 @@ import { KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { authService } from '@/api/services/auth.service'
-import { useAuthStore } from '@/store/use-authstore'
+import { useAuthStore, type User } from '@/store/use-authstore'
 import { toast } from '@/lib/toast'
 
 const inputClass = cn(
@@ -25,7 +25,7 @@ export default function SetPassword() {
       const form = new FormData(e.currentTarget)
       try {
         await authService.setPassword({ password: form.get('password') as string })
-        setUser({ ...user, hasPassword: true })
+        setUser({ ...(user as User), hasPassword: true })
         toast.success('Password set. You can now sign in with your email too.')
       } catch (err: unknown) {
         const e = err as { response?: { data?: { message?: string; detail?: string } } }

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Check, Clock, Copy, Play, Share2, Trash2, Zap } from 'lucide-react'
+import { Check, Clock, Copy, FolderInput, Play, Share2, Trash2, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { useDelete } from '@/hooks/useDelete'
@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 import Spinner from '@/components/ui/spinner'
+import MoveToFolderModal from '../library/move-to-folder-modal'
 
 dayjs.extend(relativeTime)
 
@@ -26,6 +27,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const [shareToken, setShareToken] = useState<string | null>(quiz.shareToken || null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
   const { mutate: deleteQuiz, isPending: isDeleting } = useDelete({
@@ -78,6 +80,11 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
     }
   }
 
+  const handleMove = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsMoveModalOpen(true)
+  }
+
   const publicUrl = useMemo(() => {
     return shareToken ? window.location.origin + PATHS.public.quiz(shareToken) : ''
   }, [shareToken])
@@ -101,6 +108,13 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       <div className="flex items-start justify-between gap-2">
         <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{quiz.title}</h3>
         <div className="flex shrink-0 items-center gap-1">
+          <button
+            onClick={handleMove}
+            className="text-muted-foreground hover:text-primary mt-0.5 transition-colors"
+            aria-label="Move to folder"
+          >
+            <FolderInput className="h-4 w-4" />
+          </button>
           <button
             onClick={handleShare}
             className="text-muted-foreground hover:text-primary mt-0.5 transition-colors"
@@ -211,6 +225,12 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         confirmLabel="Delete"
         variant="destructive"
         loading={isDeleting}
+      />
+      <MoveToFolderModal
+        quizId={quiz.id}
+        currentFolderId={quiz.folderId}
+        isOpen={isMoveModalOpen}
+        onClose={() => setIsMoveModalOpen(false)}
       />
     </div>
   )

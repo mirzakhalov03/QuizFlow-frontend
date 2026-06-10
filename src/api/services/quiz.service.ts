@@ -11,11 +11,13 @@ type PresignedUrlResult = {
 
 type BaseQuizPayload = {
   title: string
-  type?: QuestionType | undefined
+  type: QuestionType | undefined
   questionCount: number
   userInstructions?: string
   isTimerEnabled?: boolean
   timerDuration?: number
+  difficulty?: string
+  folderId?: string
 }
 
 export type FileQuizPayload = BaseQuizPayload & {

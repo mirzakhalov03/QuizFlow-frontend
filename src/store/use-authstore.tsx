@@ -1,14 +1,14 @@
 import { create } from 'zustand'
 import { userService } from '../api/services/user.service'
 
-type User = {
+export type User = {
   id: string
   email: string
   fullName: string
   hasPassword: boolean
 }
 
-type AuthState = {
+export type AuthState = {
   user: User | null
   isAuthed: boolean
   isLoading: boolean

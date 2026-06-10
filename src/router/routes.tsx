@@ -21,6 +21,8 @@ const ResetPassword = lazyPage(() => import('@/pages/auth/reset-password'))
 const Analytics = lazyPage(() => import('@/pages/main/analytics'))
 const Account = lazyPage(() => import('@/pages/main/account'))
 const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
+const Library = lazyPage(() => import('@/pages/main/library'))
+const LibraryFolder = lazyPage(() => import('@/pages/main/library-folder'))
 const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
 
 const PublicQuizView = lazyPage(() => import('@/pages/public/quiz-view'))
@@ -67,6 +69,8 @@ export const routes: RouteObject[] = [
           { path: 'account', lazy: Account },
           { path: 'quizzes', lazy: Quizzes },
           { path: 'quizzes/:id', lazy: QuizSolvingUI },
+          { path: 'library', lazy: Library },
+          { path: 'library/:folderId', lazy: LibraryFolder },
         ],
       },
 

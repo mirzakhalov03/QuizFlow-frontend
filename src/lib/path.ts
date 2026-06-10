@@ -19,6 +19,8 @@ export const PATHS = {
     account: '/app/account',
     quizzes: '/app/quizzes',
     quiz: (id: string) => `/app/quizzes/${id}`,
+    library: '/app/library',
+    libraryFolder: (id: string) => `/app/library/${id}`,
   },
 
   public: {

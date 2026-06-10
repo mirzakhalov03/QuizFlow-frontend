@@ -1,6 +1,9 @@
 import { useForm, useController } from 'react-hook-form'
 import { Settings2, Sparkles, ChevronLeft, X } from 'lucide-react'
 
+import { useGet } from '@/hooks/useGet'
+import { ApiResponse } from '@/types/api'
+import { Folder } from '@/types/folder'
 import { quizService } from '@/api/services/quiz.service'
 import { FormSelect } from '@/components/form/form-select'
 import FieldLabel from '@/components/form/form-label'
@@ -14,6 +17,7 @@ import { questionCounts, questionTypes } from '@/components/main/quizzes/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 import { useModal } from '@/hooks/useModal'
 import { useNotionPages } from '@/hooks/useNotionPages'
+import { useMemo } from 'react'
 
 type NotionFormValues = {
   pageIds: string[]
@@ -21,19 +25,31 @@ type NotionFormValues = {
   type: QuestionType
   questionCount: string
   userInstructions?: string
+  folderId: string
 }
 
 type NotionQuizFormProps = {
   onBack: () => void
+  folderId?: string
 }
 
-export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
+export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps) {
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
   const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
 
   const { pages, loading, error, refetch } = useNotionPages()
+
+  const { data: foldersData } = useGet<ApiResponse<Folder[]>>('/folders')
+  
+  const folderOptions = useMemo(() => {
+    const folders = foldersData?.data || []
+    return [
+      { label: 'No Folder', value: 'none' },
+      ...folders.map((f) => ({ label: f.name, value: f.id })),
+    ]
+  }, [foldersData?.data])
 
   const form = useForm<NotionFormValues>({
     defaultValues: {
@@ -42,6 +58,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
       type: 'multiple_choice',
       questionCount: '5',
       userInstructions: '',
+      folderId: folderId || 'none',
     },
   })
 
@@ -66,6 +83,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
           type: values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
+          folderId: values.folderId !== 'none' ? values.folderId : undefined,
         })
 
         setJobReady(tempId, result.jobId)
@@ -116,7 +134,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <FieldLabel required>Add Notion Pages</FieldLabel>
+        <FieldLabel required isError={false}>Add Notion Pages</FieldLabel>
         <select
           className="border-border bg-background focus:ring-primary/40 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none disabled:opacity-50"
           value=""
@@ -171,6 +189,14 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
           <Settings2 className="h-3.5 w-3.5" />
           Quiz Settings
         </p>
+
+        <FormSelect
+          label="Save to Folder"
+          options={folderOptions}
+          name="folderId"
+          control={control}
+          disabled={!!folderId}
+        />
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormSelect
