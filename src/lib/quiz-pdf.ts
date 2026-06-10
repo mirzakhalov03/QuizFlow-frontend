@@ -23,10 +23,8 @@ export async function openQuizPdf(quizId: string) {
     const res = await api.get(QUIZ_PDF(quizId), { responseType: 'blob' })
     const url = URL.createObjectURL(res.data)
 
-    if (tab) {
-      tab.location.href = url
-    } else {
-      // Popup was blocked — fall back to a direct download so the user keeps
+    const download = () => {
+      // Popup was blocked or the tab was closed — fall back to a direct download so the user keeps
       // their current app state instead of navigating the tab away.
       const link = document.createElement('a')
       link.href = url
@@ -34,6 +32,16 @@ export async function openQuizPdf(quizId: string) {
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
+    }
+
+    if (tab && !tab.closed) {
+      try {
+        tab.location.href = url
+      } catch {
+        download()
+      }
+    } else {
+      download()
     }
 
     // Give the viewer time to load before releasing the object URL.
