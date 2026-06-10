@@ -7,7 +7,8 @@ import { useMemo } from 'react'
 export const useByokKeys = () => {
   const { data: byokResponse, isLoading, error } = useGet<PaginatedResponse<ByokKey>>(BYOK)
 
-  const keys = byokResponse?.data?.items || []
+  const items = byokResponse?.data?.items
+  const keys = useMemo(() => items ?? [], [items])
 
   const options = useMemo(
     () =>
