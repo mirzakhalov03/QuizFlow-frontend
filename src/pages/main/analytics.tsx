@@ -14,8 +14,9 @@ export default function Analytics() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-20">
+      <div className="flex justify-center py-20" role="status" aria-live="polite">
         <Spinner />
+        <span className="sr-only">Loading analytics…</span>
       </div>
     )
   }
