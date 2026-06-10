@@ -72,6 +72,20 @@ export default function ResetPassword() {
       </div>
 
       <div className="space-y-1">
+        <label htmlFor="email" className="text-sm font-medium">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          className={inputClass}
+        />
+      </div>
+
+      <div className="space-y-1">
         <label htmlFor="password" className="text-sm font-medium">
           New password
         </label>

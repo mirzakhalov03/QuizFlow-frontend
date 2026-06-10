@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/path'
+import { toast } from '@/lib/toast'
 import { useGet } from '@/hooks/useGet'
+import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
-import { QUIZ_BY_ID } from '@/constants/api-endpoints'
-import type { ApiResponse, Question, QuizWithQuestions } from '@/types/quiz'
+import { buildSubmitAnswers, hasUngradableQuestions } from '@/lib/quiz-submit'
+import { QUIZ_BY_ID, QUIZ_SUBMIT } from '@/constants/api-endpoints'
+import type { Question, QuizResult, QuizWithQuestions, SubmitAnswer } from '@/types/quiz'
+import type { ApiResponse } from '@/types/api'
 import { useGlobalStore } from '@/store/global-store'
 
 import QuizIntro from '@/components/main/quiz-solving/quiz-intro'
 import QuestionCard from '@/components/main/quiz-solving/question-card'
 import QuizSubmitted from '@/components/main/quiz-solving/quiz-submitted'
+import QuizProgress from '@/components/main/quiz-solving/quiz-progress'
 
 export type QuizSolvingHeader = {
   title: string
@@ -57,31 +61,87 @@ export default function QuizPage() {
     id ? loadSavedAnswers(id) : {}
   )
   const [activeIndex, setActiveIndex] = useState(0)
+  const [result, setResult] = useState<QuizResult | null>(null)
 
-  const handleSubmit = useCallback(() => {
+  const { mutate: submit, isPending } = usePost<
+    { answers: SubmitAnswer[] },
+    ApiResponse<QuizResult>
+  >()
+
+  const containsMultiSelect = quiz ? hasUngradableQuestions(quiz.questions) : false
+
+  const clearSavedState = useCallback(() => {
     if (!id) return
     localStorage.removeItem(answersKey(id))
     localStorage.removeItem(timerKey(id))
-    setPhase('submitted')
-    // TODO: POST /quizzes/:id/submit when backend endpoint is ready
-    // Payload shape:
-    // {
-    //   answers: quiz.questions.map(q => ({
-    //     questionId: q.id,
-    //     selectedOptionIds: q.type !== 'open_ended'
-    //       ? (Array.isArray(answers[q.id]) ? answers[q.id] : answers[q.id] ? [answers[q.id]] : [])
-    //       : undefined,
-    //     textAnswer: q.type === 'open_ended' ? answers[q.id] : undefined,
-    //   }))
-    // }
   }, [id])
+
+  const submitAnswers = useCallback(
+    (payload: SubmitAnswer[]) => {
+      if (!id) return
+      submit(
+        QUIZ_SUBMIT(id),
+        { answers: payload },
+        {
+          onSuccess: (res) => {
+            clearSavedState()
+            setResult(res.data ?? null)
+            setPhase('submitted')
+          },
+        }
+      )
+    },
+    [id, submit, clearSavedState]
+  )
+
+  const handleSubmit = useCallback(() => {
+    if (!id || !quiz || isPending) return
+    const payload = buildSubmitAnswers(quiz.questions, answers)
+
+    if (payload.length === 0) {
+      const hasAnswers = Object.values(answers).some((val) =>
+        Array.isArray(val) ? val.length > 0 : val !== undefined && val !== ''
+      )
+      if (hasAnswers) {
+        clearSavedState()
+        setResult(null)
+        setPhase('submitted')
+        return
+      }
+      toast.error('Answer at least one question before submitting.')
+      return
+    }
+    submitAnswers(payload)
+  }, [id, quiz, answers, isPending, submitAnswers, clearSavedState])
+
+  const handleAutoSubmit = useCallback(() => {
+    if (!id || !quiz) return
+    const payload = buildSubmitAnswers(quiz.questions, answers)
+    if (payload.length === 0) {
+      clearSavedState()
+      setResult(null)
+      setPhase('submitted')
+      return
+    }
+    submitAnswers(payload)
+  }, [id, quiz, answers, submitAnswers, clearSavedState])
 
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
     id ? timerKey(id) : 'quiz-timer-none',
-    handleSubmit,
+    handleAutoSubmit,
     phase === 'solving' && !!quiz?.isTimerEnabled
   )
+
+  const handleRetake = useCallback(() => {
+    if (!id) return
+    localStorage.removeItem(answersKey(id))
+    localStorage.removeItem(timerKey(id))
+    setAnswers({})
+    setResult(null)
+    setActiveIndex(0)
+    setPhase('intro')
+  }, [id])
 
   const handleAnswerChange = (questionId: string, value: string | string[]) => {
     const updated = { ...answers, [questionId]: value }
@@ -91,9 +151,6 @@ export default function QuizPage() {
 
   const handleSelectProgress = useCallback((index: number) => {
     setActiveIndex(index)
-    document
-      .getElementById(`question-${index}`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [])
 
   const setData = useGlobalStore((s) => s.setData)
@@ -125,7 +182,15 @@ export default function QuizPage() {
   }
 
   if (phase === 'submitted') {
-    return <QuizSubmitted quizTitle={quiz.title} />
+    return (
+      <QuizSubmitted
+        quizTitle={quiz.title}
+        result={result}
+        questions={quiz.questions}
+        answers={answers}
+        onRetake={handleRetake}
+      />
+    )
   }
 
   if (phase === 'intro') {
@@ -141,22 +206,64 @@ export default function QuizPage() {
       </div>
     )
   }
+  if (quiz.questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-muted-foreground">This quiz has no questions.</p>
+      </div>
+    )
+  }
+  const currentQuestion = quiz.questions[activeIndex]
+  const isLastQuestion = activeIndex === quiz.questions.length - 1
 
   return (
-    <div className="flex flex-col gap-5">
-      {quiz.questions.map((question, i) => (
-        <QuestionCard
-          key={question.id}
-          question={question}
-          index={i}
-          value={answers[question.id]}
-          onChange={(value) => handleAnswerChange(question.id, value)}
+    <div className="flex flex-col gap-6">
+      <div className="lg:hidden">
+        <QuizProgress
+          questions={quiz.questions}
+          answers={answers}
+          activeIndex={activeIndex}
+          onSelect={handleSelectProgress}
         />
-      ))}
-
-      <div className="flex justify-end pb-8">
-        <Button onClick={handleSubmit}>Submit Quiz</Button>
       </div>
+
+      <QuestionCard
+        key={currentQuestion.id}
+        question={currentQuestion}
+        index={activeIndex}
+        value={answers[currentQuestion.id]}
+        onChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+      />
+
+      <div className="flex items-center justify-between gap-4 pb-8">
+        <Button
+          variant="outline"
+          onClick={() => setActiveIndex((p) => Math.max(0, p - 1))}
+          disabled={activeIndex === 0}
+        >
+          Previous
+        </Button>
+
+        <div className="flex items-center gap-3">
+          {isLastQuestion ? (
+            <Button onClick={handleSubmit} disabled={containsMultiSelect || isPending}>
+              {isPending ? 'Submitting…' : 'Submit Quiz'}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => setActiveIndex((p) => Math.min(quiz.questions.length - 1, p + 1))}
+            >
+              Next
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {containsMultiSelect && isLastQuestion && (
+        <p className="text-muted-foreground -mt-4 text-center text-sm">
+          Multi-select quizzes aren’t gradable yet — submission is disabled.
+        </p>
+      )}
     </div>
   )
 }

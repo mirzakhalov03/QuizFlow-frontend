@@ -4,7 +4,7 @@ import { useHasNotionIntegration } from '@/hooks/useHasNotionIntegration'
 
 type Source = 'file' | 'notion'
 
-interface QuizSourceSelectorProps {
+type QuizSourceSelectorProps = {
   onSelect: (source: Source) => void
 }
 
@@ -12,7 +12,7 @@ export default function QuizSourceSelector({ onSelect }: QuizSourceSelectorProps
   const { hasIntegration: hasNotion } = useHasNotionIntegration()
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-4 pb-4 sm:grid-cols-2 sm:pb-6">
       <button
         onClick={() => onSelect('file')}
         className="border-border bg-card/50 hover:border-primary/50 hover:bg-primary/5 group rounded-xl border-2 p-6 text-left transition-all duration-200"

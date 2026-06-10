@@ -58,9 +58,7 @@ export default function Register() {
 
       if (e?.response) {
         const msg =
-          e.response.data?.message ??
-          e.response.data?.detail ??
-          'Invalid code. Please try again.'
+          e.response.data?.message ?? e.response.data?.detail ?? 'Invalid code. Please try again.'
         toast.error(msg)
         setLoading(false)
         return
@@ -72,7 +70,7 @@ export default function Register() {
       const me = await authService.me()
       const user = me?.user ?? me?.data ?? me
       setUser({ ...user, hasPassword: true })
-      navigate(PATHS.app.dashboard, { replace: true })
+      navigate(PATHS.app.quizzes, { replace: true })
     } catch {
       toast.success('Account verified! Please sign in.')
       navigate(PATHS.auth.login, { replace: true })
@@ -107,7 +105,7 @@ export default function Register() {
             required
             autoComplete="one-time-code"
             placeholder="000000"
-            className={cn(inputClass, 'tracking-[0.5em] text-center font-mono text-lg')}
+            className={cn(inputClass, 'text-center font-mono text-lg tracking-[0.5em]')}
           />
         </div>
 

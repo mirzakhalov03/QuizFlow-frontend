@@ -2,9 +2,11 @@ import { api } from '@/api/axios-instance'
 
 export type LoginPayload = { email: string; password: string }
 export type RegisterPayload = { email: string; fullName: string; password: string }
+export type RegisterConfirmPayload = { email: string; otp: string }
 export type ForgotPasswordPayload = { email: string }
-export type ResetPasswordPayload = { token: string; password: string }
+export type ResetPasswordPayload = { email: string; token: string; password: string }
 export type SetPasswordPayload = { password: string }
+export type DeleteAccountConfirmPayload = { otp: string }
 
 export const authService = {
   async login(payload: LoginPayload) {
@@ -14,6 +16,11 @@ export const authService = {
 
   async register(payload: RegisterPayload) {
     const { data } = await api.post('/auth/register', payload)
+    return data
+  },
+
+  async registerConfirm(payload: RegisterConfirmPayload) {
+    const { data } = await api.post('/auth/register/confirm', payload)
     return data
   },
 
@@ -34,6 +41,16 @@ export const authService = {
 
   async setPassword(payload: SetPasswordPayload) {
     const { data } = await api.post('/auth/set-password', payload)
+    return data
+  },
+
+  async requestDeleteAccount() {
+    const { data } = await api.post('/auth/delete-account/request')
+    return data
+  },
+
+  async confirmDeleteAccount(payload: DeleteAccountConfirmPayload) {
+    const { data } = await api.post('/auth/delete-account/confirm', payload)
     return data
   },
 }

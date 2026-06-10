@@ -45,9 +45,9 @@ export default function Header() {
           <ThemeToggle />
 
           {isAuthed ? (
-            <Link to={PATHS.app.dashboard}>
+            <Link to={PATHS.app.quizzes}>
               <Button size="sm" className="whitespace-nowrap">
-                Open dashboard
+                Open app
               </Button>
             </Link>
           ) : (

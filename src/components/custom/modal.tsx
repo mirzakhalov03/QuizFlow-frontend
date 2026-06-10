@@ -1,11 +1,13 @@
 import { useModal } from '@/hooks/useModal'
 import { cn } from '@/lib/utils'
 import { ReactNode, useCallback, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { ClassNameValue } from 'tailwind-merge'
 import { X } from 'lucide-react'
 
 type Props = {
   modalKey?: string
+  isOpen?: boolean
   title?: ReactNode
   description?: ReactNode
   children?: ReactNode
@@ -33,6 +35,7 @@ const Modal = ({
   description,
   children,
   modalKey = 'default',
+  isOpen: controlledIsOpen,
   classNameTitle,
   classNameIcon,
   className = '',
@@ -40,7 +43,8 @@ const Modal = ({
   onClose,
   closable = true,
 }: Props) => {
-  const { isOpen, closeModal } = useModal(modalKey)
+  const { isOpen: contextIsOpen, closeModal } = useModal(modalKey)
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : contextIsOpen
   const overlayRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -77,18 +81,18 @@ const Modal = ({
 
   if (!isOpen) return null
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm dark:bg-black/70" />
 
       <div
         ref={contentRef}
         className={cn(
-          'relative z-50 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/30',
+          'relative z-50 max-h-[90dvh] w-full overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 shadow-lg sm:p-6 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/30',
           size,
           className
         )}
@@ -131,7 +135,8 @@ const Modal = ({
 
         <div className={title || description ? 'mt-4' : ''}>{children}</div>
       </div>
-    </div>
+    </div>,
+    document.getElementById('modal-root') || document.body
   )
 }
 

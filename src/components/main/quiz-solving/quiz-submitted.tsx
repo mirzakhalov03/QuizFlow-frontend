@@ -1,23 +1,66 @@
 import { Link } from 'react-router-dom'
-import { CheckCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/path'
+import type { Question, QuizResult } from '@/types/quiz'
+import QuizResultSummary from './quiz-result-summary'
+import QuizResultQuestion from './quiz-result-question'
 
 type Props = {
   quizTitle: string
+  result: QuizResult | null
+  questions: Question[]
+  answers: Record<string, string | string[]>
+  onRetake: () => void
 }
 
-export default function QuizSubmitted({ quizTitle }: Props) {
+export default function QuizSubmitted({ quizTitle, result, questions, answers, onRetake }: Props) {
   return (
-    <div className="border-border mx-auto flex max-w-md flex-col items-center gap-4 rounded-xl border p-8 text-center">
-      <CheckCircle className="text-primary h-12 w-12" />
-      <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold">Quiz complete!</h2>
-        <p className="text-muted-foreground text-sm">{quizTitle}</p>
+    <div className="mx-auto flex max-w-2xl flex-col gap-5">
+      {result ? (
+        <QuizResultSummary quizTitle={quizTitle} result={result} />
+      ) : (
+        <section className="enter-fade-up border-border bg-card flex flex-col items-center gap-3 rounded-2xl border p-8 text-center">
+          <CheckCircle className="text-primary h-10 w-10" />
+          <div className="flex flex-col gap-1">
+            <h1 className="font-heading text-xl font-bold">Quiz complete</h1>
+            <p className="text-muted-foreground text-sm">{quizTitle}</p>
+          </div>
+          <p className="text-muted-foreground max-w-sm text-sm">
+            Your answers weren’t scored, but you can review the correct answers below.
+          </p>
+        </section>
+      )}
+
+      {questions.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-muted-foreground px-1 text-xs font-semibold tracking-[0.18em] uppercase">
+            Review
+          </h2>
+          {questions.map((question, i) => (
+            <QuizResultQuestion
+              key={question.id}
+              question={question}
+              index={i}
+              userAnswer={answers[question.id]}
+              style={{ animationDelay: `${Math.min(i * 60 + 200, 700)}ms` }}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="flex flex-wrap justify-center gap-3 pt-2 pb-10">
+        <Button onClick={onRetake} className="gap-1.5">
+          <RotateCcw className="h-4 w-4" />
+          Retake quiz
+        </Button>
+        <Link to={PATHS.app.quizzes}>
+          <Button variant="outline" className="gap-1.5">
+            <ArrowLeft className="h-4 w-4" />
+            Back to quizzes
+          </Button>
+        </Link>
       </div>
-      <Link to={PATHS.app.quizzes}>
-        <Button variant="outline">Back to quizzes</Button>
-      </Link>
     </div>
   )
 }

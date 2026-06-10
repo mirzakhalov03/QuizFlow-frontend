@@ -1,7 +1,7 @@
 import { UseFormReturn, FieldValues } from 'react-hook-form'
 import { toast } from '@/lib/toast'
 
-interface ApiError {
+type ApiError = {
   status?: number
   response?: {
     data?: Record<string, string>
