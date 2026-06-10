@@ -18,12 +18,12 @@ const Register = lazyPage(() => import('@/pages/auth/register'))
 const ForgotPassword = lazyPage(() => import('@/pages/auth/forgot-password'))
 const ResetPassword = lazyPage(() => import('@/pages/auth/reset-password'))
 
-const Dashboard = lazyPage(() => import('@/pages/main/dashboard'))
+const Analytics = lazyPage(() => import('@/pages/main/analytics'))
 const Account = lazyPage(() => import('@/pages/main/account'))
 const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
 const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
-const Analytics = lazyPage(() => import('@/pages/main/analytics'))
-const Settings = lazyPage(() => import('@/pages/main/settings'))
+
+const PublicQuizView = lazyPage(() => import('@/pages/public/quiz-view'))
 
 const IntegrationSuccess = lazyPage(() => import('@/pages/integrations/success'))
 
@@ -40,6 +40,7 @@ export const routes: RouteObject[] = [
           { path: PATHS.features, lazy: Features },
           { path: PATHS.contact, lazy: Contact },
           { path: PATHS.pricing, lazy: Pricing },
+          { path: 'public/quizzes/:shareToken', lazy: PublicQuizView },
         ],
       },
 
@@ -61,13 +62,11 @@ export const routes: RouteObject[] = [
         element: <AppLayout />,
         loader: requireAuth,
         children: [
-          { index: true, element: <Navigate to={PATHS.app.dashboard} replace /> },
-          { path: 'dashboard', lazy: Dashboard },
+          { index: true, element: <Navigate to={PATHS.app.quizzes} replace /> },
+          { path: 'analytics', lazy: Analytics },
           { path: 'account', lazy: Account },
           { path: 'quizzes', lazy: Quizzes },
           { path: 'quizzes/:id', lazy: QuizSolvingUI },
-          { path: 'analytics', lazy: Analytics },
-          { path: 'settings', lazy: Settings },
         ],
       },
 

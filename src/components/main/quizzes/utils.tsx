@@ -18,11 +18,27 @@ export const questionCounts = [
 ]
 
 export const aiModels = [
-  { label: 'Gemini 2.0 Flash', value: 'google/gemini-2.0-flash-001' },
+  { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
   { label: 'GPT-4o Mini', value: 'openai/gpt-4o-mini' },
   { label: 'DeepSeek V3', value: 'deepseek/deepseek-chat-v3' },
   { label: 'Llama 3.3 70B', value: 'meta-llama/llama-3.3-70b-instruct' },
 ]
+
+export const DEFAULT_MODEL = aiModels[0].value
+
+/**
+ * The model selector mixes built-in models with the user's BYOK keys. BYOK
+ * options are encoded as `byok:<keyId>` so a single value can represent either.
+ */
+const BYOK_OPTION_PREFIX = 'byok:'
+
+export const buildByokOptionValue = (keyId: string) => `${BYOK_OPTION_PREFIX}${keyId}`
+
+/** Decodes a model-selector value into the fields the create-quiz API expects. */
+export const parseModelSelection = (value: string): { model: string; apiKeyId?: string } =>
+  value.startsWith(BYOK_OPTION_PREFIX)
+    ? { model: DEFAULT_MODEL, apiKeyId: value.slice(BYOK_OPTION_PREFIX.length) }
+    : { model: value }
 
 export const difficulties = [
   { label: 'Easy', value: 'easy' },

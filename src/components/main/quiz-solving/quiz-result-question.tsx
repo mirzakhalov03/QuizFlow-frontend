@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import { Check, X } from 'lucide-react'
 import type { Question, QuestionOption } from '@/types/quiz'
 import { getReviewStatus, type ReviewStatus } from '@/lib/quiz-result'
+import MarkdownText from './markdown-text'
 
 type Props = {
   question: Question
@@ -32,7 +33,6 @@ const STATUS: Record<ReviewStatus, { label: string; cls: string }> = {
 export default function QuizResultQuestion({ question, index, userAnswer, style }: Props) {
   const status = getReviewStatus(question, userAnswer)
   const pill = STATUS[status]
-  const userOptionId = typeof userAnswer === 'string' ? userAnswer : undefined
 
   return (
     <article
@@ -43,7 +43,10 @@ export default function QuizResultQuestion({ question, index, userAnswer, style 
         <span className="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
           {index + 1}
         </span>
-        <p className="flex-1 pt-0.5 text-sm leading-relaxed font-semibold">{question.text}</p>
+        <MarkdownText
+          text={question.text}
+          className="flex-1 pt-0.5 text-sm leading-relaxed font-semibold"
+        />
         <span
           className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${pill.cls}`}
         >
@@ -59,7 +62,7 @@ export default function QuizResultQuestion({ question, index, userAnswer, style 
           />
         ) : (
           question.options.map((option) => (
-            <OptionRow key={option.id} option={option} userOptionId={userOptionId} />
+            <OptionRow key={option.id} option={option} userAnswer={userAnswer} />
           ))
         )}
       </div>
@@ -69,8 +72,17 @@ export default function QuizResultQuestion({ question, index, userAnswer, style 
 
 type OptionState = 'correct' | 'wrong' | 'neutral'
 
-function OptionRow({ option, userOptionId }: { option: QuestionOption; userOptionId?: string }) {
-  const isChosen = option.id === userOptionId
+function OptionRow({
+  option,
+  userAnswer,
+}: {
+  option: QuestionOption
+  userAnswer: string | string[] | undefined
+}) {
+  const isChosen = Array.isArray(userAnswer)
+    ? userAnswer.includes(option.id)
+    : option.id === userAnswer
+
   const state: OptionState = option.isCorrect ? 'correct' : isChosen ? 'wrong' : 'neutral'
 
   const box =
@@ -94,15 +106,16 @@ function OptionRow({ option, userOptionId }: { option: QuestionOption; userOptio
       <Marker state={state} />
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <span className="text-sm">{option.text}</span>
+          <MarkdownText text={option.text} className="text-sm" />
           {label && (
             <span className={`shrink-0 text-xs font-medium ${label.cls}`}>{label.text}</span>
           )}
         </div>
         {option.explanation && (
-          <p className="text-muted-foreground mt-1.5 text-xs leading-relaxed">
-            {option.explanation}
-          </p>
+          <MarkdownText
+            text={option.explanation}
+            className="text-muted-foreground mt-1.5 text-xs leading-relaxed"
+          />
         )}
       </div>
     </div>
@@ -131,7 +144,7 @@ function OpenEndedReview({ question, answer }: { question: Question; answer: str
           Your answer
         </p>
         {trimmed ? (
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{trimmed}</p>
+          <MarkdownText text={trimmed} className="text-sm leading-relaxed" />
         ) : (
           <p className="text-muted-foreground text-sm italic">You didn’t answer this question.</p>
         )}
@@ -142,7 +155,7 @@ function OpenEndedReview({ question, answer }: { question: Question; answer: str
           <p className="text-primary mb-1 text-xs font-medium tracking-wide uppercase">
             Suggested answer
           </p>
-          <p className="text-sm leading-relaxed">{referenceText}</p>
+          <MarkdownText text={referenceText} className="text-sm leading-relaxed" />
         </div>
       )}
     </div>

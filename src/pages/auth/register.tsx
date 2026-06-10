@@ -14,24 +14,23 @@ const inputClass = cn(
 
 export default function Register() {
   const [loading, setLoading] = useState(false)
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null)
   const navigate = useNavigate()
   const setUser = useAuthStore((s) => s.setUser)
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const onRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     const form = new FormData(e.currentTarget)
+    const email = form.get('email') as string
 
     try {
-      const res = await authService.register({
-        email: form.get('email') as string,
+      await authService.register({
+        email,
         fullName: form.get('name') as string,
         password: form.get('password') as string,
       })
-
-      const extracted = res?.data?.user ?? res?.user ?? res
-      setUser({ ...extracted, hasPassword: true })
-      navigate(PATHS.app.dashboard, { replace: true })
+      setPendingEmail(email)
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string; detail?: string } } }
       const msg =
@@ -44,8 +43,92 @@ export default function Register() {
     }
   }
 
+  const onConfirm = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    const form = new FormData(e.currentTarget)
+
+    try {
+      await authService.registerConfirm({
+        email: pendingEmail!,
+        otp: form.get('otp') as string,
+      })
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string; detail?: string } } }
+
+      if (e?.response) {
+        const msg =
+          e.response.data?.message ?? e.response.data?.detail ?? 'Invalid code. Please try again.'
+        toast.error(msg)
+        setLoading(false)
+        return
+      }
+      // No response = CORS error from backend redirect — cookies are set, fall through to me()
+    }
+
+    try {
+      const me = await authService.me()
+      const user = me?.user ?? me?.data ?? me
+      setUser({ ...user, hasPassword: true })
+      navigate(PATHS.app.quizzes, { replace: true })
+    } catch {
+      toast.success('Account verified! Please sign in.')
+      navigate(PATHS.auth.login, { replace: true })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (pendingEmail) {
+    return (
+      <form onSubmit={onConfirm} className="space-y-4">
+        <div>
+          <h1 className="text-xl font-semibold">Check your email</h1>
+          <p className="text-muted-foreground text-sm">
+            We sent a 6-digit code to{' '}
+            <span className="text-foreground font-medium">{pendingEmail}</span>. Enter it below to
+            activate your account.
+          </p>
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="otp" className="text-sm font-medium">
+            Verification code
+          </label>
+          <input
+            id="otp"
+            name="otp"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]{6}"
+            maxLength={6}
+            required
+            autoComplete="one-time-code"
+            placeholder="000000"
+            className={cn(inputClass, 'text-center font-mono text-lg tracking-[0.5em]')}
+          />
+        </div>
+
+        <Button type="submit" loading={loading} className="w-full">
+          Verify
+        </Button>
+
+        <p className="text-muted-foreground text-center text-sm">
+          Wrong email?{' '}
+          <button
+            type="button"
+            onClick={() => setPendingEmail(null)}
+            className="text-foreground hover:underline"
+          >
+            Go back
+          </button>
+        </p>
+      </form>
+    )
+  }
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onRegister} className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold">Create account</h1>
         <p className="text-muted-foreground text-sm">Start building quizzes in under a minute.</p>

@@ -15,11 +15,13 @@ export const PATHS = {
 
   app: {
     root: '/app',
-    dashboard: '/app/dashboard',
+    analytics: '/app/analytics',
     account: '/app/account',
     quizzes: '/app/quizzes',
     quiz: (id: string) => `/app/quizzes/${id}`,
-    analytics: '/app/analytics',
-    settings: '/app/settings',
+  },
+
+  public: {
+    quiz: (token: string) => `/public/quizzes/${token}`,
   },
 } as const

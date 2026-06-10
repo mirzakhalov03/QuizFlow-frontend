@@ -31,7 +31,7 @@ export default function ResetPassword() {
     setLoading(true)
 
     try {
-      await authService.resetPassword({ token, password })
+      await authService.resetPassword({ email: form.get('email') as string, token, password })
       toast.success('Password updated. Please sign in.')
       navigate(PATHS.auth.login, { replace: true })
     } catch (err: unknown) {
@@ -69,6 +69,20 @@ export default function ResetPassword() {
       <div>
         <h1 className="text-xl font-semibold">Set new password</h1>
         <p className="text-muted-foreground text-sm">Choose a strong password for your account.</p>
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="email" className="text-sm font-medium">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          className={inputClass}
+        />
       </div>
 
       <div className="space-y-1">

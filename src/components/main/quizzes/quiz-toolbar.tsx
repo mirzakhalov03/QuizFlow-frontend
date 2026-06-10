@@ -12,22 +12,39 @@ import { questionTypes } from '@/components/main/quizzes/utils'
 const SORT_OPTIONS: { label: string; value: SortOption }[] = [
   { label: 'Newest first', value: 'newest' },
   { label: 'Oldest first', value: 'oldest' },
-  { label: 'A → Z', value: 'az' },
-  { label: 'Z → A', value: 'za' },
 ]
 
+// Only the question types the backend can store/filter on (excludes "mixed",
+// which is a generation option, not a persisted type).
+const FILTERABLE_TYPES = questionTypes.filter((t) => t.value !== 'mixed')
+
 type Props = {
+  search: string
+  onSearchChange: (search: string) => void
   sort: SortOption
   onSortChange: (sort: SortOption) => void
   filterTypes: QuestionType[]
   onToggleFilter: (type: QuestionType) => void
 }
 
-export function QuizToolbar({ sort, onSortChange, filterTypes, onToggleFilter }: Props) {
+export function QuizToolbar({
+  search,
+  onSearchChange,
+  sort,
+  onSortChange,
+  filterTypes,
+  onToggleFilter,
+}: Props) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="min-w-40 flex-1">
-        <Input type="search" placeholder="Search quizzes..." fullWidth />
+        <Input
+          type="search"
+          placeholder="Search quizzes..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          fullWidth
+        />
       </div>
       <SortDropdown sort={sort} onChange={onSortChange} />
       <FilterDropdown filterTypes={filterTypes} onToggle={onToggleFilter} />
@@ -104,7 +121,7 @@ function FilterDropdown({
           <div className="border-border text-muted-foreground border-b px-3 py-2 text-xs font-medium">
             Quiz Type
           </div>
-          {questionTypes.map((t) => {
+          {FILTERABLE_TYPES.map((t) => {
             const checked = filterTypes.includes(t.value as QuestionType)
             return (
               <button

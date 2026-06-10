@@ -1,37 +1,52 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { keepPreviousData } from '@tanstack/react-query'
+import { QUIZ_LIST } from '@/constants/api-endpoints'
+import { useDebounce } from '@/hooks/useDebounce'
+import { useGet } from '@/hooks/useGet'
+import type { PaginatedResponse, Quiz, QuestionType } from '@/types/quiz'
+export type SortOption = 'newest' | 'oldest'
 
-import type { Quiz, QuestionType } from '@/types/quiz'
+const SEARCH_DEBOUNCE_MS = 300
 
-export type SortOption = 'newest' | 'oldest' | 'az' | 'za'
-
-export function useQuizListControls(quizzes: Quiz[]) {
+export function useQuizListControls() {
+  const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortOption>('newest')
   const [filterTypes, setFilterTypes] = useState<QuestionType[]>([])
 
-  const processed = useMemo(() => {
-    let result = [...quizzes]
+  const debouncedSearch = useDebounce(search.trim(), SEARCH_DEBOUNCE_MS)
 
-    if (filterTypes.length > 0) {
-      result = result.filter((q) => q.type && filterTypes.includes(q.type))
-    }
+  const params = useMemo(
+    () => ({
+      search: debouncedSearch || undefined,
+      types: filterTypes.length > 0 ? filterTypes.join(',') : undefined,
+      sort,
+    }),
+    [debouncedSearch, filterTypes, sort]
+  )
 
-    result.sort((a, b) => {
-      if (sort === 'newest')
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      if (sort === 'oldest')
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      if (sort === 'az') return a.title.localeCompare(b.title)
-      return b.title.localeCompare(a.title)
-    })
+  const { data, isLoading, isFetching, isError } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
+    params,
+    options: { staleTime: 0, placeholderData: keepPreviousData },
+  })
 
-    return result
-  }, [quizzes, sort, filterTypes])
-
-  const toggleFilterType = (type: QuestionType) => {
+  const toggleFilterType = useCallback((type: QuestionType) => {
     setFilterTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     )
-  }
+  }, [])
 
-  return { processed, sort, setSort, filterTypes, toggleFilterType }
+  return {
+    items: data?.data?.items ?? [],
+    total: data?.data?.pagination?.count ?? 0,
+    isLoading,
+    isFetching,
+    isError,
+    isFiltering: debouncedSearch.length > 0 || filterTypes.length > 0,
+    search,
+    setSearch,
+    sort,
+    setSort,
+    filterTypes,
+    toggleFilterType,
+  }
 }

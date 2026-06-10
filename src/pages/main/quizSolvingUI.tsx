@@ -16,6 +16,7 @@ import { useGlobalStore } from '@/store/global-store'
 import QuizIntro from '@/components/main/quiz-solving/quiz-intro'
 import QuestionCard from '@/components/main/quiz-solving/question-card'
 import QuizSubmitted from '@/components/main/quiz-solving/quiz-submitted'
+import QuizProgress from '@/components/main/quiz-solving/quiz-progress'
 
 export type QuizSolvingHeader = {
   title: string
@@ -87,31 +88,35 @@ export default function QuizPage() {
             setResult(res.data ?? null)
             setPhase('submitted')
           },
-          // Errors surface via handleFormError (toast); stay on the solving phase
-          // so the user keeps their answers and can retry.
         }
       )
     },
     [id, submit, clearSavedState]
   )
 
-  // Manual submit: require at least one gradable answer, otherwise nudge.
   const handleSubmit = useCallback(() => {
     if (!id || !quiz || isPending) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
+
     if (payload.length === 0) {
+      const hasAnswers = Object.values(answers).some((val) =>
+        Array.isArray(val) ? val.length > 0 : val !== undefined && val !== ''
+      )
+      if (hasAnswers) {
+        clearSavedState()
+        setResult(null)
+        setPhase('submitted')
+        return
+      }
       toast.error('Answer at least one question before submitting.')
       return
     }
     submitAnswers(payload)
-  }, [id, quiz, answers, isPending, submitAnswers])
+  }, [id, quiz, answers, isPending, submitAnswers, clearSavedState])
 
-  // Timer expiry: submit whatever has been answered. Multi-select quizzes can't
-  // be graded yet (manual submit is disabled), so go straight to the unscored
-  // review rather than POST a partial, misleadingly-low score.
   const handleAutoSubmit = useCallback(() => {
     if (!id || !quiz) return
-    const payload = containsMultiSelect ? [] : buildSubmitAnswers(quiz.questions, answers)
+    const payload = buildSubmitAnswers(quiz.questions, answers)
     if (payload.length === 0) {
       clearSavedState()
       setResult(null)
@@ -119,7 +124,7 @@ export default function QuizPage() {
       return
     }
     submitAnswers(payload)
-  }, [id, quiz, answers, containsMultiSelect, submitAnswers, clearSavedState])
+  }, [id, quiz, answers, submitAnswers, clearSavedState])
 
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
@@ -146,9 +151,6 @@ export default function QuizPage() {
 
   const handleSelectProgress = useCallback((index: number) => {
     setActiveIndex(index)
-    document
-      .getElementById(`question-${index}`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [])
 
   const setData = useGlobalStore((s) => s.setData)
@@ -204,29 +206,64 @@ export default function QuizPage() {
       </div>
     )
   }
+  if (quiz.questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-muted-foreground">This quiz has no questions.</p>
+      </div>
+    )
+  }
+  const currentQuestion = quiz.questions[activeIndex]
+  const isLastQuestion = activeIndex === quiz.questions.length - 1
 
   return (
-    <div className="flex flex-col gap-5">
-      {quiz.questions.map((question, i) => (
-        <QuestionCard
-          key={question.id}
-          question={question}
-          index={i}
-          value={answers[question.id]}
-          onChange={(value) => handleAnswerChange(question.id, value)}
+    <div className="flex flex-col gap-6">
+      <div className="lg:hidden">
+        <QuizProgress
+          questions={quiz.questions}
+          answers={answers}
+          activeIndex={activeIndex}
+          onSelect={handleSelectProgress}
         />
-      ))}
-
-      <div className="flex flex-col items-end gap-2 pb-8">
-        {containsMultiSelect && (
-          <p className="text-muted-foreground text-sm">
-            Multi-select quizzes aren’t gradable yet — submission is disabled.
-          </p>
-        )}
-        <Button onClick={handleSubmit} disabled={containsMultiSelect || isPending}>
-          {isPending ? 'Submitting…' : 'Submit Quiz'}
-        </Button>
       </div>
+
+      <QuestionCard
+        key={currentQuestion.id}
+        question={currentQuestion}
+        index={activeIndex}
+        value={answers[currentQuestion.id]}
+        onChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+      />
+
+      <div className="flex items-center justify-between gap-4 pb-8">
+        <Button
+          variant="outline"
+          onClick={() => setActiveIndex((p) => Math.max(0, p - 1))}
+          disabled={activeIndex === 0}
+        >
+          Previous
+        </Button>
+
+        <div className="flex items-center gap-3">
+          {isLastQuestion ? (
+            <Button onClick={handleSubmit} disabled={containsMultiSelect || isPending}>
+              {isPending ? 'Submitting…' : 'Submit Quiz'}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => setActiveIndex((p) => Math.min(quiz.questions.length - 1, p + 1))}
+            >
+              Next
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {containsMultiSelect && isLastQuestion && (
+        <p className="text-muted-foreground -mt-4 text-center text-sm">
+          Multi-select quizzes aren’t gradable yet — submission is disabled.
+        </p>
+      )}
     </div>
   )
 }

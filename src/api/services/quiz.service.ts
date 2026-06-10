@@ -11,7 +11,7 @@ type PresignedUrlResult = {
 
 type BaseQuizPayload = {
   title: string
-  type: QuestionType
+  type?: QuestionType | undefined
   questionCount: number
   userInstructions?: string
   isTimerEnabled?: boolean
@@ -21,6 +21,8 @@ type BaseQuizPayload = {
 export type FileQuizPayload = BaseQuizPayload & {
   keys: string[]
   model: string
+  difficulty: string
+  apiKeyId?: string
 }
 
 export type NotionQuizPayload = BaseQuizPayload & {

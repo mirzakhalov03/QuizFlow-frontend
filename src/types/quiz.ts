@@ -19,10 +19,16 @@ export type Quiz = {
   isTimerEnabled: boolean
   timerDuration: number | null
   userInstructions: string | null
+  tokenUsage?: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  } | null
   completedAt: string | null
   createdAt: string
   updatedAt: string
   uploadedAt: string | null
+  shareToken?: string | null
 }
 
 export type QuizJob = {
