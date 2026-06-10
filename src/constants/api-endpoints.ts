@@ -13,3 +13,5 @@ export const INTEGRATION_BY_PROVIDER = (provider: string) => `/integrations/${pr
 
 export const BYOK = '/byok'
 export const BYOK_BY_ID = (id: string) => `/byok/${id}`
+
+export const ANALYTICS_SUMMARY = '/analytics/summary'
