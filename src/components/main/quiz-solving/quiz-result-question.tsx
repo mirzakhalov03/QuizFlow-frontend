@@ -43,7 +43,10 @@ export default function QuizResultQuestion({ question, index, userAnswer, style 
         <span className="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
           {index + 1}
         </span>
-        <MarkdownText text={question.text} className="flex-1 pt-0.5 text-sm leading-relaxed font-semibold" />
+        <MarkdownText
+          text={question.text}
+          className="flex-1 pt-0.5 text-sm leading-relaxed font-semibold"
+        />
         <span
           className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${pill.cls}`}
         >
@@ -69,13 +72,18 @@ export default function QuizResultQuestion({ question, index, userAnswer, style 
 
 type OptionState = 'correct' | 'wrong' | 'neutral'
 
-function OptionRow({ option, userAnswer }: { option: QuestionOption; userAnswer: string | string[] | undefined }) {
-  const isChosen = Array.isArray(userAnswer) 
-    ? userAnswer.includes(option.id) 
+function OptionRow({
+  option,
+  userAnswer,
+}: {
+  option: QuestionOption
+  userAnswer: string | string[] | undefined
+}) {
+  const isChosen = Array.isArray(userAnswer)
+    ? userAnswer.includes(option.id)
     : option.id === userAnswer
 
   const state: OptionState = option.isCorrect ? 'correct' : isChosen ? 'wrong' : 'neutral'
-
 
   const box =
     state === 'correct'

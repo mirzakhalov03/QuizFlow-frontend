@@ -155,9 +155,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
             ))}
           </div>
         )}
-        {fieldState.error && (
-          <p className="text-destructive text-xs">{fieldState.error.message}</p>
-        )}
+        {fieldState.error && <p className="text-destructive text-xs">{fieldState.error.message}</p>}
       </div>
 
       <FormInput

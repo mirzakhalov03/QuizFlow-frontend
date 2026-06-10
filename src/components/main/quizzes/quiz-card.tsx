@@ -14,6 +14,7 @@ import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
 import { PATHS } from '@/lib/path'
 import { usePatch } from '@/hooks/usePatch'
 import Modal from '@/components/custom/modal'
+import ConfirmDialog from '@/components/ui/confirm-dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
@@ -25,12 +26,14 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const queryClient = useQueryClient()
   const [shareToken, setShareToken] = useState<string | null>(quiz.shareToken || null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
 
   const { mutate: deleteQuiz, isPending: isDeleting } = useDelete({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
+      setIsConfirmOpen(false)
       toast.success('Quiz deleted')
     },
   })
@@ -58,8 +61,12 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
     },
   })
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const openDeleteConfirm = (e: React.MouseEvent) => {
     e.stopPropagation()
+    setIsConfirmOpen(true)
+  }
+
+  const confirmDelete = () => {
     deleteQuiz(QUIZ_BY_ID(quiz.id))
   }
 
@@ -124,9 +131,8 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
             <Share2 className="h-4 w-4" />
           </button>
           <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="text-muted-foreground hover:text-destructive mt-0.5 transition-colors disabled:opacity-40"
+            onClick={openDeleteConfirm}
+            className="text-muted-foreground hover:text-destructive mt-0.5 transition-colors"
             aria-label="Delete quiz"
           >
             <Trash2 className="h-4 w-4" />
@@ -217,6 +223,17 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
           )}
         </div>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete quiz"
+        description={`"${quiz.title}" will be permanently deleted. This can't be undone.`}
+        confirmLabel="Delete"
+        variant="destructive"
+        loading={isDeleting}
+      />
     </div>
   )
 }

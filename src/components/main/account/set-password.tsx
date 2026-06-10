@@ -16,7 +16,9 @@ export default function SetPassword() {
   const [resetSent, setResetSent] = useState(false)
   const { user, setUser } = useAuthStore()
 
-  if (!user?.hasPassword) {
+  if (!user) return null
+
+  if (!user.hasPassword) {
     const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault()
       setLoading(true)

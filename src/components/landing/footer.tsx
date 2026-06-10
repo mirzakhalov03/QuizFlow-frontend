@@ -11,7 +11,7 @@ const productLinks = [
 ]
 
 const companyLinks = [
-  { label: 'Dashboard', to: PATHS.app.dashboard },
+  { label: 'Quizzes', to: PATHS.app.quizzes },
   { label: 'Get started', to: PATHS.auth.register },
   { label: 'Support', to: PATHS.auth.login },
 ]

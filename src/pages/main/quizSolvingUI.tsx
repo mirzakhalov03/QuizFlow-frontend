@@ -88,14 +88,12 @@ export default function QuizPage() {
             setResult(res.data ?? null)
             setPhase('submitted')
           },
-         
         }
       )
     },
     [id, submit, clearSavedState]
   )
 
- 
   const handleSubmit = useCallback(() => {
     if (!id || !quiz || isPending) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
@@ -116,7 +114,6 @@ export default function QuizPage() {
     submitAnswers(payload)
   }, [id, quiz, answers, isPending, submitAnswers, clearSavedState])
 
-   
   const handleAutoSubmit = useCallback(() => {
     if (!id || !quiz) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
