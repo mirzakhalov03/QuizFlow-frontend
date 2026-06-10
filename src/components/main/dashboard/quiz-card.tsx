@@ -110,7 +110,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         <div className="flex shrink-0 items-center gap-1">
           <button
             onClick={handleExportPdf}
-            disabled={isExporting}
+            disabled={isExporting || isDeleting}
             className="text-muted-foreground hover:text-primary mt-0.5 transition-colors disabled:opacity-40"
             aria-label="Export quiz as PDF"
           >
