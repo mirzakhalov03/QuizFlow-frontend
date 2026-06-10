@@ -35,7 +35,7 @@ export default function ScoreOverTimeChart({ points }: Props) {
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="h-auto w-full"
         role="img"
-        aria-label="Line chart of quiz scores by day"
+        aria-label="Line chart of quiz scores over time"
       >
         {yTicks.map((tick) => {
           const y = yFor(tick)
