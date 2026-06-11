@@ -32,6 +32,15 @@ function loadSavedAnswers(quizId: string): Record<string, string | string[]> {
 }
 
 export default function QuizSolvingLayout() {
+  // React Router reuses this route component when navigating between quizzes
+  // (only :id changes), so the useState initializers in QuizSolving would keep
+  // the previous quiz's answers and timer. Keying on id remounts the subtree,
+  // resetting all per-quiz state in one stroke.
+  const { id } = useParams<{ id: string }>()
+  return <QuizSolving key={id ?? 'none'} />
+}
+
+function QuizSolving() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
