@@ -8,6 +8,10 @@ type Props = {
   question: Question
   index: number
   userAnswer: string | string[] | undefined
+  /** Verdict for an open-ended question once graded. */
+  verdict?: boolean
+  /** Whether open-ended grading is still in flight. */
+  isGrading?: boolean
   style?: CSSProperties
 }
 
@@ -28,10 +32,21 @@ const STATUS: Record<ReviewStatus, { label: string; cls: string }> = {
     label: 'Review',
     cls: 'border-primary/30 bg-primary/10 text-primary',
   },
+  grading: {
+    label: 'Scoring…',
+    cls: 'border-primary/30 bg-primary/10 text-primary animate-pulse',
+  },
 }
 
-export default function QuizResultQuestion({ question, index, userAnswer, style }: Props) {
-  const status = getReviewStatus(question, userAnswer)
+export default function QuizResultQuestion({
+  question,
+  index,
+  userAnswer,
+  verdict,
+  isGrading,
+  style,
+}: Props) {
+  const status = getReviewStatus(question, userAnswer, { verdict, isGrading })
   const pill = STATUS[status]
 
   return (

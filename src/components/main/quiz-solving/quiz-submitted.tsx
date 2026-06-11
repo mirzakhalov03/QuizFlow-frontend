@@ -11,10 +11,22 @@ type Props = {
   result: QuizResult | null
   questions: Question[]
   answers: Record<string, string | string[]>
+  /** Map of questionId → graded verdict (open-ended). */
+  verdicts: Record<string, boolean>
+  /** Whether open-ended grading is still in flight. */
+  isGrading: boolean
   onRetake: () => void
 }
 
-export default function QuizSubmitted({ quizTitle, result, questions, answers, onRetake }: Props) {
+export default function QuizSubmitted({
+  quizTitle,
+  result,
+  questions,
+  answers,
+  verdicts,
+  isGrading,
+  onRetake,
+}: Props) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5">
       {result ? (
@@ -43,6 +55,8 @@ export default function QuizSubmitted({ quizTitle, result, questions, answers, o
               question={question}
               index={i}
               userAnswer={answers[question.id]}
+              verdict={verdicts[question.id]}
+              isGrading={isGrading}
               style={{ animationDelay: `${Math.min(i * 60 + 200, 700)}ms` }}
             />
           ))}

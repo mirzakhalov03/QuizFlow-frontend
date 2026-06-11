@@ -11,11 +11,7 @@ import { QUIZ_BY_ID, QUIZ_RESULT, QUIZ_SUBMIT } from '@/constants/api-endpoints'
 import type { QuizResult, QuizWithQuestions, SubmitAnswer } from '@/types/quiz'
 import type { ApiResponse } from '@/types/api'
 import { useGlobalStore } from '@/store/global-store'
-import {
-  QUIZ_SOLVING_HEADER_KEY,
-  type QuizSolvingContext,
-  type QuizSolvingHeader,
-} from './context'
+import { QUIZ_SOLVING_HEADER_KEY, type QuizSolvingContext, type QuizSolvingHeader } from './context'
 
 function answersKey(quizId: string) {
   return `quiz-answers-${quizId}`
