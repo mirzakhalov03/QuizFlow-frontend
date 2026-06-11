@@ -11,7 +11,7 @@ import { useQuizSolving } from './context'
 export default function QuizResultView() {
   const { quiz, retake } = useQuizSolving()
 
-  const { data, isLoading } = useGet<ApiResponse<QuizResultResponse>>(QUIZ_RESULT(quiz.id), {
+  const { data, isLoading, isError } = useGet<ApiResponse<QuizResultResponse>>(QUIZ_RESULT(quiz.id), {
     options: {
       staleTime: 0,
       refetchInterval: (query) => {
@@ -46,6 +46,16 @@ export default function QuizResultView() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+      </div>
+    )
+  }
+
+  // An API failure leaves `result` null too, so surface the error instead of
+  // silently bouncing the user to the intro as if they'd never submitted.
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-destructive">Couldn’t load your results. Please try again.</p>
       </div>
     )
   }

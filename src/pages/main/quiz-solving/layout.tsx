@@ -68,13 +68,13 @@ function QuizSolving() {
 
   const onAnswerChange = useCallback(
     (questionId: string, value: string | string[]) => {
-      setAnswers((prev) => {
-        const updated = { ...prev, [questionId]: value }
-        if (id) localStorage.setItem(answersKey(id), JSON.stringify(updated))
-        return updated
-      })
+      // Side effect lives in the event handler (not the setState updater, which
+      // must stay pure — concurrent rendering may call it more than once).
+      const updated = { ...answers, [questionId]: value }
+      setAnswers(updated)
+      if (id) localStorage.setItem(answersKey(id), JSON.stringify(updated))
     },
-    [id]
+    [id, answers]
   )
 
   const goToResult = useCallback(() => {
