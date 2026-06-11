@@ -10,7 +10,7 @@ type PresignedUrlResult = {
 }
 
 type BaseQuizPayload = {
-  title: string
+  title?: string
   type?: QuestionType | undefined
   questionCount: number
   userInstructions?: string

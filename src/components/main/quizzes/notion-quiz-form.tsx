@@ -4,7 +4,6 @@ import { Settings2, Sparkles, ChevronLeft, X } from 'lucide-react'
 import { quizService } from '@/api/services/quiz.service'
 import { FormSelect } from '@/components/form/form-select'
 import FieldLabel from '@/components/form/form-label'
-import FormInput from '@/components/form/input'
 import FormTextarea from '@/components/form/textarea'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
@@ -17,7 +16,6 @@ import { useNotionPages } from '@/hooks/useNotionPages'
 
 type NotionFormValues = {
   pageIds: string[]
-  title: string
   type: QuestionType
   questionCount: string
   userInstructions?: string
@@ -38,7 +36,6 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   const form = useForm<NotionFormValues>({
     defaultValues: {
       pageIds: [],
-      title: '',
       type: 'multiple_choice',
       questionCount: '5',
       userInstructions: '',
@@ -57,12 +54,11 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
 
     closeModal()
     reset()
-    addJob({ jobId: tempId, title: values.title, type: values.type })
+    addJob({ jobId: tempId, title: 'Generating quiz…', type: values.type })
     ;(async () => {
       try {
         const result = await quizService.createQuiz('notion', {
           pageIds: values.pageIds,
-          title: values.title,
           type: values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
@@ -157,14 +153,6 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
         )}
         {fieldState.error && <p className="text-destructive text-xs">{fieldState.error.message}</p>}
       </div>
-
-      <FormInput
-        name="title"
-        methods={form}
-        label="Quiz Title"
-        placeholder="e.g. Chapter 5 Review"
-        required
-      />
 
       <div className="bg-muted/40 space-y-3 rounded-xl p-3">
         <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
