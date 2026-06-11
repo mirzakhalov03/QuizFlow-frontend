@@ -25,7 +25,6 @@ import {
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 
 type QuizFormValues = {
-  title: string
   type: QuestionType
   questionCount: string
   difficulty: string
@@ -50,7 +49,6 @@ export default function QuizForm({ onBack }: QuizFormProps) {
 
   const form = useForm<QuizFormValues>({
     defaultValues: {
-      title: '',
       type: 'multiple_choice',
       questionCount: '5',
       difficulty: 'medium',
@@ -95,7 +93,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
 
     closeModal()
     reset()
-    addJob({ jobId: tempId, title: values.title, type: values.type })
+    addJob({ jobId: tempId, title: 'Generating quiz…', type: values.type })
     ;(async () => {
       try {
         const keys = await Promise.all(
@@ -108,7 +106,6 @@ export default function QuizForm({ onBack }: QuizFormProps) {
 
         const result = await quizService.createQuiz('file', {
           keys,
-          title: values.title,
           type: values.type === 'mixed' ? undefined : values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
@@ -134,14 +131,6 @@ export default function QuizForm({ onBack }: QuizFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <FormInput
-        name="title"
-        methods={form}
-        label="Quiz Title"
-        placeholder="e.g. Chapter 5 Review"
-        required
-      />
-
       <div className="space-y-1">
         <FileUpload
           label="Source Documents"
