@@ -1,23 +1,38 @@
-import { useForm, useController } from 'react-hook-form'
+import { useEffect, useMemo, useRef } from 'react'
+import { useForm, useController, useWatch } from 'react-hook-form'
 import { Settings2, Sparkles, ChevronLeft, X } from 'lucide-react'
 
 import { quizService } from '@/api/services/quiz.service'
 import { FormSelect } from '@/components/form/form-select'
 import FieldLabel from '@/components/form/form-label'
 import FormTextarea from '@/components/form/textarea'
+import FormInput from '@/components/form/input'
+import { FormCheckbox } from '@/components/form/form-checkbox'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
 import { toast } from '@/lib/toast'
 import type { QuestionType } from '@/types/quiz'
-import { questionCounts, questionTypes } from '@/components/main/quizzes/utils'
+import {
+  aiModels,
+  DEFAULT_MODEL,
+  difficulties,
+  questionCounts,
+  questionTypes,
+} from '@/components/main/quizzes/utils'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 import { useModal } from '@/hooks/useModal'
 import { useNotionPages } from '@/hooks/useNotionPages'
+import { useByokKeys } from '@/hooks/useByokKeys'
 
 type NotionFormValues = {
   pageIds: string[]
   type: QuestionType
   questionCount: string
+  difficulty: string
+  model: string
+  apiKeyId: string
+  isTimerEnabled: boolean
+  timerDuration?: number
   userInstructions?: string
 }
 
@@ -32,22 +47,49 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
 
   const { pages, loading, error, refetch } = useNotionPages()
+  const { keys: byokKeys } = useByokKeys()
 
   const form = useForm<NotionFormValues>({
     defaultValues: {
       pageIds: [],
       type: 'multiple_choice',
       questionCount: '5',
+      difficulty: 'medium',
+      model: DEFAULT_MODEL,
+      apiKeyId: '',
+      isTimerEnabled: false,
       userInstructions: '',
     },
   })
 
-  const { handleSubmit, reset, control } = form
+  const { handleSubmit, reset, control, setValue, getValues } = form
   const { field: pageIdsField, fieldState } = useController({
     control,
     name: 'pageIds',
     rules: { validate: (v) => v.length > 0 || 'Select at least one page' },
   })
+
+  const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
+
+  const byokOptions = useMemo(() => {
+    return [
+      { label: 'None (Use QuizFlow credits)', value: '' },
+      ...byokKeys.map((key) => ({
+        label: `${key.keyName} (${key.provider})`,
+        value: key.id,
+      })),
+    ]
+  }, [byokKeys])
+
+  const byokDefaultApplied = useRef(false)
+  useEffect(() => {
+    if (!byokDefaultApplied.current && byokKeys.length > 0) {
+      if (!getValues('apiKeyId')) {
+        setValue('apiKeyId', byokKeys[0].id)
+      }
+      byokDefaultApplied.current = true
+    }
+  }, [byokKeys, setValue, getValues])
 
   const onSubmit = (values: NotionFormValues) => {
     const tempId = crypto.randomUUID()
@@ -59,9 +101,14 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
       try {
         const result = await quizService.createQuiz('notion', {
           pageIds: values.pageIds,
-          type: values.type,
+          type: values.type === 'mixed' ? undefined : values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
+          difficulty: values.difficulty,
+          isTimerEnabled: values.isTimerEnabled,
+          timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
+          model: values.model,
+          apiKeyId: values.apiKeyId || undefined,
         })
 
         setJobReady(tempId, result.jobId)
@@ -176,13 +223,50 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
             required
           />
         </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <FormSelect
+            label="Difficulty"
+            options={difficulties}
+            name="difficulty"
+            control={control}
+            required
+          />
+          <FormSelect label="AI Model" options={aiModels} name="model" control={control} required />
+        </div>
+
+        {byokKeys.length > 0 && (
+          <FormSelect
+            label="Use Your Own Key (BYOK)"
+            options={byokOptions}
+            name="apiKeyId"
+            control={control}
+          />
+        )}
+
+        <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
+
+        {timerEnabled && (
+          <FormInput
+            name="timerDuration"
+            methods={form}
+            label="Timer (minutes)"
+            type="number"
+            registerOptions={{
+              min: { value: 1, message: 'Minimum 1 minute' },
+              max: { value: 180, message: 'Maximum 180 minutes' },
+              valueAsNumber: true,
+            }}
+            required
+          />
+        )}
       </div>
 
       <FormTextarea
         label="Custom Instructions"
         methods={form}
         name="userInstructions"
-        placeholder="e.g. Focus on important sections, make questions harder… (optional)"
+        placeholder="e.g. Focus on chapter 3, only ask about dates… (optional)"
       />
 
       <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">

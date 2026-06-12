@@ -15,10 +15,8 @@ import { toast } from '@/lib/toast'
 import type { QuestionType } from '@/types/quiz'
 import {
   aiModels,
-  buildByokOptionValue,
   DEFAULT_MODEL,
   difficulties,
-  parseModelSelection,
   questionCounts,
   questionTypes,
 } from '@/components/main/quizzes/utils'
@@ -33,6 +31,7 @@ type QuizFormValues = {
   files: File[]
   userInstructions?: string
   model: string
+  apiKeyId: string
 }
 
 interface QuizFormProps {
@@ -55,33 +54,28 @@ export default function QuizForm({ onBack }: QuizFormProps) {
       isTimerEnabled: false,
       userInstructions: '',
       model: DEFAULT_MODEL,
+      apiKeyId: '',
     },
   })
 
   const { handleSubmit, reset, control, setValue, getValues } = form
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
 
-  // Surface the user's BYOK keys as a separate group above the built-in models.
-  const modelOptions = useMemo<{ label: string; value: string; group?: string }[]>(() => {
-    if (byokKeys.length === 0) return aiModels
+  const byokOptions = useMemo(() => {
     return [
+      { label: 'None (Use QuizFlow credits)', value: '' },
       ...byokKeys.map((key) => ({
         label: `${key.keyName} (${key.provider})`,
-        value: buildByokOptionValue(key.id),
-        group: 'Your Keys (BYOK)',
+        value: key.id,
       })),
-      ...aiModels.map((model) => ({ ...model, group: 'Models' })),
     ]
   }, [byokKeys])
 
-  // Default to the user's first key when they have one, but never override a
-  // manual change.
   const byokDefaultApplied = useRef(false)
   useEffect(() => {
     if (!byokDefaultApplied.current && byokKeys.length > 0) {
-      // Don't clobber a manual change made while the keys were still loading.
-      if (getValues('model') === DEFAULT_MODEL) {
-        setValue('model', buildByokOptionValue(byokKeys[0].id))
+      if (!getValues('apiKeyId')) {
+        setValue('apiKeyId', byokKeys[0].id)
       }
       byokDefaultApplied.current = true
     }
@@ -89,7 +83,6 @@ export default function QuizForm({ onBack }: QuizFormProps) {
 
   const onSubmit = (values: QuizFormValues) => {
     const tempId = crypto.randomUUID()
-    const { model, apiKeyId } = parseModelSelection(values.model)
 
     closeModal()
     reset()
@@ -112,8 +105,8 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
-          model,
-          apiKeyId,
+          model: values.model,
+          apiKeyId: values.apiKeyId || undefined,
         })
 
         setJobReady(tempId, result.jobId)
@@ -182,13 +175,21 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           />
           <FormSelect
             label="AI Model"
-            options={modelOptions}
-            groupKey="group"
+            options={aiModels}
             name="model"
             control={control}
             required
           />
         </div>
+
+        {byokKeys.length > 0 && (
+          <FormSelect
+            label="Use Your Own Key (BYOK)"
+            options={byokOptions}
+            name="apiKeyId"
+            control={control}
+          />
+        )}
 
         <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
 
