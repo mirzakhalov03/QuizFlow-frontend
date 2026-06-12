@@ -106,7 +106,8 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
           userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
-          timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
+          timerDuration:
+            values.isTimerEnabled && values.timerDuration ? values.timerDuration * 60 : undefined,
           model: values.model,
           apiKeyId: values.apiKeyId || undefined,
         })
