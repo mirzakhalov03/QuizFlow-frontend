@@ -26,6 +26,7 @@ const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
 const PublicQuizView = lazyPage(() => import('@/pages/public/quiz-view'))
 
 const IntegrationSuccess = lazyPage(() => import('@/pages/integrations/success'))
+const IntegrationFailure = lazyPage(() => import('@/pages/integrations/failure'))
 
 const NotFound = lazyPage(() => import('@/pages/not-found'))
 
@@ -71,6 +72,7 @@ export const routes: RouteObject[] = [
       },
 
       { path: 'integrations/success', lazy: IntegrationSuccess },
+      { path: 'integrations/failure', lazy: IntegrationFailure },
 
       { path: '*', lazy: NotFound },
     ],
