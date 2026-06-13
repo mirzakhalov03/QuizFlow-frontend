@@ -64,7 +64,7 @@ export default function NewFolderModal() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!name.trim() || isLoading) return
 
     const payload = {
       name,
@@ -142,7 +142,7 @@ export default function NewFolderModal() {
                       type="checkbox"
                       className="border-input text-primary focus:ring-primary h-4 w-4 rounded transition-all"
                       checked={selectedIds.has(quiz.id)}
-                      onChange={() => {}}
+                      onChange={() => toggleSelection(quiz.id)}
                       onClick={(e) => e.stopPropagation()}
                     />
                     <div className="flex flex-col">

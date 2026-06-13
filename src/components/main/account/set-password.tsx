@@ -25,7 +25,9 @@ export default function SetPassword() {
       const form = new FormData(e.currentTarget)
       try {
         await authService.setPassword({ password: form.get('password') as string })
-        setUser({ ...(user as User), hasPassword: true })
+        if (user) {
+          setUser({ ...user, hasPassword: true })
+        }
         toast.success('Password set. You can now sign in with your email too.')
       } catch (err: unknown) {
         const e = err as { response?: { data?: { message?: string; detail?: string } } }

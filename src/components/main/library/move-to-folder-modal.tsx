@@ -33,28 +33,36 @@ export default function MoveToFolderModal({
   const { data: foldersData, isLoading: isLoadingFolders } =
     useGet<ApiResponse<Folder[]>>('/folders')
   const { mutate: createFolder, isPending: isCreatingFolder } = usePost()
-  const { mutate: moveQuiz, isPending: isMoving } = usePatch({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
-      queryClient.invalidateQueries({ queryKey: [`/folders/${currentFolderId}/quizzes`] })
-      // Also invalidate the new folder's quiz list if we can, but simpler to just invalidate all /folders
-      queryClient.invalidateQueries({ queryKey: ['/folders'] })
-      toast.success('Quiz moved successfully')
-      onClose()
-    },
-    onError: () => {
-      toast.error('Failed to move quiz')
-    },
-  })
+  const { mutate: moveQuiz, isPending: isMoving } = usePatch()
 
   const folders = foldersData?.data || []
 
   const handleMove = (folderId: string | null) => {
-    moveQuiz(`/folders/quizzes/${quizId}`, { folderId })
+    moveQuiz(
+      `/folders/quizzes/${quizId}`,
+      { folderId },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
+          if (currentFolderId) {
+            queryClient.invalidateQueries({ queryKey: [`/folders/${currentFolderId}/quizzes`] })
+          }
+          if (folderId) {
+            queryClient.invalidateQueries({ queryKey: [`/folders/${folderId}/quizzes`] })
+          }
+          queryClient.invalidateQueries({ queryKey: ['/folders'] })
+          toast.success('Quiz moved successfully')
+          onClose()
+        },
+        onError: () => {
+          toast.error('Failed to move quiz')
+        },
+      }
+    )
   }
 
   const handleCreateAndMove = () => {
-    if (!newFolderName.trim()) return
+    if (!newFolderName.trim() || isCreatingFolder) return
     createFolder(
       '/folders',
       { name: newFolderName },

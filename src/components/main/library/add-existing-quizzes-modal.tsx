@@ -72,7 +72,7 @@ export default function AddExistingQuizzesModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (selectedIds.size === 0) return
+    if (selectedIds.size === 0 || isAdding) return
 
     addQuizzes(`/folders/${folderId}/add-quizzes`, { quizIds: Array.from(selectedIds) })
   }
@@ -112,8 +112,8 @@ export default function AddExistingQuizzesModal({
                     type="checkbox"
                     className="border-input text-primary focus:ring-primary h-4 w-4 rounded transition-all"
                     checked={selectedIds.has(quiz.id)}
-                    onChange={() => {}} // Handled by li onClick
-                    onClick={(e) => e.stopPropagation()} // Prevent double toggle
+                    onChange={() => toggleSelection(quiz.id)}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">{quiz.title}</span>

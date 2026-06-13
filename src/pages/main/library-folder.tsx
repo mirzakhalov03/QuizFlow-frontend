@@ -5,7 +5,7 @@ import { useGet } from '@/hooks/useGet'
 import { ApiResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
 import { Quiz } from '@/types/quiz'
-import QuizCard from '@/components/main/dashboard/quiz-card'
+import QuizCard from '@/components/main/quizzes/quiz-card'
 import Spinner from '@/components/ui/spinner'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
@@ -68,7 +68,11 @@ export default function LibraryFolder() {
             <h1 className="text-2xl font-bold">{folder.name}</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => setIsAddExistingOpen(true)} leftIcon={<FolderInput size={18} />}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddExistingOpen(true)}
+              leftIcon={<FolderInput size={18} />}
+            >
               Add Existing
             </Button>
             <Button onClick={openModal} leftIcon={<Plus size={18} />}>
@@ -79,10 +83,14 @@ export default function LibraryFolder() {
       </div>
 
       {quizzes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center text-muted-foreground">
+        <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center">
           <p>No quizzes in this folder yet.</p>
           <div className="flex items-center gap-3">
-            <Button onClick={() => setIsAddExistingOpen(true)} variant="outline" leftIcon={<FolderInput size={18} />}>
+            <Button
+              onClick={() => setIsAddExistingOpen(true)}
+              variant="outline"
+              leftIcon={<FolderInput size={18} />}
+            >
               Add Existing Quizzes
             </Button>
             <Button onClick={openModal} variant="outline" leftIcon={<Plus size={18} />}>
