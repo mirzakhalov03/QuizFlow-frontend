@@ -18,45 +18,51 @@ export function useSpeechRecognition(
 
   const isSupported = !!SpeechRecognitionClass;
 
-  useEffect(() => {
-    if (!SpeechRecognitionClass) {
-      return;
+  const onTranscriptRef = useRef(onTranscript);
+
+useEffect(() => {
+  onTranscriptRef.current = onTranscript;
+}, [onTranscript]);
+
+useEffect(() => {
+  if (!SpeechRecognitionClass) {
+    return;
+  }
+
+  const recognition = new SpeechRecognitionClass();
+
+  recognition.continuous = true;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+
+  recognition.onstart = () => {
+    setIsRecording(true);
+  };
+
+  recognition.onend = () => {
+    setIsRecording(false);
+  };
+
+  recognition.onresult = (event) => {
+    let transcript = "";
+
+    for (
+      let i = event.resultIndex;
+      i < event.results.length;
+      i++
+    ) {
+      transcript += event.results[i][0].transcript;
     }
 
-    const recognition = new SpeechRecognitionClass();
+    onTranscriptRef.current(transcript.trim());
+  };
 
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
+  recognitionRef.current = recognition;
 
-    recognition.onstart = () => {
-      setIsRecording(true);
-    };
-
-    recognition.onend = () => {
-      setIsRecording(false);
-    };
-
-    recognition.onresult = (event) => {
-      let transcript = "";
-
-      for (
-        let i = event.resultIndex;
-        i < event.results.length;
-        i++
-      ) {
-        transcript += event.results[i][0].transcript;
-      }
-
-      onTranscript(transcript.trim());
-    };
-
-    recognitionRef.current = recognition;
-
-    return () => {
-      recognition.stop();
-    };
-  }, [SpeechRecognitionClass, onTranscript]);
+  return () => {
+    recognition.stop();
+  };
+}, [SpeechRecognitionClass]);
 
   const toggle = () => {
     const recognition = recognitionRef.current;
