@@ -3,7 +3,7 @@ import { KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { authService } from '@/api/services/auth.service'
-import { useAuthStore, type User } from '@/store/use-authstore'
+import { useAuthStore } from '@/store/use-authstore'
 import { toast } from '@/lib/toast'
 
 const inputClass = cn(
