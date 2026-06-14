@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Outlet, useBlocker, useMatch, useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { PATHS } from '@/lib/path'
-import { toast } from '@/lib/toast'
 import { useGet } from '@/hooks/useGet'
 import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
@@ -104,10 +103,6 @@ function QuizSolving() {
   const submit = useCallback(() => {
     if (!id || !quiz || isPending) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
-    if (payload.length === 0) {
-      toast.error('Answer at least one question before submitting.')
-      return
-    }
     runSubmit(payload)
   }, [id, quiz, answers, isPending, runSubmit])
 
@@ -116,6 +111,7 @@ function QuizSolving() {
     const payload = buildSubmitAnswers(quiz.questions, answers)
     if (payload.length === 0) {
       clearSavedState()
+      runSubmit(payload)
       goToResult()
       return
     }
