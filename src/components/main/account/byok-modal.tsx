@@ -11,11 +11,11 @@ import { useGlobalStore } from '@/store/global-store'
 import { BYOK_BY_ID, BYOK } from '@/constants/api-endpoints'
 
 const PROVIDER_OPTIONS = [
-  { value: 'openai', label: 'OpenAI' },
-  { value: 'anthropic', label: 'Anthropic' },
-  { value: 'google', label: 'Google' },
   { value: 'openrouter', label: 'OpenRouter' },
-  { value: 'other', label: 'Other' },
+  { value: 'openai', label: 'OpenAI - Coming soon', disabled: true },
+  { value: 'anthropic', label: 'Anthropic - Coming soon', disabled: true },
+  { value: 'google', label: 'Google - Coming soon', disabled: true },
+  { value: 'other', label: 'Other - Coming soon', disabled: true },
 ]
 
 export default function ByokModal() {
