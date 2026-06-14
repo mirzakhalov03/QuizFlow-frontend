@@ -34,6 +34,12 @@ export function FormTimerInput<IForm extends FieldValues>({
         type="number"
         id={name}
         placeholder="Enter minutes"
+        min={1}
+        onKeyDown={(e) => {
+          if (['-', 'e', 'E', '+'].includes(e.key)) {
+            e.preventDefault()
+          }
+        }}
         className={cn('bg-secondary', error && 'border-destructive')}
         {...register(name, {
           required: required ? 'Timer is required' : false,
