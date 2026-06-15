@@ -128,6 +128,8 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
             aria-label="Move to folder"
           >
             <FolderInput className="h-4 w-4" />
+          </button>
+          <button
             onClick={handleExportPdf}
             disabled={isExporting || isDeleting}
             className="text-muted-foreground hover:text-primary mt-0.5 transition-colors disabled:opacity-40"

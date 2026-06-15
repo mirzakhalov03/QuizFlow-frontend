@@ -77,9 +77,6 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
     ]
   }, [foldersData?.data])
 
-  // Surface the user's BYOK keys as a separate group above the built-in models.
-  const modelOptions = useMemo<{ label: string; value: string; group?: string }[]>(() => {
-    if (byokKeys.length === 0) return aiModels
   const byokOptions = useMemo(() => {
     return [
       { label: 'None (Use QuizFlow credits)', value: '' },
@@ -124,8 +121,8 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
           timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
-          model,
-          apiKeyId,
+          model: values.model,
+          apiKeyId: values.apiKeyId || undefined,
           folderId: values.folderId !== 'none' ? values.folderId : undefined,
         })
 
