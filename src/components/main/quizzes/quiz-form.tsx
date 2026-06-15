@@ -194,6 +194,12 @@ export default function QuizForm({ onBack }: QuizFormProps) {
             methods={form}
             label="Timer (minutes)"
             type="number"
+            min={1}
+            onKeyDown={(e) => {
+              if (['-', 'e', 'E', '+'].includes(e.key)) {
+                e.preventDefault()
+              }
+            }}
             registerOptions={{
               min: { value: 1, message: 'Minimum 1 minute' },
               max: { value: 180, message: 'Maximum 180 minutes' },

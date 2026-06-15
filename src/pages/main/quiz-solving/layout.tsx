@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Outlet, useMatch, useNavigate, useParams } from 'react-router-dom'
+import { Outlet, useBlocker, useMatch, useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { PATHS } from '@/lib/path'
-import { toast } from '@/lib/toast'
 import { useGet } from '@/hooks/useGet'
 import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
@@ -11,6 +10,7 @@ import { QUIZ_BY_ID, QUIZ_RESULT, QUIZ_SUBMIT } from '@/constants/api-endpoints'
 import type { QuizResult, QuizWithQuestions, SubmitAnswer } from '@/types/quiz'
 import type { ApiResponse } from '@/types/api'
 import { useGlobalStore } from '@/store/global-store'
+import ConfirmDialog from '@/components/ui/confirm-dialog'
 import { QUIZ_SOLVING_HEADER_KEY, type QuizSolvingContext, type QuizSolvingHeader } from './context'
 
 function answersKey(quizId: string) {
@@ -103,10 +103,6 @@ function QuizSolving() {
   const submit = useCallback(() => {
     if (!id || !quiz || isPending) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
-    if (payload.length === 0) {
-      toast.error('Answer at least one question before submitting.')
-      return
-    }
     runSubmit(payload)
   }, [id, quiz, answers, isPending, runSubmit])
 
@@ -115,6 +111,7 @@ function QuizSolving() {
     const payload = buildSubmitAnswers(quiz.questions, answers)
     if (payload.length === 0) {
       clearSavedState()
+      runSubmit(payload)
       goToResult()
       return
     }
@@ -127,6 +124,21 @@ function QuizSolving() {
     handleAutoSubmit,
     isSolving && !!quiz?.isTimerEnabled
   )
+
+  const blocker = useBlocker(({ nextLocation }) => {
+    const isMovingToResult = nextLocation.pathname.includes(`/quizzes/${id}/result`)
+    const isStayingInQuestionFlow = nextLocation.pathname.includes(`/quizzes/${id}/question/`)
+    return isSolving && !isMovingToResult && !isStayingInQuestionFlow
+  })
+
+  useEffect(() => {
+    if (!isSolving) return
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isSolving])
 
   const retake = useCallback(() => {
     if (!id) return
@@ -192,5 +204,23 @@ function QuizSolving() {
     retake,
   }
 
-  return <Outlet context={context} />
+  return (
+    <>
+      <Outlet context={context} />
+      <ConfirmDialog
+        isOpen={blocker.state === 'blocked'}
+        onClose={() => blocker.reset?.()}
+        onConfirm={() => {
+          blocker.reset?.()
+          handleAutoSubmit()
+        }}
+        title="Leave quiz?"
+        description="If you leave now, your quiz will be automatically submitted with your current answers."
+        confirmLabel="Submit and leave"
+        cancelLabel="Stay"
+        variant="destructive"
+        loading={isPending}
+      />
+    </>
+  )
 }
