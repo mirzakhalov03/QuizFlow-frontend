@@ -19,8 +19,8 @@ import OnboardingModal from '@/components/main/onboarding/onboarding-modal'
 const navItems = [
   { label: 'Analytics', to: PATHS.app.analytics, icon: BarChart3 },
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
-  { label: 'Profile', to: PATHS.app.account, icon: User },
   { label: 'Library', to: PATHS.app.library, icon: Library },
+  { label: 'Profile', to: PATHS.app.account, icon: User },
 ]
 
 export default function AppLayout() {

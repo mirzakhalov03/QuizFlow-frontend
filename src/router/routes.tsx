@@ -23,7 +23,6 @@ const Account = lazyPage(() => import('@/pages/main/account'))
 const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
 const Library = lazyPage(() => import('@/pages/main/library'))
 const LibraryFolder = lazyPage(() => import('@/pages/main/library-folder'))
-const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
 const QuizSolvingLayout = lazyPage(() => import('@/pages/main/quiz-solving/layout'))
 const QuizIntroView = lazyPage(() => import('@/pages/main/quiz-solving/intro-view'))
 const QuizQuestionView = lazyPage(() => import('@/pages/main/quiz-solving/question-view'))
@@ -73,7 +72,6 @@ export const routes: RouteObject[] = [
           { path: 'analytics', lazy: Analytics },
           { path: 'account', lazy: Account },
           { path: 'quizzes', lazy: Quizzes },
-          { path: 'quizzes/:id', lazy: QuizSolvingUI },
           { path: 'library', lazy: Library },
           { path: 'library/:folderId', lazy: LibraryFolder },
           {

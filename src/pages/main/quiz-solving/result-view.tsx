@@ -11,15 +11,18 @@ import { useQuizSolving } from './context'
 export default function QuizResultView() {
   const { quiz, retake } = useQuizSolving()
 
-  const { data, isLoading, isError } = useGet<ApiResponse<QuizResultResponse>>(QUIZ_RESULT(quiz.id), {
-    options: {
-      staleTime: 0,
-      refetchInterval: (query) => {
-        const payload = query.state.data as ApiResponse<QuizResultResponse> | undefined
-        return payload?.data?.result?.gradingStatus === 'pending' ? 2000 : false
+  const { data, isLoading, isError } = useGet<ApiResponse<QuizResultResponse>>(
+    QUIZ_RESULT(quiz.id),
+    {
+      options: {
+        staleTime: 0,
+        refetchInterval: (query) => {
+          const payload = query.state.data as ApiResponse<QuizResultResponse> | undefined
+          return payload?.data?.result?.gradingStatus === 'pending' ? 2000 : false
+        },
       },
-    },
-  })
+    }
+  )
 
   const payload = data?.data
   const result = payload?.result ?? null

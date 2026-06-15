@@ -123,7 +123,7 @@ export default function MoveToFolderModal({
             {!showNewFolder ? (
               <button
                 onClick={() => setShowNewFolder(true)}
-                className="hover:bg-muted border-primary/30 mt-2 flex items-center gap-3 rounded-lg border border-dashed p-3 text-sm font-medium transition-colors text-primary"
+                className="hover:bg-muted border-primary/30 text-primary mt-2 flex items-center gap-3 rounded-lg border border-dashed p-3 text-sm font-medium transition-colors"
               >
                 <Plus size={20} />
                 Create New Folder
