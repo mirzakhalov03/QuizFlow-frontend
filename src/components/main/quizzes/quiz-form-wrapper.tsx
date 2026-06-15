@@ -5,14 +5,16 @@ import NotionQuizForm from './notion-quiz-form'
 
 type View = 'selector' | 'file' | 'notion'
 
-export default function QuizFormWrapper() {
+export default function QuizFormWrapper({ folderId }: { folderId?: string }) {
   const [view, setView] = useState<View>('selector')
 
   return (
     <>
       {view === 'selector' && <QuizSourceSelector onSelect={(source) => setView(source)} />}
-      {view === 'file' && <QuizForm onBack={() => setView('selector')} />}
-      {view === 'notion' && <NotionQuizForm onBack={() => setView('selector')} />}
+      {view === 'file' && <QuizForm folderId={folderId} onBack={() => setView('selector')} />}
+      {view === 'notion' && (
+        <NotionQuizForm folderId={folderId} onBack={() => setView('selector')} />
+      )}
     </>
   )
 }

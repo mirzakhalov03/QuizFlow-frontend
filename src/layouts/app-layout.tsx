@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, ListChecks, LogOut, User } from 'lucide-react'
+import { Library, ListChecks, LogOut, BarChart3, User } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import Logo from '@/components/ui/logo'
@@ -20,6 +20,7 @@ const navItems = [
   { label: 'Analytics', to: PATHS.app.analytics, icon: BarChart3 },
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
   { label: 'Profile', to: PATHS.app.account, icon: User },
+  { label: 'Library', to: PATHS.app.library, icon: Library },
 ]
 
 export default function AppLayout() {

@@ -2,6 +2,9 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
 
+import { useGet } from '@/hooks/useGet'
+import { ApiResponse } from '@/types/api'
+import { Folder } from '@/types/folder'
 import { quizService } from '@/api/services/quiz.service'
 import FileUpload from '@/components/form/file-upload'
 import { FormCheckbox } from '@/components/form/form-checkbox'
@@ -31,14 +34,16 @@ type QuizFormValues = {
   files: File[]
   userInstructions?: string
   model: string
+  folderId: string
   apiKeyId: string
 }
 
 interface QuizFormProps {
   onBack: () => void
+  folderId?: string
 }
 
-export default function QuizForm({ onBack }: QuizFormProps) {
+export default function QuizForm({ onBack, folderId }: QuizFormProps) {
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
@@ -54,6 +59,7 @@ export default function QuizForm({ onBack }: QuizFormProps) {
       isTimerEnabled: false,
       userInstructions: '',
       model: DEFAULT_MODEL,
+      folderId: folderId || 'none',
       apiKeyId: '',
     },
   })
@@ -61,6 +67,19 @@ export default function QuizForm({ onBack }: QuizFormProps) {
   const { handleSubmit, reset, control, setValue, getValues } = form
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
 
+  const { data: foldersData } = useGet<ApiResponse<Folder[]>>('/folders')
+  
+  const folderOptions = useMemo(() => {
+    const folders = foldersData?.data || []
+    return [
+      { label: 'No Folder', value: 'none' },
+      ...folders.map((f) => ({ label: f.name, value: f.id })),
+    ]
+  }, [foldersData?.data])
+
+  // Surface the user's BYOK keys as a separate group above the built-in models.
+  const modelOptions = useMemo<{ label: string; value: string; group?: string }[]>(() => {
+    if (byokKeys.length === 0) return aiModels
   const byokOptions = useMemo(() => {
     return [
       { label: 'None (Use QuizFlow credits)', value: '' },
@@ -104,10 +123,10 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
-          timerDuration:
-            values.isTimerEnabled && values.timerDuration ? values.timerDuration * 60 : undefined,
-          model: values.model,
-          apiKeyId: values.apiKeyId || undefined,
+          timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
+          model,
+          apiKeyId,
+          folderId: values.folderId !== 'none' ? values.folderId : undefined,
         })
 
         setJobReady(tempId, result.jobId)
@@ -148,6 +167,14 @@ export default function QuizForm({ onBack }: QuizFormProps) {
           <Settings2 className="h-3.5 w-3.5" />
           Quiz Settings
         </p>
+
+        <FormSelect
+          label="Save to Folder"
+          options={folderOptions}
+          name="folderId"
+          control={control}
+          disabled={!!folderId}
+        />
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormSelect
