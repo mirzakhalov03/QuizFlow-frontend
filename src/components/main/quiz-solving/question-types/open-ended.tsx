@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Mic } from "lucide-react";
 
-import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 
 const MAX_CHARS = 1000;
 
