@@ -33,7 +33,9 @@ export default function History() {
     <div className="space-y-6">
       <header>
         <h1 className="text-xl font-semibold sm:text-2xl">History</h1>
-        <p className="text-muted-foreground">Every quiz you've completed, with your latest score.</p>
+        <p className="text-muted-foreground">
+          Every quiz you've completed, with your latest score.
+        </p>
       </header>
 
       <HistoryTable rows={summary.history ?? []} />

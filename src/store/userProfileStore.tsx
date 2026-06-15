@@ -55,6 +55,8 @@ export const useUserProfileStore = create<UserProfileState>((set) => ({
         profilePicture: data.profilePicture,
         isOnboarded: data.isOnboarded,
       })
+    } catch {
+      // Leave existing state intact; the onboarding gate stays closed on a failed fetch.
     } finally {
       set({ loading: false })
     }

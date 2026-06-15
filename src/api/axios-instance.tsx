@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { authEvents } from '@/functions/AuthEvents'
 import { API_URL } from '@/lib/config'
+import { useAuthStore } from '@/store/use-authstore'
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -28,7 +29,9 @@ api.interceptors.response.use(
           .post('/auth/refresh')
           .then(() => {})
           .catch((refreshErr) => {
-            authEvents.emit('SESSION_EXPIRED')
+            if (useAuthStore.getState().isAuthed) {
+              authEvents.emit('SESSION_EXPIRED')
+            }
             throw refreshErr
           })
           .finally(() => {

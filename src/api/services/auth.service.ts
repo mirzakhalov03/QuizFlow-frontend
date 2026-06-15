@@ -6,6 +6,7 @@ export type RegisterConfirmPayload = { email: string; otp: string }
 export type ForgotPasswordPayload = { email: string }
 export type ResetPasswordPayload = { email: string; token: string; password: string }
 export type SetPasswordPayload = { password: string }
+export type ChangePasswordPayload = { currentPassword: string; newPassword: string }
 export type DeleteAccountConfirmPayload = { otp: string }
 
 export const authService = {
@@ -41,6 +42,11 @@ export const authService = {
 
   async setPassword(payload: SetPasswordPayload) {
     const { data } = await api.post('/auth/set-password', payload)
+    return data
+  },
+
+  async changePassword(payload: ChangePasswordPayload) {
+    const { data } = await api.post('/auth/change-password', payload)
     return data
   },
 

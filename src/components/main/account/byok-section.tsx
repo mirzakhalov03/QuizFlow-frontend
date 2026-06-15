@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Plus, Key } from 'lucide-react'
 import Button from '@/components/ui/button'
@@ -24,9 +25,11 @@ const PROVIDER_ICONS = {
 export default function ByokSection() {
   const queryClient = useQueryClient()
   const { openModal } = useModal('byok-modal')
+  const { openModal: openDeleteModal, closeModal: closeDeleteModal } = useModal('byok-delete')
   const { setData, getData, clearKey } = useGlobalStore()
   const { data: byokResponse, isLoading } = useGet<PaginatedResponse<ByokKey>>(BYOK)
   const byokKeys = byokResponse?.data?.items || []
+  const [keyToDelete, setKeyToDelete] = useState<ByokKey | null>(null)
   const {
     mutate: deleteKey,
     isPending: isDeleting,
@@ -35,8 +38,19 @@ export default function ByokSection() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [BYOK] })
       toast.success('API key deleted')
+      closeDeleteModal()
+      setKeyToDelete(null)
     },
   })
+
+  const requestDelete = (key: ByokKey) => {
+    setKeyToDelete(key)
+    openDeleteModal()
+  }
+
+  const confirmDelete = () => {
+    if (keyToDelete) deleteKey(BYOK_BY_ID(keyToDelete.id))
+  }
   const handleEdit = (value: ByokKey) => {
     setData(BYOK, value)
     openModal()
@@ -97,7 +111,7 @@ export default function ByokSection() {
                   apiKey={key}
                   icon={PROVIDER_ICONS[provider] ?? null}
                   onEdit={handleEdit}
-                  onDelete={(id) => deleteKey(BYOK_BY_ID(id))}
+                  onDelete={() => requestDelete(key)}
                   isDeleting={isDeleting && deletingId === BYOK_BY_ID(key.id)}
                 />
               )
@@ -116,6 +130,26 @@ export default function ByokSection() {
         }
       >
         <ByokModal />
+      </Modal>
+
+      <Modal
+        modalKey="byok-delete"
+        title="Delete API key"
+        description={
+          keyToDelete
+            ? `This will permanently remove "${keyToDelete.keyName}". This can't be undone.`
+            : ''
+        }
+        size="max-w-sm"
+      >
+        <div className="flex justify-end gap-3">
+          <Button variant="outline" size="sm" onClick={closeDeleteModal} disabled={isDeleting}>
+            Cancel
+          </Button>
+          <Button variant="destructive" size="sm" loading={isDeleting} onClick={confirmDelete}>
+            Delete key
+          </Button>
+        </div>
       </Modal>
     </div>
   )

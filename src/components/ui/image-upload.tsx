@@ -58,7 +58,7 @@ export default function ImageUpload({ value, onChange, loading }: Props) {
   const imageSrc = localPreview ?? value ?? null
 
   return (
-    <div className="border-border bg-muted/30 relative h-40 w-40 overflow-hidden rounded-2xl border">
+    <div className="border-border bg-muted/30 relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl border sm:h-40 sm:w-40">
       {imageSrc ? (
         <img src={imageSrc} alt="Profile" key={imageSrc} className="h-full w-full object-cover" />
       ) : (
