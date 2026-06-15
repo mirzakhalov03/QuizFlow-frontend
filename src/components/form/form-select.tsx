@@ -53,6 +53,7 @@ export function FormSelect<
   const selectOptions: SelectOption[] = options.map((option) => ({
     label: String(option[labelKey] ?? ''),
     value: String(option[valueKey] ?? ''),
+    disabled: !!option.disabled,
     ...(groupKey && option[groupKey] != null && { group: String(option[groupKey]) }),
     ...(renderOption && {
       customRender: () => renderOption(option),
