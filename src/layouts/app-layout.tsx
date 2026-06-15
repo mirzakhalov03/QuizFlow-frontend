@@ -12,8 +12,8 @@ import { useUserProfileStore } from '@/store/userProfileStore'
 import { useGlobalStore } from '@/store/global-store'
 import QuizTimer from '@/components/main/quiz-solving/quiz-timer'
 import QuizProgress from '@/components/main/quiz-solving/quiz-progress'
-import type { QuizSolvingHeader } from '@/pages/main/quizSolvingUI'
-import { QUIZ_SOLVING_HEADER_KEY } from '@/pages/main/quizSolvingUI'
+import type { QuizSolvingHeader } from '@/pages/main/quiz-solving/context'
+import { QUIZ_SOLVING_HEADER_KEY } from '@/pages/main/quiz-solving/context'
 import OnboardingModal from '@/components/main/onboarding/onboarding-modal'
 
 const navItems = [

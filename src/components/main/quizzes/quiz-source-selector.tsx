@@ -29,14 +29,15 @@ export default function QuizSourceSelector({ onSelect }: QuizSourceSelectorProps
       <button
         onClick={() => hasNotion && onSelect('notion')}
         disabled={!hasNotion}
-        className="border-border bg-card/50 group relative rounded-xl border-2 p-6 text-left transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40"
+        className="border-border bg-card/50 enabled:hover:border-primary/50 enabled:hover:bg-primary/5 group relative rounded-xl border-2 p-6 text-left transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40"
       >
         {!hasNotion && (
           <span className="bg-muted text-muted-foreground absolute top-3 right-3 rounded-full px-2 py-0.5 text-[11px] font-medium">
             Not connected
           </span>
         )}
-        <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
+        <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 group-enabled:group-hover:bg-gray-200">
+          {' '}
           <img src={NotionLogo} alt="Notion" className="h-5 w-5" />
         </div>
         <h3 className="mb-1 font-semibold">Notion Page</h3>

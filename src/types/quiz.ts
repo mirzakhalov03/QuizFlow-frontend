@@ -75,6 +75,8 @@ export type SubmitAnswer = {
   textAnswer?: string
 }
 
+export type GradingStatus = 'complete' | 'pending' | 'failed'
+
 export type QuizResult = {
   id: string
   userId: string
@@ -82,4 +84,16 @@ export type QuizResult = {
   totalQuestions: number
   correctAnswers: number
   wrongAnswers: number
+  gradingStatus: GradingStatus
+}
+
+export type AnswerVerdict = {
+  questionId: string
+  isCorrect: boolean
+}
+
+export type QuizResultResponse = {
+  result: QuizResult
+  verdicts: AnswerVerdict[]
+  answers: SubmitAnswer[]
 }
