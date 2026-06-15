@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, ListChecks, LogOut, User } from 'lucide-react'
+import { BarChart3, History, ListChecks, LogOut, User } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import Logo from '@/components/ui/logo'
@@ -18,6 +18,7 @@ import OnboardingModal from '@/components/main/onboarding/onboarding-modal'
 
 const navItems = [
   { label: 'Analytics', to: PATHS.app.analytics, icon: BarChart3 },
+  { label: 'History', to: PATHS.app.history, icon: History },
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
   { label: 'Profile', to: PATHS.app.account, icon: User },
 ]

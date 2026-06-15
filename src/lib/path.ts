@@ -16,6 +16,7 @@ export const PATHS = {
   app: {
     root: '/app',
     analytics: '/app/analytics',
+    history: '/app/history',
     account: '/app/account',
     quizzes: '/app/quizzes',
     quiz: (id: string) => `/app/quizzes/${id}`,

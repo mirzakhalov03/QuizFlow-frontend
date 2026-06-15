@@ -19,6 +19,7 @@ const ForgotPassword = lazyPage(() => import('@/pages/auth/forgot-password'))
 const ResetPassword = lazyPage(() => import('@/pages/auth/reset-password'))
 
 const Analytics = lazyPage(() => import('@/pages/main/analytics'))
+const History = lazyPage(() => import('@/pages/main/history'))
 const Account = lazyPage(() => import('@/pages/main/account'))
 const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
 const QuizSolvingLayout = lazyPage(() => import('@/pages/main/quiz-solving/layout'))
@@ -68,6 +69,7 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <Navigate to={PATHS.app.quizzes} replace /> },
           { path: 'analytics', lazy: Analytics },
+          { path: 'history', lazy: History },
           { path: 'account', lazy: Account },
           { path: 'quizzes', lazy: Quizzes },
           {
