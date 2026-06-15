@@ -112,7 +112,7 @@ export default function Account() {
         {/* LEFT COLUMN — Personal details */}
         <div className="space-y-6">
           <div className="border-border bg-background rounded-2xl border p-5 shadow-sm sm:p-6">
-            <div className="flex items-start gap-4">
+            <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left">
               <ImageUpload value={profilePicture} onChange={handleUpload} loading={uploading} />
               <span>
                 <h2 className="text-lg font-semibold">Personal details</h2>
@@ -175,9 +175,10 @@ export default function Account() {
         </div>
       </section>
 
-      <ByokSection />
-
-      <SetPassword />
+      <section className="grid items-start gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <ByokSection />
+        <SetPassword />
+      </section>
 
       <Modal
         modalKey="delete-account"

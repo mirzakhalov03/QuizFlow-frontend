@@ -30,7 +30,10 @@ export default function HistoryTable({ rows }: Props) {
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={`${row.quizId}-${row.date}`} className="border-border border-b last:border-b-0">
+                <tr
+                  key={`${row.quizId}-${row.date}`}
+                  className="border-border border-b last:border-b-0"
+                >
                   <td className="px-4 py-3">
                     <Link
                       to={PATHS.app.quizResult(row.quizId)}

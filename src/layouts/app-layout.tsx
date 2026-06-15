@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { BarChart3, History, Library, ListChecks, LogOut, User } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
+import ConfirmDialog from '@/components/ui/confirm-dialog'
 import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
@@ -33,8 +34,17 @@ export default function AppLayout() {
     fetchProfile()
   }, [fetchProfile])
 
-  const onLogout = async () => {
-    await logout(navigate)
+  const [confirmingLogout, setConfirmingLogout] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+
+  const handleConfirmLogout = async () => {
+    setLoggingOut(true)
+    try {
+      await logout(navigate)
+    } finally {
+      setLoggingOut(false)
+      setConfirmingLogout(false)
+    }
   }
 
   const quizHeader = useGlobalStore(
@@ -83,7 +93,7 @@ export default function AppLayout() {
           <Button
             variant="ghost"
             size="md"
-            onClick={onLogout}
+            onClick={() => setConfirmingLogout(true)}
             className="w-full justify-start text-red-500"
             leftIcon={<LogOut size={18} />}
           >
@@ -127,7 +137,7 @@ export default function AppLayout() {
             </div>
             <button
               type="button"
-              onClick={onLogout}
+              onClick={() => setConfirmingLogout(true)}
               aria-label="Logout"
               className="hover:bg-muted rounded-md p-1.5 lg:hidden"
             >
@@ -149,20 +159,37 @@ export default function AppLayout() {
             key={to}
             to={to}
             end
-            className={({ isActive }) =>
-              cn(
-                'flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs transition-colors',
-                isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-              )
-            }
+            className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
           >
-            <Icon size={20} />
-            <span>{label}</span>
+            {({ isActive }) => (
+              <span
+                className={cn(
+                  'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
+                  isActive
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Icon size={20} />
+                <span>{label}</span>
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
 
       <OnboardingModal />
+
+      <ConfirmDialog
+        isOpen={confirmingLogout}
+        onClose={() => setConfirmingLogout(false)}
+        onConfirm={handleConfirmLogout}
+        title="Log out?"
+        description="You'll need to sign in again to access your account."
+        confirmLabel="Log out"
+        variant="destructive"
+        loading={loggingOut}
+      />
     </div>
   )
 }

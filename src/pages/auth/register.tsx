@@ -1,6 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { OtpInput } from '@/components/form/otp-input'
+import { PasswordInput } from '@/components/form/password-input'
+import { PasswordRequirements, isPasswordValid } from '@/components/form/password-requirements'
 import { PATHS } from '@/lib/path'
 import { cn } from '@/lib/utils'
 import { authService } from '@/api/services/auth.service'
@@ -15,7 +19,13 @@ const inputClass = cn(
 export default function Register() {
   const [loading, setLoading] = useState(false)
   const [pendingEmail, setPendingEmail] = useState<string | null>(null)
+  const [otp, setOtp] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const navigate = useNavigate()
+
+  const passwordsMatch = password === confirmPassword
+  const canRegister = isPasswordValid(password) && passwordsMatch
   const setUser = useAuthStore((s) => s.setUser)
 
   const onRegister = async (e: FormEvent<HTMLFormElement>) => {
@@ -28,7 +38,7 @@ export default function Register() {
       await authService.register({
         email,
         fullName: form.get('name') as string,
-        password: form.get('password') as string,
+        password,
       })
       setPendingEmail(email)
     } catch (err: unknown) {
@@ -46,12 +56,11 @@ export default function Register() {
   const onConfirm = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    const form = new FormData(e.currentTarget)
 
     try {
       await authService.registerConfirm({
         email: pendingEmail!,
-        otp: form.get('otp') as string,
+        otp,
       })
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string; detail?: string } } }
@@ -60,6 +69,7 @@ export default function Register() {
         const msg =
           e.response.data?.message ?? e.response.data?.detail ?? 'Invalid code. Please try again.'
         toast.error(msg)
+        setOtp('')
         setLoading(false)
         return
       }
@@ -91,25 +101,18 @@ export default function Register() {
           </p>
         </div>
 
-        <div className="space-y-1">
-          <label htmlFor="otp" className="text-sm font-medium">
-            Verification code
-          </label>
-          <input
-            id="otp"
-            name="otp"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]{6}"
-            maxLength={6}
-            required
-            autoComplete="one-time-code"
-            placeholder="000000"
-            className={cn(inputClass, 'text-center font-mono text-lg tracking-[0.5em]')}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Verification code</label>
+          <OtpInput
+            value={otp}
+            onChange={setOtp}
+            disabled={loading}
+            autoFocus
+            ariaLabel="Verification code"
           />
         </div>
 
-        <Button type="submit" loading={loading} className="w-full">
+        <Button type="submit" loading={loading} disabled={otp.length !== 6} className="w-full">
           Verify
         </Button>
 
@@ -117,7 +120,10 @@ export default function Register() {
           Wrong email?{' '}
           <button
             type="button"
-            onClick={() => setPendingEmail(null)}
+            onClick={() => {
+              setPendingEmail(null)
+              setOtp('')
+            }}
             className="text-foreground hover:underline"
           >
             Go back
@@ -159,18 +165,51 @@ export default function Register() {
         <label htmlFor="password" className="text-sm font-medium">
           Password
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           required
-          minLength={8}
           autoComplete="new-password"
-          className={inputClass}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
+        {password.length > 0 && (
+          <div className="pt-1">
+            <PasswordRequirements value={password} />
+          </div>
+        )}
       </div>
 
-      <Button type="submit" loading={loading} className="w-full">
+      <div className="space-y-1">
+        <label htmlFor="confirmPassword" className="text-sm font-medium">
+          Confirm password
+        </label>
+        <PasswordInput
+          id="confirmPassword"
+          name="confirmPassword"
+          required
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+        {confirmPassword.length > 0 && (
+          <p
+            className={cn(
+              'flex items-center gap-2 pt-1 text-xs',
+              passwordsMatch ? 'text-emerald-600' : 'text-destructive'
+            )}
+          >
+            {passwordsMatch ? (
+              <Check className="h-3.5 w-3.5 shrink-0" />
+            ) : (
+              <X className="h-3.5 w-3.5 shrink-0" />
+            )}
+            {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
+          </p>
+        )}
+      </div>
+
+      <Button type="submit" loading={loading} disabled={!canRegister} className="w-full">
         Create account
       </Button>
 
