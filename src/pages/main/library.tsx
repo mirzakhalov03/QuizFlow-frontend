@@ -57,7 +57,7 @@ export default function Library() {
               className="bg-card hover:border-primary flex flex-col gap-2 rounded-xl border p-4 transition-all"
             >
               <FolderIcon className="text-primary" size={32} />
-              <h3 className="font-semibold truncate">{folder.name}</h3>
+              <h3 className="truncate font-semibold">{folder.name}</h3>
               <p className="text-muted-foreground text-sm">{folder.quizCount} quizzes</p>
             </Link>
           ))}

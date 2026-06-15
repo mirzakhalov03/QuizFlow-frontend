@@ -55,7 +55,7 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
   const { keys: byokKeys } = useByokKeys()
 
   const { data: foldersData } = useGet<ApiResponse<Folder[]>>('/folders')
-  
+
   const folderOptions = useMemo(() => {
     const folders = foldersData?.data || []
     return [
@@ -177,7 +177,9 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <FieldLabel required isError={!!fieldState.error}>Add Notion Pages</FieldLabel>
+        <FieldLabel required isError={!!fieldState.error}>
+          Add Notion Pages
+        </FieldLabel>
         <select
           className="border-border bg-background focus:ring-primary/40 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none disabled:opacity-50"
           value=""

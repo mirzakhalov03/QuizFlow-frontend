@@ -71,27 +71,29 @@ export default function NewFolderModal() {
       quizIds: Array.from(selectedIds),
     }
 
-    createFolder(
-      '/folders',
-      payload,
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['/folders'] })
-          if (payload.quizIds.length > 0) {
-            queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
-          }
-          toast.success('Folder created successfully')
-          handleClose()
-        },
-        onError: () => {
-          toast.error('Failed to create folder')
-        },
-      }
-    )
+    createFolder('/folders', payload, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['/folders'] })
+        if (payload.quizIds.length > 0) {
+          queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
+        }
+        toast.success('Folder created successfully')
+        handleClose()
+      },
+      onError: () => {
+        toast.error('Failed to create folder')
+      },
+    })
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} modalKey={NEW_FOLDER_MODAL_KEY} title="Create New Folder" size="max-w-2xl">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      modalKey={NEW_FOLDER_MODAL_KEY}
+      title="Create New Folder"
+      size="max-w-2xl"
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-2">
         <div className="flex flex-col gap-2">
           <label htmlFor="folder-name" className="text-sm font-medium">
@@ -107,9 +109,7 @@ export default function NewFolderModal() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">
-            Add Existing Quizzes (Optional)
-          </label>
+          <label className="text-sm font-medium">Add Existing Quizzes (Optional)</label>
           <Input
             placeholder="Search quizzes to add..."
             value={search}

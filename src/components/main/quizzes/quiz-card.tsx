@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Check, Clock, Copy, FileDown, Play, Share2, Trash2, Zap,FolderInput } from 'lucide-react'
+import { Check, Clock, Copy, FileDown, Play, Share2, Trash2, Zap, FolderInput } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { useDelete } from '@/hooks/useDelete'
@@ -97,7 +97,6 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       setIsExporting(false)
     }
   }
- 
 
   const publicUrl = useMemo(() => {
     return shareToken ? window.location.origin + PATHS.public.quiz(shareToken) : ''

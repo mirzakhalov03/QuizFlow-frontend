@@ -68,7 +68,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
 
   const { data: foldersData } = useGet<ApiResponse<Folder[]>>('/folders')
-  
+
   const folderOptions = useMemo(() => {
     const folders = foldersData?.data || []
     return [
