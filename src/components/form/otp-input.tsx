@@ -47,10 +47,10 @@ export function OtpInput({
 
   const handleKeyDown = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace') {
+      e.preventDefault()
       if (digits[i]) {
         setDigit(i, '')
       } else if (i > 0) {
-        e.preventDefault()
         setDigit(i - 1, '')
         focusIndex(i - 1)
       }

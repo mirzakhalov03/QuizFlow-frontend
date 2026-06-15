@@ -103,14 +103,15 @@ function ToastCard({
       data-expanded={expanded}
       data-reverse-index={reverseIndex}
       className={cn(
-        'text-foreground pointer-events-auto absolute top-0 right-0 flex items-start gap-2 rounded-md border p-3 pr-8 shadow-2xl backdrop-blur-xl transition-all duration-300 ease-out',
+        'text-foreground pointer-events-auto flex items-start gap-2 rounded-md border p-3 pr-8 shadow-2xl backdrop-blur-xl transition-all duration-300 ease-out',
+        expanded ? 'relative' : 'absolute top-0 right-0',
         accentFor(toast.type),
         !mounted && '-translate-y-2 opacity-0',
         leaving && '-translate-y-2 opacity-0'
       )}
       style={{
         width: TOAST_WIDTH,
-        transform: `translateY(${offset}px) scale(${scale})`,
+        transform: expanded ? undefined : `translateY(${offset}px) scale(${scale})`,
         opacity: leaving ? 0 : hidden ? 0 : 1,
         zIndex: 1000 - reverseIndex,
       }}
@@ -164,7 +165,10 @@ export function Toaster() {
     <ol
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      className="pointer-events-none fixed top-4 right-4 z-9999 flex flex-col"
+      className={cn(
+        'pointer-events-none fixed top-4 right-4 z-9999 flex flex-col',
+        expanded && 'gap-3.5'
+      )}
       style={{
         width: TOAST_WIDTH,
         height: toasts.length ? (expanded ? expandedHeight : collapsedHeight) : 0,
