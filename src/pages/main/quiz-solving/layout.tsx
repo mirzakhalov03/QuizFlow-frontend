@@ -53,10 +53,11 @@ function QuizSolving() {
     id ? loadSavedAnswers(id) : {}
   )
 
-  const { mutate: submitMutation, isPending } = usePost<
-    { answers: SubmitAnswer[] },
-    ApiResponse<QuizResult>
-  >()
+  const {
+    mutate: submitMutation,
+    isPending,
+    isError: submitFailed,
+  } = usePost<{ answers: SubmitAnswer[] }, ApiResponse<QuizResult>>()
 
   const questionMatch = useMatch('/app/quizzes/:id/question/:questionId')
   const resultMatch = useMatch('/app/quizzes/:id/result')
@@ -81,7 +82,10 @@ function QuizSolving() {
 
   const goToResult = useCallback(() => {
     if (!id) return
-    queryClient.invalidateQueries({ queryKey: [QUIZ_RESULT(id)] })
+    // Drop any cached (stale) result so the result view starts clean — it shows
+    // the grading overlay until the finalized result is fetched, with no flash
+    // of a previous attempt's score.
+    queryClient.removeQueries({ queryKey: [QUIZ_RESULT(id)] })
     navigate(PATHS.app.quizResult(id), { replace: true })
   }, [id, navigate, queryClient])
 
@@ -94,36 +98,29 @@ function QuizSolving() {
         {
           onSuccess: () => {
             clearSavedState()
-            goToResult()
+            queryClient.invalidateQueries({ queryKey: [QUIZ_RESULT(id)] })
           },
         }
       )
     },
-    [id, submitMutation, clearSavedState, goToResult]
+    [id, submitMutation, clearSavedState, queryClient]
   )
 
+  // Move to the result screen immediately, then fire the request. Grading is a
+  // synchronous LLM call, so the result view shows an "evaluating" overlay while
+  // the request is in flight, then renders the finalized score. Used for manual
+  // submit, timer expiry, and the leave-mid-quiz confirm.
   const submit = useCallback(() => {
     if (!id || !quiz || isPending) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
+    goToResult()
     runSubmit(payload)
-  }, [id, quiz, answers, isPending, runSubmit])
-
-  const handleAutoSubmit = useCallback(() => {
-    if (!id || !quiz) return
-    const payload = buildSubmitAnswers(quiz.questions, answers)
-    if (payload.length === 0) {
-      clearSavedState()
-      runSubmit(payload)
-      goToResult()
-      return
-    }
-    runSubmit(payload)
-  }, [id, quiz, answers, clearSavedState, goToResult, runSubmit])
+  }, [id, quiz, answers, isPending, goToResult, runSubmit])
 
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
     id ? timerKey(id) : 'quiz-timer-none',
-    handleAutoSubmit,
+    submit,
     isSolving && !!quiz?.isTimerEnabled
   )
 
@@ -203,6 +200,7 @@ function QuizSolving() {
     onAnswerChange,
     submit,
     isSubmitting: isPending,
+    submitFailed,
     retake,
   }
 
@@ -222,7 +220,7 @@ function QuizSolving() {
         onClose={() => blocker.reset?.()}
         onConfirm={() => {
           blocker.reset?.()
-          handleAutoSubmit()
+          submit()
         }}
         title="Leave quiz?"
         description="If you leave now, your quiz will be automatically submitted with your current answers."

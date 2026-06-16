@@ -55,7 +55,7 @@ export function DropdownMenu({
           setOpen((v) => !v)
         }}
         className={cn(
-          'text-muted-foreground hover:text-foreground rounded-md transition-colors focus-visible:ring-primary/30 focus-visible:outline-none focus-visible:ring-2',
+          'text-muted-foreground hover:text-foreground focus-visible:ring-primary/30 rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none',
           triggerClassName
         )}
       >

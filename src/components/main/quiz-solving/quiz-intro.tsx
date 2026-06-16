@@ -125,7 +125,7 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
 
   return (
     <div className="enter-fade-up border-border mx-auto max-w-2xl overflow-hidden rounded-xl border">
-      <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+      <div className="h-1.5 bg-linear-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
 
       <div className="flex flex-col gap-6 p-8">
         <div className="flex flex-col gap-2">
