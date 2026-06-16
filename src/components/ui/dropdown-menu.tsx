@@ -99,7 +99,6 @@ export function DropdownItem({
       role="menuitem"
       disabled={disabled}
       onClick={(e) => {
-        e.stopPropagation()
         onClick?.(e)
       }}
       className={cn(
