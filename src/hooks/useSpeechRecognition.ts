@@ -81,10 +81,14 @@ export function useSpeechRecognition(
       return
     }
 
-    if (isRecording) {
-      recognition.stop()
-    } else {
-      recognition.start()
+    try {
+      if (isRecording) {
+        recognition.stop()
+      } else {
+        recognition.start()
+      }
+    } catch (error) {
+      console.error('Speech recognition toggle error:', error)
     }
   }
 
