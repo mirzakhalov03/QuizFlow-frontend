@@ -72,6 +72,7 @@ export type QuizWithQuestions = Quiz & {
 export type SubmitAnswer = {
   questionId: string
   selectedOptionId?: string
+  selectedOptionIds?: string[]
   textAnswer?: string
 }
 

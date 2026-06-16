@@ -40,7 +40,7 @@ export default function QuizResultView() {
     const list = payload?.answers
     if (!list) return {}
     return list.reduce<Record<string, string | string[]>>((acc, a) => {
-      acc[a.questionId] = a.selectedOptionId ?? a.textAnswer ?? ''
+      acc[a.questionId] = a.selectedOptionIds ?? a.selectedOptionId ?? a.textAnswer ?? ''
       return acc
     }, {})
   }, [payload])

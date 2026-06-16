@@ -11,6 +11,7 @@ import type { QuizResult, QuizWithQuestions, SubmitAnswer } from '@/types/quiz'
 import type { ApiResponse } from '@/types/api'
 import { useGlobalStore } from '@/store/global-store'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
+import Breadcrumb, { type Crumb } from '@/components/ui/breadcrumb'
 import { QUIZ_SOLVING_HEADER_KEY, type QuizSolvingContext, type QuizSolvingHeader } from './context'
 
 function answersKey(quizId: string) {
@@ -58,6 +59,7 @@ function QuizSolving() {
   >()
 
   const questionMatch = useMatch('/app/quizzes/:id/question/:questionId')
+  const resultMatch = useMatch('/app/quizzes/:id/result')
   const isSolving = Boolean(questionMatch)
 
   const clearSavedState = useCallback(() => {
@@ -204,8 +206,16 @@ function QuizSolving() {
     retake,
   }
 
+  const crumbs: Crumb[] = [
+    { label: 'Quizzes', to: PATHS.app.quizzes },
+    { label: quiz.title, to: PATHS.app.quiz(quiz.id) },
+  ]
+  if (questionMatch) crumbs.push({ label: `Question ${activeIndex + 1}` })
+  else if (resultMatch) crumbs.push({ label: 'Result' })
+
   return (
     <>
+      <Breadcrumb items={crumbs} className="mb-6" />
       <Outlet context={context} />
       <ConfirmDialog
         isOpen={blocker.state === 'blocked'}

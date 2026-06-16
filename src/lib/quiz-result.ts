@@ -32,7 +32,14 @@ export function getReviewStatus(
     return 'ungraded'
   }
 
-  if (question.type === 'multi_select') return 'ungraded'
+  if (question.type === 'multi_select') {
+    if (!Array.isArray(userAnswer) || userAnswer.length === 0) return 'unanswered'
+    const correctIds = new Set(question.options.filter((o) => o.isCorrect).map((o) => o.id))
+    const chosen = new Set(userAnswer)
+    const isCorrect =
+      chosen.size === correctIds.size && [...chosen].every((id) => correctIds.has(id))
+    return isCorrect ? 'correct' : 'incorrect'
+  }
 
   if (typeof userAnswer !== 'string' || !userAnswer) return 'unanswered'
 
