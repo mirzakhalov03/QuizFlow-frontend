@@ -68,7 +68,6 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
 
   const { data: foldersData } = useGet<ApiResponse<Folder[]>>('/folders')
-
   const folderOptions = useMemo(() => {
     const folders = foldersData?.data || []
     return [
@@ -99,10 +98,16 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
 
   const onSubmit = (values: QuizFormValues) => {
     const tempId = crypto.randomUUID()
+    const targetFolderId = values.folderId !== 'none' ? values.folderId : undefined
 
     closeModal()
     reset()
-    addJob({ jobId: tempId, title: 'Generating quiz…', type: values.type })
+    addJob({
+      jobId: tempId,
+      title: 'Generating quiz…',
+      type: values.type,
+      folderId: targetFolderId,
+    })
     ;(async () => {
       try {
         const keys = await Promise.all(

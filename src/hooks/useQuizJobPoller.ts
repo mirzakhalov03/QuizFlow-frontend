@@ -9,9 +9,13 @@ import type { ApiResponse, QuizJob } from '@/types/quiz'
 type Options = {
   onDone: () => void
   onFailed: (error?: string) => void
+  folderId?: string
 }
 
-export const useQuizJobPoller = (initialJobId: string | null, { onDone, onFailed }: Options) => {
+export const useQuizJobPoller = (
+  initialJobId: string | null,
+  { onDone, onFailed, folderId }: Options
+) => {
   const queryClient = useQueryClient()
   const [jobId, setJobId] = useState<string | null>(initialJobId)
 
@@ -39,13 +43,17 @@ export const useQuizJobPoller = (initialJobId: string | null, { onDone, onFailed
 
     if (jobStatus === 'done') {
       queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
+      if (folderId) {
+        queryClient.invalidateQueries({ queryKey: [`/folders/${folderId}/quizzes`] })
+      }
+      queryClient.invalidateQueries({ queryKey: ['/folders'] })
       queueMicrotask(() => setJobId(null))
       onDoneRef.current()
     } else if (jobStatus === 'failed') {
       queueMicrotask(() => setJobId(null))
       onFailedRef.current(jobError ?? undefined)
     }
-  }, [jobStatus, jobError, jobId, queryClient])
+  }, [jobStatus, jobError, jobId, queryClient, folderId])
 
   return { startPolling: setJobId }
 }
