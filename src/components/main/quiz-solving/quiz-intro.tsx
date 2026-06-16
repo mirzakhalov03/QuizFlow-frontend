@@ -226,7 +226,7 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
           </p>
           <Button
             onClick={beginCountdown}
-            disabled={isCountingDown}
+            disabled={isCountingDown || quiz.questions.length === 0}
             className="min-w-32 self-start"
             rightIcon={isCountingDown ? undefined : <ArrowRight className="h-4 w-4" />}
           >
