@@ -37,12 +37,11 @@ export default function MoveToFolderModal({
   const { mutate: createFolder, isPending: isCreatingFolder } = usePost()
   const { mutate: moveQuiz, isPending: isMoving } = usePatch()
 
-  const folders = foldersData?.data || []
-
   const filteredFolders = useMemo(() => {
+    const folders = foldersData?.data || []
     if (!searchTerm.trim()) return folders
     return folders.filter((f) => f.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  }, [folders, searchTerm])
+  }, [foldersData?.data, searchTerm])
 
   const handleMove = (folderId: string | null) => {
     moveQuiz(
