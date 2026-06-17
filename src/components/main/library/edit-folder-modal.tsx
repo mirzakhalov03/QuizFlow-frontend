@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Modal from '@/components/custom/modal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,18 +15,12 @@ interface EditFolderModalProps {
 }
 
 export default function EditFolderModal({ folder, isOpen, onClose }: EditFolderModalProps) {
-  const [name, setName] = useState('')
+  // ✅ initialize from props (safe because we remount via key)
+  const [name, setName] = useState(folder?.name ?? '')
 
   const queryClient = useQueryClient()
   const { mutate: updateFolder, isPending: isLoading } = usePatch()
 
-  useEffect(() => {
-    if (folder) {
-      setName(folder.name)
-    } else {
-      setName('')
-    }
-  }, [folder])
   const handleClose = () => {
     setName('')
     onClose()
@@ -42,7 +36,9 @@ export default function EditFolderModal({ folder, isOpen, onClose }: EditFolderM
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['/folders'] })
-          queryClient.invalidateQueries({ queryKey: [`/folders/${folder.id}`] })
+          queryClient.invalidateQueries({
+            queryKey: [`/folders/${folder.id}`],
+          })
           toast.success('Folder updated successfully')
           handleClose()
         },
@@ -54,7 +50,13 @@ export default function EditFolderModal({ folder, isOpen, onClose }: EditFolderM
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Edit Folder" size="max-w-md">
+    <Modal
+      key={folder?.id}
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Edit Folder"
+      size="max-w-md"
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 py-2">
         <div className="flex flex-col gap-2">
           <label
@@ -63,6 +65,7 @@ export default function EditFolderModal({ folder, isOpen, onClose }: EditFolderM
           >
             Folder Name
           </label>
+
           <Input
             id="edit-folder-name"
             placeholder="e.g. Biology, History, My Quizzes"
@@ -80,6 +83,7 @@ export default function EditFolderModal({ folder, isOpen, onClose }: EditFolderM
             <Button type="button" variant="ghost" onClick={handleClose} className="h-9">
               Cancel
             </Button>
+
             <Button
               type="submit"
               loading={isLoading}
