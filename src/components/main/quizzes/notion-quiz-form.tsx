@@ -57,10 +57,16 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
 
   const onSubmit = (values: NotionFormValues) => {
     const tempId = crypto.randomUUID()
+    const targetFolderId = values.folderId !== 'none' ? values.folderId : undefined
 
     closeModal()
     reset()
-    addJob({ jobId: tempId, title: 'Generating quiz…', type: values.type })
+    addJob({
+      jobId: tempId,
+      title: 'Generating quiz…',
+      type: values.type,
+      folderId: targetFolderId,
+    })
     ;(async () => {
       try {
         const result = await quizService.createQuiz('notion', {

@@ -29,6 +29,10 @@ export function useQuizCardActions(quiz: Quiz) {
   const { mutate: deleteQuiz, isPending: isDeleting } = useDelete({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
+      if (quiz.folderId) {
+        queryClient.invalidateQueries({ queryKey: [`/folders/${quiz.folderId}/quizzes`] })
+      }
+      queryClient.invalidateQueries({ queryKey: ['/folders'] })
       setIsConfirmOpen(false)
       toast.success('Quiz deleted')
     },

@@ -55,16 +55,10 @@ export const routes: RouteObject[] = [
         path: PATHS.auth.root,
         element: <AuthLayout />,
         children: [
-          {
-            index: true,
-            element: <Navigate to={PATHS.auth.login} replace />,
-            loader: requireGuest,
-          },
+          { index: true, element: <Navigate to={PATHS.auth.login} replace /> },
           { path: 'login', lazy: Login, loader: requireGuest },
           { path: 'register', lazy: Register, loader: requireGuest },
           { path: 'forgot-password', lazy: ForgotPassword, loader: requireGuest },
-          // reset-password is intentionally ungated: a logged-in user following the
-          // emailed link must reach the form (requireGuest would bounce them to /app).
           { path: 'reset-password', lazy: ResetPassword },
         ],
       },

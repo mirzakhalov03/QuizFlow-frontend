@@ -6,6 +6,7 @@ export type PendingJob = {
   type: string
   status: 'uploading' | 'generating' | 'failed'
   error?: string
+  folderId?: string
 }
 
 type PendingJobsStore = {
