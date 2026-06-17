@@ -1,5 +1,6 @@
 import { api } from '@/api/axios-instance'
 import { useAuthStore } from '@/store/use-authstore'
+import { useUserProfileStore } from '@/store/userProfileStore'
 import { toast } from '@/lib/toast'
 
 export const logout = async (navigate?: (path: string) => void) => {
@@ -16,6 +17,8 @@ export const logout = async (navigate?: (path: string) => void) => {
   // that event surfaces an error toast meant for involuntary session loss.
   setUser(null)
   setLoading(false)
+  // Wipe the cached profile so the next account doesn't inherit this user's avatar/bio.
+  useUserProfileStore.getState().reset()
 
   if (navigate) {
     toast.success('Logged out successfully.')

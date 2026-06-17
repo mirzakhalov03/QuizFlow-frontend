@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { PasswordInput } from '@/components/form/password-input'
 import { PATHS } from '@/lib/path'
 import { cn } from '@/lib/utils'
 import { authService } from '@/api/services/auth.service'
@@ -89,14 +90,12 @@ export default function ResetPassword() {
         <label htmlFor="password" className="text-sm font-medium">
           New password
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           required
           minLength={8}
           autoComplete="new-password"
-          className={inputClass}
         />
       </div>
 
@@ -104,14 +103,12 @@ export default function ResetPassword() {
         <label htmlFor="confirm" className="text-sm font-medium">
           Confirm password
         </label>
-        <input
+        <PasswordInput
           id="confirm"
           name="confirm"
-          type="password"
           required
           minLength={8}
           autoComplete="new-password"
-          className={inputClass}
         />
       </div>
 

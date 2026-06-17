@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useAuthStore } from '@/store/use-authstore'
+import { useUserProfileStore } from '@/store/userProfileStore'
 import { api } from '@/api/axios-instance'
 import { toast } from '@/lib/toast'
 import { authEvents } from './AuthEvents'
@@ -28,6 +29,7 @@ export const AuthInitializer = ({ children }: { children: React.ReactNode }) => 
     authEvents.on(() => {
       setUser(null)
       setLoading(false)
+      useUserProfileStore.getState().reset()
       toast.error('Session expired. Please sign in again.')
     })
   }, [setUser, setLoading])

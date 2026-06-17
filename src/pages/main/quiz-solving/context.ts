@@ -21,8 +21,6 @@ export type QuizSolvingContext = {
   onAnswerChange: (questionId: string, value: string | string[]) => void
   submit: () => void
   isSubmitting: boolean
-  /** The last submit request failed — the result view surfaces an error state. */
-  submitFailed: boolean
   retake: () => void
 }
 

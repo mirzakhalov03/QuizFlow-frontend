@@ -12,7 +12,16 @@ import type { ApiResponse } from '@/types/api'
 import { useGlobalStore } from '@/store/global-store'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
 import Breadcrumb, { type Crumb } from '@/components/ui/breadcrumb'
+import LoadingOverlay from '@/components/ui/loading-overlay'
 import { QUIZ_SOLVING_HEADER_KEY, type QuizSolvingContext, type QuizSolvingHeader } from './context'
+
+const GRADING_MESSAGES = [
+  'Submitting your answers',
+  'Evaluating your responses',
+  'Comparing against the model answer',
+  'Calculating your score',
+  'Almost there',
+]
 
 function answersKey(quizId: string) {
   return `quiz-answers-${quizId}`
@@ -53,11 +62,10 @@ function QuizSolving() {
     id ? loadSavedAnswers(id) : {}
   )
 
-  const {
-    mutate: submitMutation,
-    isPending,
-    isError: submitFailed,
-  } = usePost<{ answers: SubmitAnswer[] }, ApiResponse<QuizResult>>()
+  const { mutate: submitMutation, isPending } = usePost<
+    { answers: SubmitAnswer[] },
+    ApiResponse<QuizResult>
+  >()
 
   const questionMatch = useMatch('/app/quizzes/:id/question/:questionId')
   const resultMatch = useMatch('/app/quizzes/:id/result')
@@ -82,13 +90,16 @@ function QuizSolving() {
 
   const goToResult = useCallback(() => {
     if (!id) return
-    // Drop any cached (stale) result so the result view starts clean — it shows
-    // the grading overlay until the finalized result is fetched, with no flash
-    // of a previous attempt's score.
+    // Drop any cached (stale) result so the view fetches the just-persisted
+    // attempt fresh — no flash of a previous attempt's score/answers.
     queryClient.removeQueries({ queryKey: [QUIZ_RESULT(id)] })
     navigate(PATHS.app.quizResult(id), { replace: true })
   }, [id, navigate, queryClient])
 
+  // Navigate to the result screen only AFTER the submit (incl. synchronous LLM
+  // grading) has committed — fetching earlier would read the previous attempt's
+  // rows. The full-screen grading overlay (driven by `isPending` below) covers
+  // the wait. On error we stay put; usePost surfaces a toast via handleFormError.
   const runSubmit = useCallback(
     (payload: SubmitAnswer[]) => {
       if (!id) return
@@ -98,24 +109,21 @@ function QuizSolving() {
         {
           onSuccess: () => {
             clearSavedState()
-            queryClient.invalidateQueries({ queryKey: [QUIZ_RESULT(id)] })
+            goToResult()
           },
         }
       )
     },
-    [id, submitMutation, clearSavedState, queryClient]
+    [id, submitMutation, clearSavedState, goToResult]
   )
 
-  // Move to the result screen immediately, then fire the request. Grading is a
-  // synchronous LLM call, so the result view shows an "evaluating" overlay while
-  // the request is in flight, then renders the finalized score. Used for manual
-  // submit, timer expiry, and the leave-mid-quiz confirm.
+  // Fires the submit and shows the grading overlay; used for manual submit,
+  // timer expiry, and the leave-mid-quiz confirm.
   const submit = useCallback(() => {
     if (!id || !quiz || isPending) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
-    goToResult()
     runSubmit(payload)
-  }, [id, quiz, answers, isPending, goToResult, runSubmit])
+  }, [id, quiz, answers, isPending, runSubmit])
 
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
@@ -200,7 +208,6 @@ function QuizSolving() {
     onAnswerChange,
     submit,
     isSubmitting: isPending,
-    submitFailed,
     retake,
   }
 
@@ -215,6 +222,9 @@ function QuizSolving() {
     <>
       <Breadcrumb items={crumbs} className="mb-6" />
       <Outlet context={context} />
+      {/* Full-screen overlay during submit. Grading is a synchronous LLM call,
+          so this covers the wait, then we navigate to the result on success. */}
+      {isPending && <LoadingOverlay messages={GRADING_MESSAGES} />}
       <ConfirmDialog
         isOpen={blocker.state === 'blocked'}
         onClose={() => blocker.reset?.()}
