@@ -101,21 +101,21 @@ export default function AddExistingQuizzesModal({
         />
 
         <div className="flex items-center justify-between px-1">
-          <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
             Available Quizzes ({filteredQuizzes.length})
           </p>
           {filteredQuizzes.length > 0 && (
             <button
               type="button"
               onClick={toggleAll}
-              className="text-primary hover:underline text-xs font-medium"
+              className="text-primary text-xs font-medium hover:underline"
             >
               {selectedIds.size === filteredQuizzes.length ? 'Deselect All' : 'Select All'}
             </button>
           )}
         </div>
 
-        <div className="border-border scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-border max-h-[400px] min-h-[300px] overflow-y-auto rounded-xl border bg-muted/20">
+        <div className="border-border scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-border bg-muted/20 max-h-[400px] min-h-[300px] overflow-y-auto rounded-xl border">
           {isLoading ? (
             <div className="flex h-[300px] items-center justify-center">
               <Spinner />
@@ -125,14 +125,18 @@ export default function AddExistingQuizzesModal({
               <div className="bg-muted mb-4 flex h-12 w-12 items-center justify-center rounded-full">
                 <FileQuestion className="text-muted-foreground" size={24} />
               </div>
-              <p className="text-muted-foreground text-sm font-medium">All your quizzes are already in this folder.</p>
+              <p className="text-muted-foreground text-sm font-medium">
+                All your quizzes are already in this folder.
+              </p>
             </div>
           ) : filteredQuizzes.length === 0 ? (
             <div className="flex h-[300px] flex-col items-center justify-center p-8 text-center">
               <div className="bg-muted mb-4 flex h-12 w-12 items-center justify-center rounded-full">
                 <Search className="text-muted-foreground" size={24} />
               </div>
-              <p className="text-muted-foreground text-sm font-medium">No quizzes match &quot;{search}&quot;</p>
+              <p className="text-muted-foreground text-sm font-medium">
+                No quizzes match &quot;{search}&quot;
+              </p>
             </div>
           ) : (
             <div className="divide-border flex flex-col divide-y">
@@ -155,7 +159,9 @@ export default function AddExistingQuizzesModal({
                       )}
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <span className="truncate text-sm font-semibold leading-none">{quiz.title}</span>
+                      <span className="truncate text-sm leading-none font-semibold">
+                        {quiz.title}
+                      </span>
                       <div className="flex items-center gap-3">
                         <span
                           className={cn(
@@ -178,22 +184,18 @@ export default function AddExistingQuizzesModal({
           )}
         </div>
 
-        <div className="bg-muted/30 -mx-6 -mb-6 mt-2 flex items-center justify-between border-t border-border px-6 py-4">
+        <div className="bg-muted/30 border-border -mx-6 mt-2 -mb-6 flex items-center justify-between border-t px-6 py-4">
           <div className="flex flex-col">
-            <span className="text-sm font-bold">
-              {selectedIds.size} Selected
-            </span>
-            <p className="text-muted-foreground text-[11px]">
-              Ready to be added to this folder
-            </p>
+            <span className="text-sm font-bold">{selectedIds.size} Selected</span>
+            <p className="text-muted-foreground text-[11px]">Ready to be added to this folder</p>
           </div>
           <div className="flex gap-3">
             <Button type="button" variant="ghost" onClick={onClose} className="h-9 px-4">
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              disabled={selectedIds.size === 0 || isAdding} 
+            <Button
+              type="submit"
+              disabled={selectedIds.size === 0 || isAdding}
               loading={isAdding}
               className="h-9 px-6"
             >

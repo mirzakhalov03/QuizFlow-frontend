@@ -99,7 +99,10 @@ export default function NewFolderModal() {
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 py-2">
         <div className="flex flex-col gap-2">
-          <label htmlFor="folder-name" className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+          <label
+            htmlFor="folder-name"
+            className="text-muted-foreground text-xs font-bold tracking-wider uppercase"
+          >
             Folder Name
           </label>
           <Input
@@ -123,7 +126,7 @@ export default function NewFolderModal() {
               Only ungrouped quizzes are shown
             </span>
           </div>
-          
+
           <Input
             placeholder="Search quizzes by title..."
             value={search}
@@ -132,7 +135,7 @@ export default function NewFolderModal() {
             fullWidth
           />
 
-          <div className="border-border scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-border max-h-60 overflow-y-auto rounded-xl border bg-muted/20">
+          <div className="border-border scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-border bg-muted/20 max-h-60 overflow-y-auto rounded-xl border">
             {isLoadingQuizzes ? (
               <div className="flex h-32 items-center justify-center">
                 <Spinner />
@@ -142,17 +145,21 @@ export default function NewFolderModal() {
                 <div className="bg-muted mb-2 flex h-8 w-8 items-center justify-center rounded-full">
                   <FileQuestion className="text-muted-foreground" size={16} />
                 </div>
-                <p className="text-muted-foreground text-xs font-medium">No ungrouped quizzes available.</p>
+                <p className="text-muted-foreground text-xs font-medium">
+                  No ungrouped quizzes available.
+                </p>
               </div>
             ) : filteredQuizzes.length === 0 ? (
               <div className="flex h-32 flex-col items-center justify-center p-4 text-center">
                 <div className="bg-muted mb-2 flex h-8 w-8 items-center justify-center rounded-full">
                   <Search className="text-muted-foreground" size={16} />
                 </div>
-                <p className="text-muted-foreground text-xs font-medium">No match for &quot;{search}&quot;</p>
+                <p className="text-muted-foreground text-xs font-medium">
+                  No match for &quot;{search}&quot;
+                </p>
               </div>
             ) : (
-              <div className="divide-border flex flex-col divide-y bg-background">
+              <div className="divide-border bg-background flex flex-col divide-y">
                 {filteredQuizzes.map((quiz) => {
                   const isSelected = selectedIds.has(quiz.id)
                   return (
@@ -172,7 +179,9 @@ export default function NewFolderModal() {
                         )}
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <span className="truncate text-xs font-semibold leading-tight">{quiz.title}</span>
+                        <span className="truncate text-xs leading-tight font-semibold">
+                          {quiz.title}
+                        </span>
                         <div className="flex items-center gap-2">
                           <span
                             className={cn(
@@ -196,7 +205,7 @@ export default function NewFolderModal() {
           </div>
         </div>
 
-        <div className="bg-muted/30 -mx-6 -mb-6 mt-2 flex items-center justify-between border-t border-border px-6 py-4">
+        <div className="bg-muted/30 border-border -mx-6 mt-2 -mb-6 flex items-center justify-between border-t px-6 py-4">
           <div className="flex flex-col">
             {selectedIds.size > 0 ? (
               <>
@@ -211,12 +220,7 @@ export default function NewFolderModal() {
             <Button type="button" variant="ghost" onClick={handleClose} className="h-9">
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              loading={isLoading} 
-              disabled={!name.trim()}
-              className="h-9 px-6"
-            >
+            <Button type="submit" loading={isLoading} disabled={!name.trim()} className="h-9 px-6">
               Create Folder
             </Button>
           </div>

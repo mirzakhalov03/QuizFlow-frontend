@@ -125,6 +125,11 @@ export default function AppLayout() {
             </div>
           )}
           <div className="ml-auto flex items-center gap-2">
+            {quizHeader?.isTimerEnabled && (
+              <div className="lg:hidden">
+                <QuizTimer timeRemaining={quizHeader.timeRemaining} />
+              </div>
+            )}
             <ThemeToggle />
             <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
               {profilePicture ? (
@@ -158,7 +163,6 @@ export default function AppLayout() {
           <NavLink
             key={to}
             to={to}
-            end
             className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
           >
             {({ isActive }) => (

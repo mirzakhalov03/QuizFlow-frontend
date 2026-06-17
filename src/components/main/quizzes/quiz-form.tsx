@@ -1,41 +1,20 @@
-import { useEffect, useMemo, useRef } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
-import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 
-import { useGet } from '@/hooks/useGet'
-import { ApiResponse } from '@/types/api'
-import { Folder } from '@/types/folder'
 import { quizService } from '@/api/services/quiz.service'
 import FileUpload from '@/components/form/file-upload'
-import { FormCheckbox } from '@/components/form/form-checkbox'
-import FormInput from '@/components/form/input'
-import { FormSelect } from '@/components/form/form-select'
-import FormTextarea from '@/components/form/textarea'
-import Button from '@/components/ui/button'
 import { useModal } from '@/hooks/useModal'
-import { useByokKeys } from '@/hooks/useByokKeys'
 import { toast } from '@/lib/toast'
-import type { QuestionType } from '@/types/quiz'
+import { extractApiErrorMessage } from '@/lib/api-error'
 import {
-  aiModels,
   DEFAULT_MODEL,
-  difficulties,
-  questionCounts,
-  questionTypes,
+  toTimerSeconds,
+  type QuizSettingsValues,
 } from '@/components/main/quizzes/utils'
+import QuizSettingsFields from '@/components/main/quizzes/quiz-settings-fields'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 
-type QuizFormValues = {
-  type: QuestionType
-  questionCount: string
-  difficulty: string
-  isTimerEnabled: boolean
-  timerDuration?: number
+type QuizFormValues = QuizSettingsValues & {
   files: File[]
-  userInstructions?: string
-  model: string
-  folderId: string
-  apiKeyId: string
 }
 
 interface QuizFormProps {
@@ -48,8 +27,6 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
   const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
-
-  const { keys: byokKeys } = useByokKeys()
 
   const form = useForm<QuizFormValues>({
     defaultValues: {
@@ -64,37 +41,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
     },
   })
 
-  const { handleSubmit, reset, control, setValue, getValues } = form
-  const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
-
-  const { data: foldersData } = useGet<ApiResponse<Folder[]>>('/folders')
-  const folderOptions = useMemo(() => {
-    const folders = foldersData?.data || []
-    return [
-      { label: 'No Folder', value: 'none' },
-      ...folders.map((f) => ({ label: f.name, value: f.id })),
-    ]
-  }, [foldersData?.data])
-
-  const byokOptions = useMemo(() => {
-    return [
-      { label: 'None (Use QuizFlow credits)', value: '' },
-      ...byokKeys.map((key) => ({
-        label: `${key.keyName} (${key.provider})`,
-        value: key.id,
-      })),
-    ]
-  }, [byokKeys])
-
-  const byokDefaultApplied = useRef(false)
-  useEffect(() => {
-    if (!byokDefaultApplied.current && byokKeys.length > 0) {
-      if (!getValues('apiKeyId')) {
-        setValue('apiKeyId', byokKeys[0].id)
-      }
-      byokDefaultApplied.current = true
-    }
-  }, [byokKeys, setValue, getValues])
+  const { handleSubmit, reset } = form
 
   const onSubmit = (values: QuizFormValues) => {
     const tempId = crypto.randomUUID()
@@ -125,7 +72,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
           userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
-          timerDuration: values.isTimerEnabled ? (values.timerDuration ?? 0) * 60 : undefined,
+          timerDuration: toTimerSeconds(values.isTimerEnabled, values.timerDuration),
           model: values.model,
           apiKeyId: values.apiKeyId || undefined,
           folderId: values.folderId !== 'none' ? values.folderId : undefined,
@@ -133,11 +80,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
 
         setJobReady(tempId, result.jobId)
       } catch (err: unknown) {
-        const e = err as { response?: { data?: { message?: string; detail?: string } } }
-        const message =
-          e?.response?.data?.message ??
-          e?.response?.data?.detail ??
-          (err instanceof Error ? err.message : 'Generation failed. Please try again.')
+        const message = extractApiErrorMessage(err)
         markJobFailed(tempId, message)
         toast.error(message)
       }
@@ -149,7 +92,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
       <div className="space-y-1">
         <FileUpload
           label="Source Documents"
-          control={control}
+          control={form.control}
           name="files"
           required
           multiple
@@ -164,102 +107,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
         </p>
       </div>
 
-      <div className="bg-muted/40 space-y-3 rounded-xl p-3">
-        <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
-          <Settings2 className="h-3.5 w-3.5" />
-          Quiz Settings
-        </p>
-
-        <FormSelect
-          label="Save to Folder"
-          options={folderOptions}
-          name="folderId"
-          control={control}
-          disabled={!!folderId}
-        />
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <FormSelect
-            label="Question Type"
-            options={questionTypes}
-            name="type"
-            control={control}
-            required
-          />
-          <FormSelect
-            label="Question Count"
-            options={questionCounts}
-            name="questionCount"
-            control={control}
-            required
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <FormSelect
-            label="Difficulty"
-            options={difficulties}
-            name="difficulty"
-            control={control}
-            required
-          />
-          <FormSelect label="AI Model" options={aiModels} name="model" control={control} required />
-        </div>
-
-        {byokKeys.length > 0 && (
-          <FormSelect
-            label="Use Your Own Key (BYOK)"
-            options={byokOptions}
-            name="apiKeyId"
-            control={control}
-          />
-        )}
-
-        <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
-
-        {timerEnabled && (
-          <FormInput
-            name="timerDuration"
-            methods={form}
-            label="Timer (minutes)"
-            type="number"
-            min={1}
-            onKeyDown={(e) => {
-              if (['-', 'e', 'E', '+'].includes(e.key)) {
-                e.preventDefault()
-              }
-            }}
-            registerOptions={{
-              min: { value: 1, message: 'Minimum 1 minute' },
-              max: { value: 180, message: 'Maximum 180 minutes' },
-              valueAsNumber: true,
-            }}
-            required
-          />
-        )}
-      </div>
-
-      <FormTextarea
-        label="Custom Instructions"
-        methods={form}
-        name="userInstructions"
-        placeholder="e.g. Focus on chapter 3, only ask about dates… (optional)"
-      />
-
-      <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          leftIcon={<ChevronLeft size={16} />}
-          className="flex-1"
-        >
-          Back
-        </Button>
-        <Button type="submit" className="flex-1" rightIcon={<Sparkles className="h-4 w-4" />}>
-          Generate Quiz
-        </Button>
-      </div>
+      <QuizSettingsFields form={form} onBack={onBack} folderId={folderId} />
     </form>
   )
 }

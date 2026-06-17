@@ -114,14 +114,16 @@ export default function MoveToFolderModal({
                 disabled={isMoving || !currentFolderId}
                 className={cn(
                   'hover:bg-accent group flex w-full items-center justify-between rounded-lg p-3 transition-all duration-200',
-                  !currentFolderId && 'bg-primary/5 ring-1 ring-primary/20 cursor-default'
+                  !currentFolderId && 'bg-primary/5 ring-primary/20 cursor-default ring-1'
                 )}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
                       'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
-                      !currentFolderId ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground group-hover:bg-primary/5 group-hover:text-primary'
+                      !currentFolderId
+                        ? 'bg-primary/10 text-primary'
+                        : 'bg-muted text-muted-foreground group-hover:bg-primary/5 group-hover:text-primary'
                     )}
                   >
                     <FolderIcon size={18} />
@@ -156,21 +158,26 @@ export default function MoveToFolderModal({
                   disabled={isMoving || currentFolderId === folder.id}
                   className={cn(
                     'hover:bg-accent group flex w-full items-center justify-between rounded-lg p-3 transition-all duration-200',
-                    currentFolderId === folder.id && 'bg-primary/5 ring-1 ring-primary/20 cursor-default'
+                    currentFolderId === folder.id &&
+                      'bg-primary/5 ring-primary/20 cursor-default ring-1'
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
                         'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
-                        currentFolderId === folder.id ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground group-hover:bg-primary/5 group-hover:text-primary'
+                        currentFolderId === folder.id
+                          ? 'bg-primary/10 text-primary'
+                          : 'bg-muted text-muted-foreground group-hover:bg-primary/5 group-hover:text-primary'
                       )}
                     >
                       <FolderIcon size={18} />
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="text-sm font-semibold">{folder.name}</span>
-                      <span className="text-muted-foreground text-xs">{folder.quizCount || 0} quizzes</span>
+                      <span className="text-muted-foreground text-xs">
+                        {folder.quizCount || 0} quizzes
+                      </span>
                     </div>
                   </div>
                   {currentFolderId === folder.id && (
@@ -188,16 +195,21 @@ export default function MoveToFolderModal({
           {!showNewFolder ? (
             <button
               onClick={() => setShowNewFolder(true)}
-              className="hover:bg-primary/5 hover:border-primary/40 text-primary flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border p-3 text-sm font-medium transition-all duration-200"
+              className="hover:bg-primary/5 hover:border-primary/40 text-primary border-border flex w-full items-center justify-center gap-2 rounded-lg border border-dashed p-3 text-sm font-medium transition-all duration-200"
             >
               <FolderPlus size={18} />
               Create New Folder
             </button>
           ) : (
-            <div className="bg-muted/30 flex flex-col gap-3 rounded-xl border border-border p-3">
+            <div className="bg-muted/30 border-border flex flex-col gap-3 rounded-xl border p-3">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">New Folder</span>
-                <button onClick={() => setShowNewFolder(false)} className="text-muted-foreground hover:text-foreground">
+                <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  New Folder
+                </span>
+                <button
+                  onClick={() => setShowNewFolder(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X size={14} />
                 </button>
               </div>
@@ -230,7 +242,7 @@ export default function MoveToFolderModal({
         </div>
       </div>
 
-      <div className="bg-muted/20 -mx-6 mt-4 flex items-center gap-2 border-t border-border px-6 pt-4">
+      <div className="bg-muted/20 border-border -mx-6 mt-4 flex items-center gap-2 border-t px-6 pt-4">
         <Info size={14} className="text-muted-foreground" />
         <p className="text-muted-foreground text-xs">
           Moving a quiz will update its location in your library.

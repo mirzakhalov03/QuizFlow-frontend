@@ -1,6 +1,14 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useState, useMemo } from 'react'
-import { Folder as FolderIcon, ChevronLeft, Plus, FolderInput, MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import {
+  Folder as FolderIcon,
+  ChevronLeft,
+  Plus,
+  FolderInput,
+  MoreVertical,
+  Pencil,
+  Trash2,
+} from 'lucide-react'
 import { useGet } from '@/hooks/useGet'
 import { useDelete } from '@/hooks/useDelete'
 import { ApiResponse } from '@/types/api'
@@ -27,7 +35,7 @@ export default function LibraryFolder() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { openModal } = useModal('quiz-add')
-  
+
   const [isAddExistingOpen, setIsAddExistingOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false)
@@ -105,18 +113,18 @@ export default function LibraryFolder() {
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-md p-1 transition-colors"
                 >
                   <MoreVertical size={20} />
                 </button>
                 {isMenuOpen && (
-                  <div className="bg-popover text-popover-foreground border-border absolute top-8 left-0 z-50 min-w-32 rounded-md border shadow-lg overflow-hidden py-1">
+                  <div className="bg-popover text-popover-foreground border-border absolute top-8 left-0 z-50 min-w-32 overflow-hidden rounded-md border py-1 shadow-lg">
                     <button
                       onClick={() => {
                         setIsEditModalOpen(true)
                         setIsMenuOpen(false)
                       }}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                      className="hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors"
                     >
                       <Pencil size={14} />
                       Rename
@@ -126,7 +134,7 @@ export default function LibraryFolder() {
                         setIsConfirmDeleteOpen(true)
                         setIsMenuOpen(false)
                       }}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors text-destructive hover:bg-destructive/10"
+                      className="text-destructive hover:bg-destructive/10 flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors"
                     >
                       <Trash2 size={14} />
                       Delete
@@ -152,7 +160,7 @@ export default function LibraryFolder() {
       </div>
 
       {isEmpty ? (
-        <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center border-border">
+        <div className="text-muted-foreground border-border flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center">
           <p>No quizzes in this folder yet.</p>
           <div className="flex items-center gap-3">
             <Button

@@ -20,7 +20,7 @@ export default function Library() {
   const queryClient = useQueryClient()
   const { data, isLoading } = useGet<ApiResponse<Folder[]>>('/folders')
   const { openModal } = useModal(NEW_FOLDER_MODAL_KEY)
-  
+
   const [editingFolder, setEditingFolder] = useState<Folder | null>(null)
   const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null)
 
@@ -58,7 +58,7 @@ export default function Library() {
       </div>
 
       {folders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center border-border">
+        <div className="border-border flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center">
           <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-full">
             <FolderIcon className="text-muted-foreground" size={32} />
           </div>
@@ -73,9 +73,9 @@ export default function Library() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {folders.map((folder) => (
-            <FolderCard 
-              key={folder.id} 
-              folder={folder} 
+            <FolderCard
+              key={folder.id}
+              folder={folder}
               onEdit={() => setEditingFolder(folder)}
               onDelete={() => setDeletingFolderId(folder.id)}
             />
@@ -84,10 +84,10 @@ export default function Library() {
       )}
 
       <NewFolderModal />
-      <EditFolderModal 
-        folder={editingFolder} 
-        isOpen={!!editingFolder} 
-        onClose={() => setEditingFolder(null)} 
+      <EditFolderModal
+        folder={editingFolder}
+        isOpen={!!editingFolder}
+        onClose={() => setEditingFolder(null)}
       />
       <ConfirmDialog
         isOpen={!!deletingFolderId}
@@ -103,14 +103,14 @@ export default function Library() {
   )
 }
 
-function FolderCard({ 
-  folder, 
-  onEdit, 
-  onDelete 
-}: { 
-  folder: Folder; 
-  onEdit: () => void;
-  onDelete: () => void;
+function FolderCard({
+  folder,
+  onEdit,
+  onDelete,
+}: {
+  folder: Folder
+  onEdit: () => void
+  onDelete: () => void
 }) {
   const [menuOpen, setOpen] = useState(false)
   const ref = useClickOutside<HTMLDivElement>(() => setOpen(false))
@@ -119,26 +119,26 @@ function FolderCard({
     <div ref={ref} className="group relative">
       <Link
         to={PATHS.app.libraryFolder(folder.id)}
-        className="bg-card hover:border-primary flex flex-col gap-2 rounded-xl border border-border p-4 transition-all"
+        className="bg-card hover:border-primary border-border flex flex-col gap-2 rounded-xl border p-4 transition-all"
       >
         <FolderIcon className="text-primary" size={32} />
-        <h3 className="truncate font-semibold pr-6">{folder.name}</h3>
+        <h3 className="truncate pr-6 font-semibold">{folder.name}</h3>
         <p className="text-muted-foreground text-sm">{folder.quizCount} quizzes</p>
       </Link>
-      
+
       <button
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
           setOpen(!menuOpen)
         }}
-        className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
+        className="text-muted-foreground hover:text-foreground hover:bg-muted absolute top-3 right-3 rounded-md p-1 transition-colors"
       >
         <MoreVertical size={18} />
       </button>
 
       {menuOpen && (
-        <div className="bg-popover text-popover-foreground border-border absolute top-10 right-3 z-50 min-w-32 rounded-md border shadow-lg overflow-hidden py-1">
+        <div className="bg-popover text-popover-foreground border-border absolute top-10 right-3 z-50 min-w-32 overflow-hidden rounded-md border py-1 shadow-lg">
           <button
             onClick={(e) => {
               e.preventDefault()
@@ -146,7 +146,7 @@ function FolderCard({
               onEdit()
               setOpen(false)
             }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+            className="hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors"
           >
             <Pencil size={14} />
             Edit
@@ -158,7 +158,7 @@ function FolderCard({
               onDelete()
               setOpen(false)
             }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors text-destructive hover:bg-destructive/10"
+            className="text-destructive hover:bg-destructive/10 flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors"
           >
             <Trash2 size={14} />
             Delete

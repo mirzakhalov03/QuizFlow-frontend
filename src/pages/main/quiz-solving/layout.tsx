@@ -6,30 +6,23 @@ import { useGet } from '@/hooks/useGet'
 import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
 import { buildSubmitAnswers } from '@/lib/quiz-submit'
+import { clearQuizState, loadSavedAnswers, saveAnswers, timerStorageKey } from '@/lib/quiz-storage'
 import { QUIZ_BY_ID, QUIZ_RESULT, QUIZ_SUBMIT } from '@/constants/api-endpoints'
 import type { QuizResult, QuizWithQuestions, SubmitAnswer } from '@/types/quiz'
 import type { ApiResponse } from '@/types/api'
 import { useGlobalStore } from '@/store/global-store'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
+import Breadcrumb, { type Crumb } from '@/components/ui/breadcrumb'
+import LoadingOverlay from '@/components/ui/loading-overlay'
 import { QUIZ_SOLVING_HEADER_KEY, type QuizSolvingContext, type QuizSolvingHeader } from './context'
 
-function answersKey(quizId: string) {
-  return `quiz-answers-${quizId}`
-}
-
-function timerKey(quizId: string) {
-  return `quiz-timer-${quizId}`
-}
-
-function loadSavedAnswers(quizId: string): Record<string, string | string[]> {
-  try {
-    const saved = localStorage.getItem(answersKey(quizId))
-    if (saved) return JSON.parse(saved)
-  } catch {
-    // ignore corrupt data
-  }
-  return {}
-}
+const GRADING_MESSAGES = [
+  'Submitting your answers',
+  'Evaluating your responses',
+  'Comparing against the model answer',
+  'Calculating your score',
+  'Almost there',
+]
 
 export default function QuizSolvingLayout() {
   // React Router reuses this route component when navigating between quizzes
@@ -58,12 +51,12 @@ function QuizSolving() {
   >()
 
   const questionMatch = useMatch('/app/quizzes/:id/question/:questionId')
+  const resultMatch = useMatch('/app/quizzes/:id/result')
   const isSolving = Boolean(questionMatch)
 
   const clearSavedState = useCallback(() => {
     if (!id) return
-    localStorage.removeItem(answersKey(id))
-    localStorage.removeItem(timerKey(id))
+    clearQuizState(id)
   }, [id])
 
   const onAnswerChange = useCallback(
@@ -72,17 +65,23 @@ function QuizSolving() {
       // must stay pure — concurrent rendering may call it more than once).
       const updated = { ...answers, [questionId]: value }
       setAnswers(updated)
-      if (id) localStorage.setItem(answersKey(id), JSON.stringify(updated))
+      if (id) saveAnswers(id, updated)
     },
     [id, answers]
   )
 
   const goToResult = useCallback(() => {
     if (!id) return
-    queryClient.invalidateQueries({ queryKey: [QUIZ_RESULT(id)] })
+    // Drop any cached (stale) result so the view fetches the just-persisted
+    // attempt fresh — no flash of a previous attempt's score/answers.
+    queryClient.removeQueries({ queryKey: [QUIZ_RESULT(id)] })
     navigate(PATHS.app.quizResult(id), { replace: true })
   }, [id, navigate, queryClient])
 
+  // Navigate to the result screen only AFTER the submit (incl. synchronous LLM
+  // grading) has committed — fetching earlier would read the previous attempt's
+  // rows. The full-screen grading overlay (driven by `isPending` below) covers
+  // the wait. On error we stay put; usePost surfaces a toast via handleFormError.
   const runSubmit = useCallback(
     (payload: SubmitAnswer[]) => {
       if (!id) return
@@ -100,28 +99,18 @@ function QuizSolving() {
     [id, submitMutation, clearSavedState, goToResult]
   )
 
+  // Fires the submit and shows the grading overlay; used for manual submit,
+  // timer expiry, and the leave-mid-quiz confirm.
   const submit = useCallback(() => {
     if (!id || !quiz || isPending) return
     const payload = buildSubmitAnswers(quiz.questions, answers)
     runSubmit(payload)
   }, [id, quiz, answers, isPending, runSubmit])
 
-  const handleAutoSubmit = useCallback(() => {
-    if (!id || !quiz) return
-    const payload = buildSubmitAnswers(quiz.questions, answers)
-    if (payload.length === 0) {
-      clearSavedState()
-      runSubmit(payload)
-      goToResult()
-      return
-    }
-    runSubmit(payload)
-  }, [id, quiz, answers, clearSavedState, goToResult, runSubmit])
-
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
-    id ? timerKey(id) : 'quiz-timer-none',
-    handleAutoSubmit,
+    id ? timerStorageKey(id) : 'quiz-timer-none',
+    submit,
     isSolving && !!quiz?.isTimerEnabled
   )
 
@@ -142,8 +131,7 @@ function QuizSolving() {
 
   const retake = useCallback(() => {
     if (!id) return
-    localStorage.removeItem(answersKey(id))
-    localStorage.removeItem(timerKey(id))
+    clearQuizState(id)
     setAnswers({})
     queryClient.removeQueries({ queryKey: [QUIZ_RESULT(id)] })
     navigate(PATHS.app.quiz(id))
@@ -204,15 +192,26 @@ function QuizSolving() {
     retake,
   }
 
+  const crumbs: Crumb[] = [
+    { label: 'Quizzes', to: PATHS.app.quizzes },
+    { label: quiz.title, to: PATHS.app.quiz(quiz.id) },
+  ]
+  if (questionMatch) crumbs.push({ label: `Question ${activeIndex + 1}` })
+  else if (resultMatch) crumbs.push({ label: 'Result' })
+
   return (
     <>
+      <Breadcrumb items={crumbs} className="mb-6" />
       <Outlet context={context} />
+      {/* Full-screen overlay during submit. Grading is a synchronous LLM call,
+          so this covers the wait, then we navigate to the result on success. */}
+      {isPending && <LoadingOverlay messages={GRADING_MESSAGES} />}
       <ConfirmDialog
         isOpen={blocker.state === 'blocked'}
         onClose={() => blocker.reset?.()}
         onConfirm={() => {
           blocker.reset?.()
-          handleAutoSubmit()
+          submit()
         }}
         title="Leave quiz?"
         description="If you leave now, your quiz will be automatically submitted with your current answers."

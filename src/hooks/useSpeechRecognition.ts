@@ -6,9 +6,7 @@ import type {
   SpeechRecognitionWindow,
 } from '@/types/speech-recognition'
 
-export function useSpeechRecognition(
-  onTranscript: (text: string) => void,
-) {
+export function useSpeechRecognition(onTranscript: (text: string) => void) {
   const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   const [isRecording, setIsRecording] = useState(false)
@@ -20,10 +18,7 @@ export function useSpeechRecognition(
 
     const speechWindow = window as SpeechRecognitionWindow
 
-    return (
-      speechWindow.SpeechRecognition ??
-      speechWindow.webkitSpeechRecognition
-    )
+    return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition
   }, [])
 
   const isSupported = !!SpeechRecognitionClass
@@ -56,11 +51,7 @@ export function useSpeechRecognition(
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let transcript = ''
 
-      for (
-        let i = event.resultIndex;
-        i < event.results.length;
-        i++
-      ) {
+      for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript
       }
 

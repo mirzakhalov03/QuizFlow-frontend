@@ -11,17 +11,11 @@ import { useQuizSolving } from './context'
 export default function QuizResultView() {
   const { quiz, retake } = useQuizSolving()
 
+  // We only land here after submit (incl. synchronous grading) has committed, so
+  // a single fetch returns the finalized score and answers — no polling.
   const { data, isLoading, isError } = useGet<ApiResponse<QuizResultResponse>>(
     QUIZ_RESULT(quiz.id),
-    {
-      options: {
-        staleTime: 0,
-        refetchInterval: (query) => {
-          const payload = query.state.data as ApiResponse<QuizResultResponse> | undefined
-          return payload?.data?.result?.gradingStatus === 'pending' ? 2000 : false
-        },
-      },
-    }
+    { options: { staleTime: 0 } }
   )
 
   const payload = data?.data
@@ -40,7 +34,7 @@ export default function QuizResultView() {
     const list = payload?.answers
     if (!list) return {}
     return list.reduce<Record<string, string | string[]>>((acc, a) => {
-      acc[a.questionId] = a.selectedOptionId ?? a.textAnswer ?? ''
+      acc[a.questionId] = a.selectedOptionIds ?? a.selectedOptionId ?? a.textAnswer ?? ''
       return acc
     }, {})
   }, [payload])
@@ -74,7 +68,7 @@ export default function QuizResultView() {
       questions={quiz.questions}
       answers={answers}
       verdicts={verdicts}
-      isGrading={result.gradingStatus === 'pending'}
+      isGrading={false}
       onRetake={retake}
     />
   )

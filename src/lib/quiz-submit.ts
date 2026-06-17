@@ -3,18 +3,8 @@ import type { Question, SubmitAnswer } from '@/types/quiz'
 type AnswersState = Record<string, string | string[] | undefined>
 
 /**
- * Whether the quiz contains question types the submit pipeline can't grade yet.
- * Today that's `multi_select`: the backend stores one option per question and
- * scores a single correct option, so multi-answer questions can't be represented.
- */
-export function hasUngradableQuestions(questions: Question[]): boolean {
-  return questions.some((q) => q.type === 'multi_select')
-}
-
-/**
  * Maps the local answers state into the API submit payload. Drops unanswered
- * questions (so we never send an empty `selectedOptionId`, which fails UUID
- * validation) and skips `multi_select`, which the backend can't grade.
+ * questions (so we never send an empty option id, which fails UUID validation).
  */
 export function buildSubmitAnswers(questions: Question[], answers: AnswersState): SubmitAnswer[] {
   const payload: SubmitAnswer[] = []
@@ -28,14 +18,16 @@ export function buildSubmitAnswers(questions: Question[], answers: AnswersState)
       continue
     }
 
-    if (question.type === 'multiple_choice' || question.type === 'true_false') {
-      if (typeof value === 'string' && value) {
-        payload.push({ questionId: question.id, selectedOptionId: value })
-      }
+    if (question.type === 'multi_select') {
+      const ids = Array.isArray(value) ? value.filter(Boolean) : []
+      if (ids.length > 0) payload.push({ questionId: question.id, selectedOptionIds: ids })
       continue
     }
 
-    // multi_select / mixed: not gradable by the current backend — skip.
+    // multiple_choice / true_false
+    if (typeof value === 'string' && value) {
+      payload.push({ questionId: question.id, selectedOptionId: value })
+    }
   }
 
   return payload

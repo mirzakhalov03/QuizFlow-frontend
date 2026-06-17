@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/path'
 import QuestionCard from '@/components/main/quiz-solving/question-card'
 import QuizProgress from '@/components/main/quiz-solving/quiz-progress'
-import { hasUngradableQuestions } from '@/lib/quiz-submit'
 import { useQuizSolving } from './context'
 
 export default function QuizQuestionView() {
@@ -26,7 +25,6 @@ export default function QuizQuestionView() {
 
   const currentQuestion = quiz.questions[index]
   const isLast = index === quiz.questions.length - 1
-  const containsMultiSelect = hasUngradableQuestions(quiz.questions)
 
   const goTo = (i: number) => {
     const target = quiz.questions[i]
@@ -34,7 +32,7 @@ export default function QuizQuestionView() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       <div className="lg:hidden">
         <QuizProgress
           questions={quiz.questions}
@@ -59,7 +57,7 @@ export default function QuizQuestionView() {
 
         <div className="flex items-center gap-3">
           {isLast ? (
-            <Button onClick={submit} disabled={containsMultiSelect || isSubmitting}>
+            <Button onClick={submit} disabled={isSubmitting}>
               {isSubmitting ? 'Submitting…' : 'Submit Quiz'}
             </Button>
           ) : (
@@ -67,12 +65,6 @@ export default function QuizQuestionView() {
           )}
         </div>
       </div>
-
-      {containsMultiSelect && isLast && (
-        <p className="text-muted-foreground -mt-4 text-center text-sm">
-          Multi-select quizzes aren’t gradable yet — submission is disabled.
-        </p>
-      )}
     </div>
   )
 }

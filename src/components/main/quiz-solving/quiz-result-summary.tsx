@@ -102,11 +102,6 @@ export default function QuizResultSummary({ quizTitle, result }: Props) {
               label="Incorrect"
               className="border-destructive/20 bg-destructive/10 text-destructive"
             />
-            <Stat
-              value={result.totalQuestions}
-              label="Graded"
-              className="border-border bg-muted text-muted-foreground"
-            />
           </div>
         </div>
       </div>
