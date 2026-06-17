@@ -54,12 +54,11 @@ export const routes: RouteObject[] = [
       {
         path: PATHS.auth.root,
         element: <AuthLayout />,
-        loader: requireGuest,
         children: [
           { index: true, element: <Navigate to={PATHS.auth.login} replace /> },
-          { path: 'login', lazy: Login },
-          { path: 'register', lazy: Register },
-          { path: 'forgot-password', lazy: ForgotPassword },
+          { path: 'login', lazy: Login, loader: requireGuest },
+          { path: 'register', lazy: Register, loader: requireGuest },
+          { path: 'forgot-password', lazy: ForgotPassword, loader: requireGuest },
           { path: 'reset-password', lazy: ResetPassword },
         ],
       },
