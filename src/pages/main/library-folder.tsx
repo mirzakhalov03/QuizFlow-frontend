@@ -1,7 +1,8 @@
-import { useParams, Link } from 'react-router-dom'
-import { useState } from 'react'
-import { Folder as FolderIcon, ChevronLeft, Plus, FolderInput } from 'lucide-react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useState, useMemo } from 'react'
+import { Folder as FolderIcon, ChevronLeft, Plus, FolderInput, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { useGet } from '@/hooks/useGet'
+import { useDelete } from '@/hooks/useDelete'
 import { ApiResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
 import { Quiz } from '@/types/quiz'
@@ -10,14 +11,35 @@ import Spinner from '@/components/ui/spinner'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import { useModal } from '@/hooks/useModal'
+import { useClickOutside } from '@/hooks/useClickOutside'
 import Modal from '@/components/custom/modal'
 import QuizFormWrapper from '@/components/main/quizzes/quiz-form-wrapper'
 import AddExistingQuizzesModal from '@/components/main/library/add-existing-quizzes-modal'
+import EditFolderModal from '@/components/main/library/edit-folder-modal'
+import ConfirmDialog from '@/components/ui/confirm-dialog'
+import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
+import { PendingQuizCard } from '@/components/main/quizzes/pending-quiz-card'
+import { toast } from '@/lib/toast'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function LibraryFolder() {
   const { folderId } = useParams()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { openModal } = useModal('quiz-add')
+  
   const [isAddExistingOpen, setIsAddExistingOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const menuRef = useClickOutside<HTMLDivElement>(() => setIsMenuOpen(false))
+
+  const allPendingJobs = usePendingJobsStore((s) => s.jobs)
+
+  const folderPendingJobs = useMemo(
+    () => allPendingJobs.filter((job) => job.folderId === folderId),
+    [allPendingJobs, folderId]
+  )
 
   const { data: folderData, isLoading: isLoadingFolder } = useGet<ApiResponse<Folder>>(
     `/folders/${folderId}`
@@ -28,6 +50,17 @@ export default function LibraryFolder() {
 
   const folder = folderData?.data
   const quizzes = quizzesData?.data || []
+
+  const { mutate: deleteFolder, isPending: isDeleting } = useDelete({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/folders'] })
+      toast.success('Folder deleted successfully')
+      navigate(PATHS.app.library)
+    },
+    onError: () => {
+      toast.error('Failed to delete folder')
+    },
+  })
 
   if (isLoadingFolder || isLoadingQuizzes) {
     return (
@@ -50,6 +83,8 @@ export default function LibraryFolder() {
     )
   }
 
+  const isEmpty = quizzes.length === 0 && folderPendingJobs.length === 0
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -65,7 +100,41 @@ export default function LibraryFolder() {
             <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
               <FolderIcon className="text-primary" size={24} />
             </div>
-            <h1 className="text-2xl font-bold">{folder.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold">{folder.name}</h1>
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors"
+                >
+                  <MoreVertical size={20} />
+                </button>
+                {isMenuOpen && (
+                  <div className="bg-popover text-popover-foreground border-border absolute top-8 left-0 z-50 min-w-32 rounded-md border shadow-lg overflow-hidden py-1">
+                    <button
+                      onClick={() => {
+                        setIsEditModalOpen(true)
+                        setIsMenuOpen(false)
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <Pencil size={14} />
+                      Rename
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsConfirmDeleteOpen(true)
+                        setIsMenuOpen(false)
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 size={14} />
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -82,8 +151,8 @@ export default function LibraryFolder() {
         </div>
       </div>
 
-      {quizzes.length === 0 ? (
-        <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center">
+      {isEmpty ? (
+        <div className="text-muted-foreground flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center border-border">
           <p>No quizzes in this folder yet.</p>
           <div className="flex items-center gap-3">
             <Button
@@ -100,6 +169,9 @@ export default function LibraryFolder() {
         </div>
       ) : (
         <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {folderPendingJobs.map((job) => (
+            <PendingQuizCard key={job.jobId} {...job} />
+          ))}
           {quizzes.map((quiz) => (
             <QuizCard key={quiz.id} quiz={quiz} />
           ))}
@@ -109,6 +181,23 @@ export default function LibraryFolder() {
       <Modal size="max-w-3xl" modalKey="quiz-add" title="Create New Quiz" className="pb-0 sm:pb-0">
         <QuizFormWrapper folderId={folderId} />
       </Modal>
+
+      <EditFolderModal
+        folder={folder}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => setIsConfirmDeleteOpen(false)}
+        onConfirm={() => folderId && deleteFolder(`/folders/${folderId}`)}
+        title="Delete Folder?"
+        description="This will permanently delete the folder. Quizzes inside will be moved to your root library."
+        confirmLabel="Delete"
+        variant="destructive"
+        loading={isDeleting}
+      />
 
       {folderId && (
         <AddExistingQuizzesModal

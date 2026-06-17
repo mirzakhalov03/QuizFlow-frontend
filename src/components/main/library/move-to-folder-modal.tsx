@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Modal from '@/components/custom/modal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,9 +9,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ApiResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
 import { toast } from '@/lib/toast'
-import { Folder as FolderIcon, Check, Plus, X } from 'lucide-react'
+import { Folder as FolderIcon, Check, X, Search, FolderPlus, Info } from 'lucide-react'
 import Spinner from '@/components/ui/spinner'
 import { QUIZ_LIST } from '@/constants/api-endpoints'
+import { cn } from '@/lib/utils'
 
 interface MoveToFolderModalProps {
   quizId: string
@@ -29,13 +30,18 @@ export default function MoveToFolderModal({
   const queryClient = useQueryClient()
   const [showNewFolder, setShowNewFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
 
   const { data: foldersData, isLoading: isLoadingFolders } =
     useGet<ApiResponse<Folder[]>>('/folders')
   const { mutate: createFolder, isPending: isCreatingFolder } = usePost()
   const { mutate: moveQuiz, isPending: isMoving } = usePatch()
 
-  const folders = foldersData?.data || []
+  const filteredFolders = useMemo(() => {
+    const folders = foldersData?.data || []
+    if (!searchTerm.trim()) return folders
+    return folders.filter((f) => f.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  }, [foldersData?.data, searchTerm])
 
   const handleMove = (folderId: string | null) => {
     moveQuiz(
@@ -81,58 +87,124 @@ export default function MoveToFolderModal({
   const handleClose = () => {
     setShowNewFolder(false)
     setNewFolderName('')
+    setSearchTerm('')
     onClose()
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Move to Folder">
-      <div className="flex flex-col gap-2 py-4">
-        {isLoadingFolders ? (
-          <div className="flex justify-center py-8">
-            <Spinner />
-          </div>
-        ) : (
-          <>
-            <button
-              onClick={() => handleMove(null)}
-              disabled={isMoving || !currentFolderId}
-              className="hover:bg-muted flex items-center justify-between rounded-lg p-3 transition-colors disabled:opacity-50"
-            >
-              <div className="flex items-center gap-3 text-sm font-medium">
-                <FolderIcon className="text-muted-foreground" size={20} />
-                No Folder (Root)
-              </div>
-              {!currentFolderId && <Check className="text-primary" size={18} />}
-            </button>
+    <Modal isOpen={isOpen} onClose={handleClose} title="Move Quiz" size="max-w-md">
+      <div className="flex flex-col gap-4 py-2">
+        <Input
+          placeholder="Search folders..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          prefixIcon={<Search size={16} />}
+          fullWidth
+        />
 
-            {folders.map((folder) => (
+        <div className="scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-border max-h-[350px] space-y-1 overflow-y-auto pr-1">
+          {isLoadingFolders ? (
+            <div className="flex justify-center py-12">
+              <Spinner />
+            </div>
+          ) : (
+            <>
               <button
-                key={folder.id}
-                onClick={() => handleMove(folder.id)}
-                disabled={isMoving || currentFolderId === folder.id}
-                className="hover:bg-muted flex items-center justify-between rounded-lg p-3 transition-colors disabled:opacity-50"
+                onClick={() => handleMove(null)}
+                disabled={isMoving || !currentFolderId}
+                className={cn(
+                  'hover:bg-accent group flex w-full items-center justify-between rounded-lg p-3 transition-all duration-200',
+                  !currentFolderId && 'bg-primary/5 ring-1 ring-primary/20 cursor-default'
+                )}
               >
-                <div className="flex items-center gap-3 text-sm font-medium">
-                  <FolderIcon className="text-primary" size={20} />
-                  {folder.name}
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+                      !currentFolderId ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground group-hover:bg-primary/5 group-hover:text-primary'
+                    )}
+                  >
+                    <FolderIcon size={18} />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-semibold">Root Library</span>
+                    <span className="text-muted-foreground text-xs">No specific folder</span>
+                  </div>
                 </div>
-                {currentFolderId === folder.id && <Check className="text-primary" size={18} />}
+                {!currentFolderId && (
+                  <div className="bg-primary flex h-5 w-5 items-center justify-center rounded-full">
+                    <Check className="text-primary-foreground" size={12} strokeWidth={3} />
+                  </div>
+                )}
               </button>
-            ))}
 
-            {!showNewFolder ? (
-              <button
-                onClick={() => setShowNewFolder(true)}
-                className="hover:bg-muted border-primary/30 text-primary mt-2 flex items-center gap-3 rounded-lg border border-dashed p-3 text-sm font-medium transition-colors"
-              >
-                <Plus size={20} />
-                Create New Folder
-              </button>
-            ) : (
-              <div className="bg-muted/50 border-primary/20 mt-2 flex items-center gap-2 rounded-lg border p-2">
+              <div className="h-2" />
+
+              {filteredFolders.length === 0 && searchTerm && (
+                <div className="flex flex-col items-center justify-center py-10 text-center">
+                  <div className="bg-muted mb-3 flex h-10 w-10 items-center justify-center rounded-full">
+                    <Search className="text-muted-foreground" size={20} />
+                  </div>
+                  <p className="text-muted-foreground text-sm">No folders found</p>
+                </div>
+              )}
+
+              {filteredFolders.map((folder) => (
+                <button
+                  key={folder.id}
+                  onClick={() => handleMove(folder.id)}
+                  disabled={isMoving || currentFolderId === folder.id}
+                  className={cn(
+                    'hover:bg-accent group flex w-full items-center justify-between rounded-lg p-3 transition-all duration-200',
+                    currentFolderId === folder.id && 'bg-primary/5 ring-1 ring-primary/20 cursor-default'
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+                        currentFolderId === folder.id ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground group-hover:bg-primary/5 group-hover:text-primary'
+                      )}
+                    >
+                      <FolderIcon size={18} />
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-semibold">{folder.name}</span>
+                      <span className="text-muted-foreground text-xs">{folder.quizCount || 0} quizzes</span>
+                    </div>
+                  </div>
+                  {currentFolderId === folder.id && (
+                    <div className="bg-primary flex h-5 w-5 items-center justify-center rounded-full">
+                      <Check className="text-primary-foreground" size={12} strokeWidth={3} />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+
+        <div className="pt-2">
+          {!showNewFolder ? (
+            <button
+              onClick={() => setShowNewFolder(true)}
+              className="hover:bg-primary/5 hover:border-primary/40 text-primary flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border p-3 text-sm font-medium transition-all duration-200"
+            >
+              <FolderPlus size={18} />
+              Create New Folder
+            </button>
+          ) : (
+            <div className="bg-muted/30 flex flex-col gap-3 rounded-xl border border-border p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">New Folder</span>
+                <button onClick={() => setShowNewFolder(false)} className="text-muted-foreground hover:text-foreground">
+                  <X size={14} />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
                 <Input
                   autoFocus
-                  placeholder="New folder name..."
+                  placeholder="Folder name..."
                   value={newFolderName}
                   onChange={(e) => setNewFolderName(e.target.value)}
                   onKeyDown={(e) => {
@@ -141,27 +213,28 @@ export default function MoveToFolderModal({
                       handleCreateAndMove()
                     }
                   }}
+                  className="h-10"
+                  fullWidth
                 />
                 <Button
-                  size="sm"
                   onClick={handleCreateAndMove}
                   loading={isCreatingFolder}
                   disabled={!newFolderName.trim()}
+                  className="h-10 shrink-0 px-4"
                 >
-                  Create & Move
-                </Button>
-                <Button size="icon" variant="ghost" onClick={() => setShowNewFolder(false)}>
-                  <X size={16} />
+                  Create
                 </Button>
               </div>
-            )}
-          </>
-        )}
+            </div>
+          )}
+        </div>
       </div>
-      <div className="flex justify-end pt-2">
-        <Button variant="ghost" onClick={handleClose}>
-          Cancel
-        </Button>
+
+      <div className="bg-muted/20 -mx-6 mt-4 flex items-center gap-2 border-t border-border px-6 pt-4">
+        <Info size={14} className="text-muted-foreground" />
+        <p className="text-muted-foreground text-xs">
+          Moving a quiz will update its location in your library.
+        </p>
       </div>
     </Modal>
   )

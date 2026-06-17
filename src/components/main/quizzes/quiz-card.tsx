@@ -35,6 +35,10 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const { mutate: deleteQuiz, isPending: isDeleting } = useDelete({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
+      if (quiz.folderId) {
+        queryClient.invalidateQueries({ queryKey: [`/folders/${quiz.folderId}/quizzes`] })
+      }
+      queryClient.invalidateQueries({ queryKey: ['/folders'] })
       setIsConfirmOpen(false)
       toast.success('Quiz deleted')
     },
@@ -97,6 +101,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       setIsExporting(false)
     }
   }
+ 
 
   const publicUrl = useMemo(() => {
     return shareToken ? window.location.origin + PATHS.public.quiz(shareToken) : ''
