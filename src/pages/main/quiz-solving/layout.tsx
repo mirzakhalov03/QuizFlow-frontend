@@ -6,6 +6,7 @@ import { useGet } from '@/hooks/useGet'
 import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
 import { buildSubmitAnswers } from '@/lib/quiz-submit'
+import { clearQuizState, loadSavedAnswers, saveAnswers, timerStorageKey } from '@/lib/quiz-storage'
 import { QUIZ_BY_ID, QUIZ_RESULT, QUIZ_SUBMIT } from '@/constants/api-endpoints'
 import type { QuizResult, QuizWithQuestions, SubmitAnswer } from '@/types/quiz'
 import type { ApiResponse } from '@/types/api'
@@ -22,24 +23,6 @@ const GRADING_MESSAGES = [
   'Calculating your score',
   'Almost there',
 ]
-
-function answersKey(quizId: string) {
-  return `quiz-answers-${quizId}`
-}
-
-function timerKey(quizId: string) {
-  return `quiz-timer-${quizId}`
-}
-
-function loadSavedAnswers(quizId: string): Record<string, string | string[]> {
-  try {
-    const saved = localStorage.getItem(answersKey(quizId))
-    if (saved) return JSON.parse(saved)
-  } catch {
-    // ignore corrupt data
-  }
-  return {}
-}
 
 export default function QuizSolvingLayout() {
   // React Router reuses this route component when navigating between quizzes
@@ -73,8 +56,7 @@ function QuizSolving() {
 
   const clearSavedState = useCallback(() => {
     if (!id) return
-    localStorage.removeItem(answersKey(id))
-    localStorage.removeItem(timerKey(id))
+    clearQuizState(id)
   }, [id])
 
   const onAnswerChange = useCallback(
@@ -83,7 +65,7 @@ function QuizSolving() {
       // must stay pure — concurrent rendering may call it more than once).
       const updated = { ...answers, [questionId]: value }
       setAnswers(updated)
-      if (id) localStorage.setItem(answersKey(id), JSON.stringify(updated))
+      if (id) saveAnswers(id, updated)
     },
     [id, answers]
   )
@@ -127,7 +109,7 @@ function QuizSolving() {
 
   const { timeRemaining } = useQuizTimer(
     quiz?.timerDuration ?? 0,
-    id ? timerKey(id) : 'quiz-timer-none',
+    id ? timerStorageKey(id) : 'quiz-timer-none',
     submit,
     isSolving && !!quiz?.isTimerEnabled
   )
@@ -149,8 +131,7 @@ function QuizSolving() {
 
   const retake = useCallback(() => {
     if (!id) return
-    localStorage.removeItem(answersKey(id))
-    localStorage.removeItem(timerKey(id))
+    clearQuizState(id)
     setAnswers({})
     queryClient.removeQueries({ queryKey: [QUIZ_RESULT(id)] })
     navigate(PATHS.app.quiz(id))

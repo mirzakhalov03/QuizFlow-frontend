@@ -167,12 +167,33 @@
     -webkit-text-fill-color: transparent;
     animation: thinking-shimmer 2.4s linear infinite;
   }
+
+  /* Hourglass on the quiz timer: holds upright, flips, holds, then completes the
+     turn back to upright — the classic "pour then flip" loop. */
+  @keyframes hourglass-flip {
+    0%,
+    40% {
+      transform: rotate(0deg);
+    }
+    50%,
+    90% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .hourglass-flip {
+    animation: hourglass-flip 2.2s ease-in-out infinite;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .enter-fade-up,
   .enter-fade-right,
-  .hero-breathe {
+  .hero-breathe,
+  .hourglass-flip {
     opacity: 1;
     transform: none;
     animation: none;

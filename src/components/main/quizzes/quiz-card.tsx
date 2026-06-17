@@ -1,135 +1,40 @@
-import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import {
-  ArrowRight,
-  Check,
-  Clock,
-  Copy,
-  FileDown,
-  Menu,
-  Share2,
-  Trash2,
-  Zap,
-  FolderInput,
-} from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { ArrowRight, Clock, FileDown, Menu, Share2, Trash2, Zap, FolderInput } from 'lucide-react'
 
-import { useDelete } from '@/hooks/useDelete'
-import { QUIZ_BY_ID, QUIZ_LIST, QUIZ_SHARE_ENABLE } from '@/constants/api-endpoints'
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from '@/lib/toast'
-import { openQuizPdf } from '@/lib/quiz-pdf'
-import type { PaginatedResponse, Quiz } from '@/types/quiz'
+import type { Quiz } from '@/types/quiz'
 import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
-import { PATHS } from '@/lib/path'
-import { usePatch } from '@/hooks/usePatch'
-import Modal from '@/components/custom/modal'
+import { useQuizCardActions } from '@/hooks/useQuizCardActions'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownItem } from '@/components/ui/dropdown-menu'
-
-import Spinner from '@/components/ui/spinner'
 import MoveToFolderModal from '../library/move-to-folder-modal'
+import ShareQuizModal from './share-quiz-modal'
 
 dayjs.extend(relativeTime)
 
 export default function QuizCard({ quiz }: { quiz: Quiz }) {
-  const queryClient = useQueryClient()
-  const navigate = useNavigate()
-  const [shareToken, setShareToken] = useState<string | null>(quiz.shareToken || null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
-  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
-
-  const { mutate: deleteQuiz, isPending: isDeleting } = useDelete({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
-      setIsConfirmOpen(false)
-      toast.success('Quiz deleted')
-    },
-  })
-
-  const { mutate: enableShare, isPending: isSharing } = usePatch({
-    onSuccess: (data: { data: { shareToken: string } }) => {
-      const token = data.data.shareToken
-      setShareToken(token)
-      // Update the quiz list cache with the new token
-      queryClient.setQueriesData<PaginatedResponse<Quiz>>({ queryKey: [QUIZ_LIST] }, (old) => {
-        if (!old) return old
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            items: old.data.items.map((item) =>
-              item.id === quiz.id ? { ...item, shareToken: token } : item
-            ),
-          },
-        }
-      })
-    },
-    onError: () => {
-      toast.error('Failed to generate share link')
-    },
-  })
-
-  const openDeleteConfirm = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsConfirmOpen(true)
-  }
-
-  const confirmDelete = () => {
-    deleteQuiz(QUIZ_BY_ID(quiz.id))
-  }
-
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (isSharing) return
-
-    setIsModalOpen(true)
-    if (!shareToken) {
-      enableShare(QUIZ_SHARE_ENABLE(quiz.id), {})
-    }
-  }
-
-  const handleMove = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsMoveModalOpen(true)
-  }
-  const handleExportPdf = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (isExporting) return
-
-    setIsExporting(true)
-    try {
-      await openQuizPdf(quiz.id)
-    } finally {
-      setIsExporting(false)
-    }
-  }
-
-  const publicUrl = useMemo(() => {
-    return shareToken ? window.location.origin + PATHS.public.quiz(shareToken) : ''
-  }, [shareToken])
-
-  const copyToClipboard = () => {
-    if (!publicUrl) return
-    navigator.clipboard
-      .writeText(publicUrl)
-      .then(() => {
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
-        toast.success('Link copied to clipboard')
-      })
-      .catch(() => {
-        toast.error('Failed to copy link')
-      })
-  }
-
-  const openQuiz = () => navigate(PATHS.app.quiz(quiz.id))
+  const {
+    shareToken,
+    publicUrl,
+    copied,
+    isModalOpen,
+    isConfirmOpen,
+    isMoveModalOpen,
+    isExporting,
+    isDeleting,
+    isSharing,
+    openQuiz,
+    openDeleteConfirm,
+    confirmDelete,
+    handleShare,
+    handleMove,
+    handleExportPdf,
+    copyToClipboard,
+    generateShareLink,
+    closeShareModal,
+    closeConfirm,
+    closeMoveModal,
+  } = useQuizCardActions(quiz)
 
   return (
     <>
@@ -210,53 +115,20 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         </div>
       </div>
 
-      <Modal
+      <ShareQuizModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Share Quiz"
-        description="Anyone with this link can view the quiz questions."
-      >
-        <div className="flex flex-col gap-4 py-4">
-          {isSharing ? (
-            <div className="flex h-20 items-center justify-center">
-              <Spinner size="md" />
-            </div>
-          ) : !shareToken ? (
-            <div className="flex flex-col items-center gap-3 py-4 text-center">
-              <p className="text-destructive text-sm">Failed to generate share link.</p>
-              <Button size="sm" onClick={() => enableShare(QUIZ_SHARE_ENABLE(quiz.id), {})}>
-                Retry
-              </Button>
-            </div>
-          ) : (
-            <>
-              <div className="flex gap-2">
-                <Input value={publicUrl} readOnly fullWidth />
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={copyToClipboard}
-                  aria-label="Copy link"
-                >
-                  {copied ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <p className="text-muted-foreground text-xs">
-                Note: This link allows read-only access. Users cannot submit answers or see correct
-                ones.
-              </p>
-            </>
-          )}
-        </div>
-      </Modal>
+        onClose={closeShareModal}
+        isSharing={isSharing}
+        shareToken={shareToken}
+        publicUrl={publicUrl}
+        copied={copied}
+        onCopy={copyToClipboard}
+        onRetry={generateShareLink}
+      />
 
       <ConfirmDialog
         isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
+        onClose={closeConfirm}
         onConfirm={confirmDelete}
         title="Delete quiz"
         description={`"${quiz.title}" will be permanently deleted. This can't be undone.`}
@@ -268,7 +140,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         quizId={quiz.id}
         currentFolderId={quiz.folderId}
         isOpen={isMoveModalOpen}
-        onClose={() => setIsMoveModalOpen(false)}
+        onClose={closeMoveModal}
       />
     </>
   )

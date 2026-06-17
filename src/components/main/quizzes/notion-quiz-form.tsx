@@ -1,43 +1,24 @@
-import { useEffect, useMemo, useRef } from 'react'
-import { useForm, useController, useWatch } from 'react-hook-form'
-import { Settings2, Sparkles, ChevronLeft, X } from 'lucide-react'
+import { useForm, useController } from 'react-hook-form'
+import { ChevronLeft, X } from 'lucide-react'
 
-import { useGet } from '@/hooks/useGet'
-import { ApiResponse } from '@/types/api'
-import { Folder } from '@/types/folder'
 import { quizService } from '@/api/services/quiz.service'
-import { FormSelect } from '@/components/form/form-select'
 import FieldLabel from '@/components/form/form-label'
-import FormTextarea from '@/components/form/textarea'
-import FormInput from '@/components/form/input'
-import { FormCheckbox } from '@/components/form/form-checkbox'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
 import { toast } from '@/lib/toast'
-import type { QuestionType } from '@/types/quiz'
+import { extractApiErrorMessage } from '@/lib/api-error'
 import {
-  aiModels,
   DEFAULT_MODEL,
-  difficulties,
-  questionCounts,
-  questionTypes,
+  toTimerSeconds,
+  type QuizSettingsValues,
 } from '@/components/main/quizzes/utils'
+import QuizSettingsFields from '@/components/main/quizzes/quiz-settings-fields'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 import { useModal } from '@/hooks/useModal'
 import { useNotionPages } from '@/hooks/useNotionPages'
-import { useByokKeys } from '@/hooks/useByokKeys'
 
-type NotionFormValues = {
+type NotionFormValues = QuizSettingsValues & {
   pageIds: string[]
-  type: QuestionType
-  questionCount: string
-  difficulty: string
-  model: string
-  apiKeyId: string
-  isTimerEnabled: boolean
-  timerDuration?: number
-  userInstructions?: string
-  folderId: string
 }
 
 type NotionQuizFormProps = {
@@ -52,17 +33,6 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
   const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
 
   const { pages, loading, error, refetch } = useNotionPages()
-  const { keys: byokKeys } = useByokKeys()
-
-  const { data: foldersData } = useGet<ApiResponse<Folder[]>>('/folders')
-
-  const folderOptions = useMemo(() => {
-    const folders = foldersData?.data || []
-    return [
-      { label: 'No Folder', value: 'none' },
-      ...folders.map((f) => ({ label: f.name, value: f.id })),
-    ]
-  }, [foldersData?.data])
 
   const form = useForm<NotionFormValues>({
     defaultValues: {
@@ -78,34 +48,12 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
     },
   })
 
-  const { handleSubmit, reset, control, setValue, getValues } = form
+  const { handleSubmit, reset, control } = form
   const { field: pageIdsField, fieldState } = useController({
     control,
     name: 'pageIds',
     rules: { validate: (v) => v.length > 0 || 'Select at least one page' },
   })
-
-  const timerEnabled = useWatch({ control, name: 'isTimerEnabled' }) ?? false
-
-  const byokOptions = useMemo(() => {
-    return [
-      { label: 'None (Use QuizFlow credits)', value: '' },
-      ...byokKeys.map((key) => ({
-        label: `${key.keyName} (${key.provider})`,
-        value: key.id,
-      })),
-    ]
-  }, [byokKeys])
-
-  const byokDefaultApplied = useRef(false)
-  useEffect(() => {
-    if (!byokDefaultApplied.current && byokKeys.length > 0) {
-      if (!getValues('apiKeyId')) {
-        setValue('apiKeyId', byokKeys[0].id)
-      }
-      byokDefaultApplied.current = true
-    }
-  }, [byokKeys, setValue, getValues])
 
   const onSubmit = (values: NotionFormValues) => {
     const tempId = crypto.randomUUID()
@@ -123,19 +71,14 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
           folderId: values.folderId !== 'none' ? values.folderId : undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
-          timerDuration:
-            values.isTimerEnabled && values.timerDuration ? values.timerDuration * 60 : undefined,
+          timerDuration: toTimerSeconds(values.isTimerEnabled, values.timerDuration),
           model: values.model,
           apiKeyId: values.apiKeyId || undefined,
         })
 
         setJobReady(tempId, result.jobId)
       } catch (err: unknown) {
-        const e = err as { response?: { data?: { message?: string; detail?: string } } }
-        const message =
-          e?.response?.data?.message ??
-          e?.response?.data?.detail ??
-          (err instanceof Error ? err.message : 'Generation failed. Please try again.')
+        const message = extractApiErrorMessage(err)
         markJobFailed(tempId, message)
         toast.error(message)
       }
@@ -221,102 +164,7 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
         {fieldState.error && <p className="text-destructive text-xs">{fieldState.error.message}</p>}
       </div>
 
-      <div className="bg-muted/40 space-y-3 rounded-xl p-3">
-        <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
-          <Settings2 className="h-3.5 w-3.5" />
-          Quiz Settings
-        </p>
-
-        <FormSelect
-          label="Save to Folder"
-          options={folderOptions}
-          name="folderId"
-          control={control}
-          disabled={!!folderId}
-        />
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <FormSelect
-            label="Question Type"
-            options={questionTypes}
-            name="type"
-            control={control}
-            required
-          />
-          <FormSelect
-            label="Question Count"
-            options={questionCounts}
-            name="questionCount"
-            control={control}
-            required
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <FormSelect
-            label="Difficulty"
-            options={difficulties}
-            name="difficulty"
-            control={control}
-            required
-          />
-          <FormSelect label="AI Model" options={aiModels} name="model" control={control} required />
-        </div>
-
-        {byokKeys.length > 0 && (
-          <FormSelect
-            label="Use Your Own Key (BYOK)"
-            options={byokOptions}
-            name="apiKeyId"
-            control={control}
-          />
-        )}
-
-        <FormCheckbox label="Enable Timer" control={control} name="isTimerEnabled" />
-
-        {timerEnabled && (
-          <FormInput
-            name="timerDuration"
-            methods={form}
-            label="Timer (minutes)"
-            type="number"
-            min={1}
-            onKeyDown={(e) => {
-              if (['-', 'e', 'E', '+'].includes(e.key)) {
-                e.preventDefault()
-              }
-            }}
-            registerOptions={{
-              min: { value: 1, message: 'Minimum 1 minute' },
-              max: { value: 180, message: 'Maximum 180 minutes' },
-              valueAsNumber: true,
-            }}
-            required
-          />
-        )}
-      </div>
-
-      <FormTextarea
-        label="Custom Instructions"
-        methods={form}
-        name="userInstructions"
-        placeholder="e.g. Focus on chapter 3, only ask about dates… (optional)"
-      />
-
-      <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          leftIcon={<ChevronLeft size={16} />}
-          className="flex-1"
-        >
-          Back
-        </Button>
-        <Button type="submit" className="flex-1" rightIcon={<Sparkles className="h-4 w-4" />}>
-          Generate Quiz
-        </Button>
-      </div>
+      <QuizSettingsFields form={form} onBack={onBack} folderId={folderId} />
     </form>
   )
 }
