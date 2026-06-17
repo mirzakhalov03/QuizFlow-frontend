@@ -1,22 +1,17 @@
 import { AlertTriangle, Sparkles, Upload, X } from 'lucide-react'
 
-import { useQueryClient } from '@tanstack/react-query'
-
-import { QUIZ_LIST } from '@/constants/api-endpoints'
 import { useQuizJobPoller } from '@/hooks/useQuizJobPoller'
 import { usePendingJobsStore, type PendingJob } from '@/store/use-pending-jobs-store'
 import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
 import type { QuestionType } from '@/types/quiz'
 
-export function PendingQuizCard({ jobId, title, type, status, error }: PendingJob) {
-  const queryClient = useQueryClient()
+export function PendingQuizCard({ jobId, title, type, status, error, folderId }: PendingJob) {
   const removeJob = usePendingJobsStore((s) => s.removeJob)
   const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
 
   useQuizJobPoller(status === 'generating' ? jobId : null, {
+    folderId,
     onDone: () => {
-      queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
-      queryClient.invalidateQueries({ queryKey: ['/folders'] })
       removeJob(jobId)
     },
     onFailed: (err) => {

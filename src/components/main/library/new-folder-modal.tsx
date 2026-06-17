@@ -11,6 +11,10 @@ import { QUIZ_LIST } from '@/constants/api-endpoints'
 import { PaginatedResponse } from '@/types/api'
 import { Quiz } from '@/types/quiz'
 import Spinner from '@/components/ui/spinner'
+import { Search, CheckCircle2, Circle, FileQuestion, Calendar, FolderPlus } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import dayjs from 'dayjs'
+import { TYPE_COLORS, TYPE_LABELS } from '../quizzes/utils'
 
 export const NEW_FOLDER_MODAL_KEY = 'new-folder'
 
@@ -34,8 +38,7 @@ export default function NewFolderModal() {
 
   const availableQuizzes = useMemo(() => {
     if (!quizzesData?.data?.items) return []
-    // Allow users to add any quizzes that aren't already grouped, or just all quizzes.
-    // For simplicity, we can show all quizzes that don't have a folder yet.
+    // Show all quizzes that don't have a folder yet
     return quizzesData.data.items.filter((quiz) => !quiz.folderId)
   }, [quizzesData])
 
@@ -94,9 +97,9 @@ export default function NewFolderModal() {
       title="Create New Folder"
       size="max-w-2xl"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-2">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5 py-2">
         <div className="flex flex-col gap-2">
-          <label htmlFor="folder-name" className="text-sm font-medium">
+          <label htmlFor="folder-name" className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
             Folder Name
           </label>
           <Input
@@ -104,69 +107,116 @@ export default function NewFolderModal() {
             placeholder="e.g. Biology, History, My Quizzes"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            prefixIcon={<FolderPlus size={16} />}
+            className="h-10 text-sm font-medium"
+            fullWidth
             autoFocus
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Add Existing Quizzes (Optional)</label>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <label className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+              Add Quizzes (Optional)
+            </label>
+            <span className="text-muted-foreground text-[10px] font-medium">
+              Only ungrouped quizzes are shown
+            </span>
+          </div>
+          
           <Input
-            placeholder="Search quizzes to add..."
+            placeholder="Search quizzes by title..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="mb-2"
+            prefixIcon={<Search size={16} />}
+            fullWidth
           />
 
-          <div className="border-border max-h-60 overflow-y-auto rounded-lg border">
+          <div className="border-border scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-border max-h-60 overflow-y-auto rounded-xl border bg-muted/20">
             {isLoadingQuizzes ? (
               <div className="flex h-32 items-center justify-center">
                 <Spinner />
               </div>
             ) : availableQuizzes.length === 0 ? (
-              <div className="text-muted-foreground flex h-32 items-center justify-center text-sm">
-                No ungrouped quizzes available to add.
+              <div className="flex h-32 flex-col items-center justify-center p-4 text-center">
+                <div className="bg-muted mb-2 flex h-8 w-8 items-center justify-center rounded-full">
+                  <FileQuestion className="text-muted-foreground" size={16} />
+                </div>
+                <p className="text-muted-foreground text-xs font-medium">No ungrouped quizzes available.</p>
               </div>
             ) : filteredQuizzes.length === 0 ? (
-              <div className="text-muted-foreground flex h-32 items-center justify-center text-sm">
-                No quizzes match your search.
+              <div className="flex h-32 flex-col items-center justify-center p-4 text-center">
+                <div className="bg-muted mb-2 flex h-8 w-8 items-center justify-center rounded-full">
+                  <Search className="text-muted-foreground" size={16} />
+                </div>
+                <p className="text-muted-foreground text-xs font-medium">No match for &quot;{search}&quot;</p>
               </div>
             ) : (
-              <ul className="divide-border divide-y">
-                {filteredQuizzes.map((quiz) => (
-                  <li
-                    key={quiz.id}
-                    className="hover:bg-muted flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors"
-                    onClick={() => toggleSelection(quiz.id)}
-                  >
-                    <input
-                      type="checkbox"
-                      className="border-input text-primary focus:ring-primary h-4 w-4 rounded transition-all"
-                      checked={selectedIds.has(quiz.id)}
-                      onChange={() => toggleSelection(quiz.id)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{quiz.title}</span>
-                      <span className="text-muted-foreground text-xs">
-                        {quiz.type ? quiz.type.replace('_', ' ') : 'mixed'}
-                      </span>
+              <div className="divide-border flex flex-col divide-y bg-background">
+                {filteredQuizzes.map((quiz) => {
+                  const isSelected = selectedIds.has(quiz.id)
+                  return (
+                    <div
+                      key={quiz.id}
+                      className={cn(
+                        'group flex cursor-pointer items-center gap-3 px-4 py-2.5 transition-all duration-200',
+                        isSelected ? 'bg-primary/5' : 'hover:bg-accent'
+                      )}
+                      onClick={() => toggleSelection(quiz.id)}
+                    >
+                      <div className="flex shrink-0 items-center justify-center">
+                        {isSelected ? (
+                          <CheckCircle2 className="text-primary h-4 w-4" />
+                        ) : (
+                          <Circle className="text-muted-foreground group-hover:text-primary/40 h-4 w-4" />
+                        )}
+                      </div>
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <span className="truncate text-xs font-semibold leading-tight">{quiz.title}</span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              'rounded-full px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase',
+                              TYPE_COLORS[quiz.type ?? 'mixed']
+                            )}
+                          >
+                            {TYPE_LABELS[quiz.type ?? 'mixed']}
+                          </span>
+                          <div className="text-muted-foreground flex items-center gap-0.5 text-[10px]">
+                            <Calendar size={9} />
+                            {dayjs(quiz.createdAt).format('MMM D, YYYY')}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </li>
-                ))}
-              </ul>
+                  )
+                })}
+              </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2">
-          <span className="text-muted-foreground text-sm">
-            {selectedIds.size > 0 ? `${selectedIds.size} quiz(zes) selected` : ''}
-          </span>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="ghost" onClick={handleClose}>
+        <div className="bg-muted/30 -mx-6 -mb-6 mt-2 flex items-center justify-between border-t border-border px-6 py-4">
+          <div className="flex flex-col">
+            {selectedIds.size > 0 ? (
+              <>
+                <span className="text-sm font-bold">{selectedIds.size} Selected</span>
+                <p className="text-muted-foreground text-[11px]">Will be added to the new folder</p>
+              </>
+            ) : (
+              <span className="text-muted-foreground text-sm font-medium italic">Empty folder</span>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <Button type="button" variant="ghost" onClick={handleClose} className="h-9">
               Cancel
             </Button>
-            <Button type="submit" loading={isLoading} disabled={!name.trim()}>
+            <Button 
+              type="submit" 
+              loading={isLoading} 
+              disabled={!name.trim()}
+              className="h-9 px-6"
+            >
               Create Folder
             </Button>
           </div>
