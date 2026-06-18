@@ -28,6 +28,26 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
 
   const activeData = useMemo(() => data.filter((k) => k.tokensUsed > 0), [data])
 
+  // Build the donut segments configuration. Each circle uses stroke-dasharray to paint
+  // exactly its arc length, and stroke-dashoffset to rotate it into position.
+  const segmentsData = useMemo(() => {
+    const list = []
+    let cumulativeOffset = 0
+    for (let i = 0; i < activeData.length; i++) {
+      const item = activeData[i]
+      const ratio = totalTokens > 0 ? item.tokensUsed / totalTokens : 0
+      const arcLength = Math.max(ratio * CIRCUMFERENCE - GAP, 0)
+      const offset = CIRCUMFERENCE - cumulativeOffset
+      cumulativeOffset += arcLength + GAP
+      list.push({
+        id: item.keyId ?? '__default__',
+        arcLength,
+        offset,
+      })
+    }
+    return list
+  }, [activeData, totalTokens])
+
   if (activeData.length === 0) {
     return (
       <div className="border-border bg-background rounded-lg border p-8 text-center">
@@ -40,39 +60,6 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
       </div>
     )
   }
-
-  // Build the donut segments. Each circle uses stroke-dasharray to paint
-  // exactly its arc length, and stroke-dashoffset to rotate it into position.
-  let cumulativeOffset = 0
-  const segments = activeData.map((item, i) => {
-    const ratio = totalTokens > 0 ? item.tokensUsed / totalTokens : 0
-    const arcLength = Math.max(ratio * CIRCUMFERENCE - GAP, 0)
-    const offset = CIRCUMFERENCE - cumulativeOffset
-    cumulativeOffset += arcLength + GAP
-
-    const color = PALETTE[i % PALETTE.length]
-    const id = item.keyId ?? '__default__'
-    const isHovered = hoveredKey === id
-
-    return (
-      <circle
-        key={id}
-        cx={CENTER}
-        cy={CENTER}
-        r={RADIUS}
-        fill="none"
-        stroke={color}
-        strokeWidth={isHovered ? STROKE + 4 : STROKE}
-        strokeDasharray={`${arcLength} ${CIRCUMFERENCE - arcLength}`}
-        strokeDashoffset={offset}
-        strokeLinecap="round"
-        className="transition-all duration-300"
-        style={{ opacity: hoveredKey && !isHovered ? 0.35 : 1 }}
-        onMouseEnter={() => setHoveredKey(id)}
-        onMouseLeave={() => setHoveredKey(null)}
-      />
-    )
-  })
 
   return (
     <div className="border-border bg-background rounded-lg border p-4 sm:p-6">
@@ -97,7 +84,31 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
               strokeWidth={STROKE}
             />
             {/* Segment group, rotated so arcs start from 12 o'clock */}
-            <g transform={`rotate(-90 ${CENTER} ${CENTER})`}>{segments}</g>
+            <g transform={`rotate(-90 ${CENTER} ${CENTER})`}>
+              {segmentsData.map((item, i) => {
+                const color = PALETTE[i % PALETTE.length]
+                const isHovered = hoveredKey === item.id
+
+                return (
+                  <circle
+                    key={item.id}
+                    cx={CENTER}
+                    cy={CENTER}
+                    r={RADIUS}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={isHovered ? STROKE + 4 : STROKE}
+                    strokeDasharray={`${item.arcLength} ${CIRCUMFERENCE - item.arcLength}`}
+                    strokeDashoffset={item.offset}
+                    strokeLinecap="round"
+                    className="transition-all duration-300"
+                    style={{ opacity: hoveredKey && !isHovered ? 0.35 : 1 }}
+                    onMouseEnter={() => setHoveredKey(item.id)}
+                    onMouseLeave={() => setHoveredKey(null)}
+                  />
+                )
+              })}
+            </g>
           </svg>
 
           {/* Center label */}

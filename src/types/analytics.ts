@@ -20,9 +20,19 @@ export type QuizHistoryItem = {
   date: string
 }
 
+export type KeyUsageSummary = {
+  keyId: string | null
+  keyName: string
+  tokensUsed: number
+  quizCount: number
+  percentage: number
+}
+
 export type AnalyticsSummary = {
   totalQuizzesTaken: number
   averageScore: number
+  totalTokensUsed: number
+  keyUsageBreakdown: KeyUsageSummary[]
   scoreOverTime: ScorePoint[]
   breakdownByType: TypeBreakdown[]
   history: QuizHistoryItem[]

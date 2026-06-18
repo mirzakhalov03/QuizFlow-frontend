@@ -1,4 +1,5 @@
 import AnalyticsStats from '@/components/main/analytics/analytics-stats'
+import ApiKeyAnalytics from '@/components/main/analytics/api-key-analytics'
 import ScoreOverTimeChart from '@/components/main/analytics/score-over-time-chart'
 import TypeBreakdownTable from '@/components/main/analytics/type-breakdown-table'
 import Spinner from '@/components/ui/spinner'
@@ -41,6 +42,11 @@ export default function Analytics() {
       <AnalyticsStats summary={summary} />
       <ScoreOverTimeChart points={summary.scoreOverTime ?? []} />
       <TypeBreakdownTable rows={summary.breakdownByType ?? []} />
+      <ApiKeyAnalytics
+        data={summary.keyUsageBreakdown ?? []}
+        totalTokens={summary.totalTokensUsed ?? 0}
+      />
     </div>
   )
 }
+

@@ -30,6 +30,8 @@ export type Quiz = {
   updatedAt: string
   uploadedAt: string | null
   shareToken?: string | null
+  apiKeyId?: string | null
+  apiKeyName?: string | null
 }
 
 export type QuizJob = {

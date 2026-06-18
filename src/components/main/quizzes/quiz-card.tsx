@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ArrowRight, Clock, FileDown, Menu, Share2, Trash2, Zap, FolderInput } from 'lucide-react'
+import { ArrowRight, Clock, FileDown, Menu, Share2, Trash2, FolderInput, Info } from 'lucide-react'
 
 import type { Quiz } from '@/types/quiz'
 import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
@@ -12,7 +12,27 @@ import ShareQuizModal from './share-quiz-modal'
 
 dayjs.extend(relativeTime)
 
+function getKeyInfo(quiz: Quiz) {
+  const isDefault = !quiz.apiKeyId
+  const label = isDefault ? 'QuizFlow Default Key' : (quiz.apiKeyName ?? 'BYOK Key')
+
+  if (isDefault) {
+    return { label, color: '#A855F7' }
+  }
+
+  const colors = ['#14B8A6', '#F43F5E', '#3B82F6', '#F59E0B']
+  let hash = 0
+  const keyId = quiz.apiKeyId || ''
+  for (let i = 0; i < keyId.length; i++) {
+    hash = keyId.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % colors.length
+  return { label, color: colors[index] }
+}
+
 export default function QuizCard({ quiz }: { quiz: Quiz }) {
+  const { label: keyLabel, color: keyColor } = getKeyInfo(quiz)
+
   const {
     shareToken,
     publicUrl,
@@ -56,24 +76,87 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       >
         <div className="flex items-start justify-between gap-2">
           <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{quiz.title}</h3>
-          <DropdownMenu trigger={<Menu className="h-4 w-4" />} ariaLabel="Quiz actions">
-            <DropdownItem icon={FolderInput} onClick={handleMove}>
-              Move to folder
-            </DropdownItem>
-            <DropdownItem
-              icon={FileDown}
-              onClick={handleExportPdf}
-              disabled={isExporting || isDeleting}
+          <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+            {/* Info Icon & Custom Dropdown/Tooltip */}
+            <div className="relative group/info flex items-center justify-center">
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/30 rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none flex items-center justify-center h-7 w-7"
+              >
+                <Info className="h-4 w-4" />
+              </button>
+              <div className="pointer-events-none absolute right-0 top-8 z-30 w-52 origin-top-right scale-95 opacity-0 rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-md transition-all duration-200 group-hover/info:pointer-events-auto group-hover/info:scale-100 group-hover/info:opacity-100">
+                <div className="space-y-2 text-xs font-normal">
+                  <div className="font-semibold text-foreground border-b border-border/50 pb-1">
+                    Generation Details
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">
+                      API Key
+                    </div>
+                    <div className="flex items-center gap-1.5 font-medium text-foreground">
+                      <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{
+                          backgroundColor: keyColor,
+                          boxShadow: `0 0 5px ${keyColor}80`,
+                        }}
+                      />
+                      <span className="truncate" title={keyLabel}>
+                        {keyLabel}
+                      </span>
+                    </div>
+                  </div>
+                  {quiz.tokenUsage && (
+                    <div className="space-y-1 pt-1 border-t border-border/30">
+                      <div className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">
+                        Token Usage
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 font-medium text-foreground text-[11px]">
+                        <span className="text-muted-foreground">Prompt:</span>
+                        <span className="text-right tabular-nums">
+                          {quiz.tokenUsage.prompt_tokens.toLocaleString()}
+                        </span>
+                        <span className="text-muted-foreground">Completion:</span>
+                        <span className="text-right tabular-nums">
+                          {quiz.tokenUsage.completion_tokens.toLocaleString()}
+                        </span>
+                        <span className="text-foreground font-semibold border-t border-border/30 mt-0.5 pt-0.5">
+                          Total:
+                        </span>
+                        <span className="text-right tabular-nums font-semibold border-t border-border/30 mt-0.5 pt-0.5">
+                          {quiz.tokenUsage.total_tokens.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <DropdownMenu
+              trigger={<Menu className="h-4 w-4" />}
+              ariaLabel="Quiz actions"
+              triggerClassName="h-7 w-7 flex items-center justify-center"
             >
-              Export as PDF
-            </DropdownItem>
-            <DropdownItem icon={Share2} onClick={handleShare}>
-              Share
-            </DropdownItem>
-            <DropdownItem icon={Trash2} onClick={openDeleteConfirm} destructive>
-              Delete
-            </DropdownItem>
-          </DropdownMenu>
+              <DropdownItem icon={FolderInput} onClick={handleMove}>
+                Move to folder
+              </DropdownItem>
+              <DropdownItem
+                icon={FileDown}
+                onClick={handleExportPdf}
+                disabled={isExporting || isDeleting}
+              >
+                Export as PDF
+              </DropdownItem>
+              <DropdownItem icon={Share2} onClick={handleShare}>
+                Share
+              </DropdownItem>
+              <DropdownItem icon={Trash2} onClick={openDeleteConfirm} destructive>
+                Delete
+              </DropdownItem>
+            </DropdownMenu>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -87,21 +170,6 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
             <span className="text-muted-foreground flex items-center gap-1 text-xs">
               <Clock className="h-3 w-3" />
               {Math.round(quiz.timerDuration / 60)} min
-            </span>
-          )}
-
-          {quiz.tokenUsage && (
-            <span
-              className="text-muted-foreground flex items-center gap-1 text-xs"
-              title={
-                'Prompt: ' +
-                quiz.tokenUsage.prompt_tokens.toLocaleString() +
-                ', Completion: ' +
-                quiz.tokenUsage.completion_tokens.toLocaleString()
-              }
-            >
-              <Zap className="h-3 w-3 text-amber-500" />
-              {quiz.tokenUsage.total_tokens.toLocaleString()}
             </span>
           )}
         </div>
