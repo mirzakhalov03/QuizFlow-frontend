@@ -51,7 +51,7 @@ export default function ModelAnalytics({ data }: Props) {
 
   if (activeData.length === 0) {
     return (
-      <div className="border-border bg-background rounded-lg border p-8 text-center flex flex-col items-center justify-center min-h-[350px]">
+      <div className="border-border bg-background flex min-h-[350px] flex-col items-center justify-center rounded-lg border p-8 text-center">
         <div className="text-muted-foreground mb-3 flex h-10 w-10 items-center justify-center rounded-full opacity-40">
           <Cpu size={20} />
         </div>
@@ -63,10 +63,10 @@ export default function ModelAnalytics({ data }: Props) {
   }
 
   return (
-    <div className="border-border bg-background rounded-lg border p-4 sm:p-6 flex flex-col min-h-[350px]">
+    <div className="border-border bg-background flex min-h-[350px] flex-col rounded-lg border p-4 sm:p-6">
       <h3 className="mb-4 text-sm font-semibold sm:mb-6">Token usage by AI model</h3>
 
-      <div className="flex-1 flex flex-col justify-center gap-4">
+      <div className="flex flex-1 flex-col justify-center gap-4">
         {activeData.map((item) => {
           const { label, color, provider } = getModelDetails(item.modelName)
           const isHovered = hoveredModel === item.modelName
@@ -74,7 +74,7 @@ export default function ModelAnalytics({ data }: Props) {
           return (
             <div
               key={item.modelName}
-              className="bg-muted/30 border border-border/50 rounded-xl p-4 space-y-3 transition-all duration-300 hover:bg-muted/50 cursor-default"
+              className="bg-muted/30 border-border/50 hover:bg-muted/50 cursor-default space-y-3 rounded-xl border p-4 transition-all duration-300"
               style={{
                 opacity: hoveredModel && !isHovered ? 0.45 : 1,
                 transform: isHovered ? 'translateX(3px)' : 'translateX(0)',
@@ -85,22 +85,20 @@ export default function ModelAnalytics({ data }: Props) {
               onMouseLeave={() => setHoveredModel(null)}
             >
               <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex min-w-0 items-center gap-2">
                   <span
-                    className="h-2 w-2 rounded-full shrink-0 animate-pulse"
+                    className="h-2 w-2 shrink-0 animate-pulse rounded-full"
                     style={{
                       backgroundColor: color,
                       boxShadow: `0 0 6px ${color}80`,
                     }}
                   />
-                  <span className="font-semibold text-sm text-foreground truncate">
-                    {label}
-                  </span>
-                  <span className="text-[9px] font-semibold bg-muted border border-border/50 px-1.5 py-0.5 rounded text-muted-foreground uppercase tracking-wider shrink-0">
+                  <span className="text-foreground truncate text-sm font-semibold">{label}</span>
+                  <span className="bg-muted border-border/50 text-muted-foreground shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase">
                     {provider}
                   </span>
                 </div>
-                <div className="text-right shrink-0">
+                <div className="shrink-0 text-right">
                   <span className="text-sm font-bold tabular-nums" style={{ color }}>
                     {item.percentage}%
                   </span>
@@ -108,7 +106,7 @@ export default function ModelAnalytics({ data }: Props) {
               </div>
 
               {/* Progress bar container */}
-              <div className="h-2 w-full bg-muted/70 rounded-full overflow-hidden">
+              <div className="bg-muted/70 h-2 w-full overflow-hidden rounded-full">
                 <div
                   className="h-full rounded-full transition-all duration-500 ease-out"
                   style={{
@@ -119,10 +117,8 @@ export default function ModelAnalytics({ data }: Props) {
                 />
               </div>
 
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>
-                  {formatTokens(item.tokensUsed)} tokens
-                </span>
+              <div className="text-muted-foreground flex items-center justify-between text-[11px]">
+                <span>{formatTokens(item.tokensUsed)} tokens</span>
                 <span>
                   {item.quizCount} {item.quizCount === 1 ? 'quiz' : 'quizzes'}
                 </span>

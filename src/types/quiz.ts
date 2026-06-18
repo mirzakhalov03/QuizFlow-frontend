@@ -30,6 +30,7 @@ export type Quiz = {
   updatedAt: string
   uploadedAt: string | null
   shareToken?: string | null
+  isPublic?: boolean
   apiKeyId?: string | null
   apiKeyName?: string | null
   properties?: {
@@ -104,4 +105,48 @@ export type QuizResultResponse = {
   result: QuizResult
   verdicts: AnswerVerdict[]
   answers: SubmitAnswer[]
+}
+
+/** A question's options as exposed publicly — no isCorrect / explanation. */
+export type PublicQuestionOption = {
+  id: string
+  questionId: string
+  text: string
+  position: number
+}
+
+export type PublicQuestion = {
+  id: string
+  quizId: string
+  text: string
+  type: QuestionType
+  position: number
+  options: PublicQuestionOption[]
+}
+
+export type PublicQuiz = {
+  id: string
+  title: string
+  userInstructions: string | null
+  type: QuestionType | null
+  isTimerEnabled: boolean
+  timerDuration: number | null
+  isOwner?: boolean
+  owner: { fullName: string }
+  questions: PublicQuestion[]
+}
+
+export type PublicReviewItem = {
+  questionId: string
+  isCorrect: boolean
+  correctOptionIds: string[]
+  modelAnswer?: string
+}
+
+export type PublicSubmitResponse = {
+  name: string
+  totalQuestions: number
+  correctAnswers: number
+  wrongAnswers: number
+  review: PublicReviewItem[]
 }
