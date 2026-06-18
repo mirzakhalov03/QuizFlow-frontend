@@ -1,9 +1,9 @@
 import { Checkbox } from '@/components/ui/checkbox'
-import type { QuestionOption } from '@/types/quiz'
+import type { SolvableOption } from '@/types/quiz'
 import MarkdownText from '../markdown-text'
 
 type Props = {
-  options: QuestionOption[]
+  options: SolvableOption[]
   value: string[]
   onChange: (optionIds: string[]) => void
 }

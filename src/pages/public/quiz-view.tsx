@@ -62,7 +62,7 @@ export default function PublicQuizView() {
 
   const handleSubmit = () => {
     if (!quiz || !shareToken || isPending) return
-    const payload = buildSubmitAnswers(quiz.questions as never, answers)
+    const payload = buildSubmitAnswers(quiz.questions, answers)
     submitMutation(
       PUBLIC_QUIZ_SUBMIT(shareToken),
       { name, answers: payload },
@@ -125,6 +125,17 @@ export default function PublicQuizView() {
     )
   }
 
+  // A quiz with no questions can't be solved — guard so the solver never lands on
+  // an empty stepper ("Question 1 of 0" with a dead Next button).
+  if (quiz.questions.length === 0) {
+    return (
+      <div className="container mx-auto max-w-2xl py-20 text-center">
+        <h1 className="text-2xl font-bold">This quiz has no questions yet</h1>
+        <p className="text-muted-foreground mt-2">There’s nothing to solve here right now.</p>
+      </div>
+    )
+  }
+
   if (phase === 'intro') {
     return (
       <NameGate
@@ -157,7 +168,7 @@ export default function PublicQuizView() {
             Question {index + 1} of {total}
           </p>
           <QuizProgress
-            questions={quiz.questions as never}
+            questions={quiz.questions}
             answers={answers}
             activeIndex={index}
             onSelect={setCurrentIndex}
@@ -167,7 +178,7 @@ export default function PublicQuizView() {
         {question && (
           <QuestionCard
             key={question.id}
-            question={question as never}
+            question={question}
             index={index}
             value={answers[question.id]}
             onChange={(value) => setAnswers((prev) => ({ ...prev, [question.id]: value }))}

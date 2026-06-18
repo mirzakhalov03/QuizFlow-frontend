@@ -10,15 +10,20 @@ type Props = {
 }
 
 export default function PublicResultQuestion({ question, index, review, userAnswer }: Props) {
-  const isCorrect = review?.isCorrect ?? false
+  const verdict = review?.isCorrect
   const correctIds = new Set(review?.correctOptionIds ?? [])
 
-  const pill = isCorrect
-    ? {
-        label: 'Correct',
-        cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-      }
-    : { label: 'Incorrect', cls: 'border-destructive/30 bg-destructive/10 text-destructive' }
+  // null = couldn't be graded (LLM outage); it's dropped from the score, so show
+  // a neutral "Not graded" pill instead of penalizing the answer as wrong.
+  const pill =
+    verdict === true
+      ? {
+          label: 'Correct',
+          cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        }
+      : verdict == null
+        ? { label: 'Not graded', cls: 'border-border bg-muted text-muted-foreground' }
+        : { label: 'Incorrect', cls: 'border-destructive/30 bg-destructive/10 text-destructive' }
 
   return (
     <article className="border-border bg-card flex flex-col gap-4 rounded-xl border p-5">

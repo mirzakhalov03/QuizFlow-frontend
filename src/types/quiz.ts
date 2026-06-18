@@ -77,6 +77,24 @@ export type QuizWithQuestions = Quiz & {
   questions: Question[]
 }
 
+/**
+ * Minimal shapes the solving UI actually consumes. Both the full `Question` and
+ * the answer-stripped `PublicQuestion` satisfy these, so the shared solving
+ * components stay typed across both flows without casts — and can never read an
+ * answer field (isCorrect/explanation) that the public payload omits.
+ */
+export type SolvableOption = {
+  id: string
+  text: string
+}
+
+export type SolvableQuestion = {
+  id: string
+  text: string
+  type: QuestionType
+  options: SolvableOption[]
+}
+
 export type SubmitAnswer = {
   questionId: string
   selectedOptionId?: string
@@ -138,7 +156,8 @@ export type PublicQuiz = {
 
 export type PublicReviewItem = {
   questionId: string
-  isCorrect: boolean
+  /** null = an answered open-ended that couldn't be graded (LLM outage) — render as "Not graded". */
+  isCorrect: boolean | null
   correctOptionIds: string[]
   modelAnswer?: string
 }
