@@ -1,19 +1,17 @@
-import type { AnalyticsSummary } from '@/types/analytics'
+import type { FolderStat } from '@/types/analytics'
 
 type Props = {
-  summary: AnalyticsSummary
+  stat: FolderStat
 }
 
-export default function AnalyticsStats({ summary }: Props) {
-  const hasQuizzes = summary.totalQuizzesTaken > 0
-  const scorePoints = summary.scoreOverTime ?? []
-  const bestScore = scorePoints.reduce((max, p) => Math.max(max, p.score), 0)
+export default function AnalyticsStats({ stat }: Props) {
+  const hasAttempts = stat.attemptCount > 0
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <Stat label="Quizzes taken" value={String(summary.totalQuizzesTaken)} />
-      <Stat label="Average score" value={hasQuizzes ? formatPercent(summary.averageScore) : '—'} />
-      <Stat label="Best score" value={hasQuizzes ? formatPercent(bestScore) : '—'} />
+    <div className="grid gap-4 sm:grid-cols-3">
+      <Stat label="Attempts" value={String(stat.attemptCount)} />
+      <Stat label="Average score" value={hasAttempts ? formatPercent(stat.averageScore) : '—'} />
+      <Stat label="Best score" value={hasAttempts ? formatPercent(stat.bestScore) : '—'} />
     </div>
   )
 }
