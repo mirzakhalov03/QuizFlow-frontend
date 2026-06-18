@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Cpu } from 'lucide-react'
 import type { ModelUsageSummary } from '@/types/analytics'
 
@@ -46,6 +46,7 @@ function formatTokens(n: number): string {
 }
 
 export default function ModelAnalytics({ data }: Props) {
+  const [hoveredModel, setHoveredModel] = useState<string | null>(null)
   const activeData = useMemo(() => data.filter((m) => m.tokensUsed > 0), [data])
 
   if (activeData.length === 0) {
@@ -68,15 +69,25 @@ export default function ModelAnalytics({ data }: Props) {
       <div className="flex-1 flex flex-col justify-center gap-4">
         {activeData.map((item) => {
           const { label, color, provider } = getModelDetails(item.modelName)
+          const isHovered = hoveredModel === item.modelName
+
           return (
             <div
               key={item.modelName}
-              className="bg-muted/30 border border-border/50 rounded-xl p-4 space-y-3 transition-all duration-300 hover:bg-muted/50"
+              className="bg-muted/30 border border-border/50 rounded-xl p-4 space-y-3 transition-all duration-300 hover:bg-muted/50 cursor-default"
+              style={{
+                opacity: hoveredModel && !isHovered ? 0.45 : 1,
+                transform: isHovered ? 'translateX(3px)' : 'translateX(0)',
+                borderColor: isHovered ? color : undefined,
+                boxShadow: isHovered ? `0 0 12px ${color}1A` : undefined,
+              }}
+              onMouseEnter={() => setHoveredModel(item.modelName)}
+              onMouseLeave={() => setHoveredModel(null)}
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2 min-w-0">
                   <span
-                    className="h-2 w-2 rounded-full shrink-0"
+                    className="h-2 w-2 rounded-full shrink-0 animate-pulse"
                     style={{
                       backgroundColor: color,
                       boxShadow: `0 0 6px ${color}80`,
@@ -103,7 +114,7 @@ export default function ModelAnalytics({ data }: Props) {
                   style={{
                     width: `${item.percentage}%`,
                     backgroundColor: color,
-                    boxShadow: `0 0 8px ${color}40`,
+                    boxShadow: isHovered ? `0 0 12px ${color}70` : `0 0 8px ${color}40`,
                   }}
                 />
               </div>
