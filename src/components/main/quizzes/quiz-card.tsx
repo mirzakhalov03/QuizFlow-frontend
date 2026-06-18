@@ -74,7 +74,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         aria-label={`Open quiz: ${quiz.title}`}
         className="group bg-card border-border hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex cursor-pointer flex-col gap-3 rounded-xl border p-4 transition-colors hover:shadow-sm focus-visible:ring-2 focus-visible:outline-none"
       >
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center justify-between gap-2">
           <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{quiz.title}</h3>
           <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
             {/* Info Icon & Custom Dropdown/Tooltip */}
