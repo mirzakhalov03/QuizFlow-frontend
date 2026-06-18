@@ -10,6 +10,7 @@ const TYPE_LABEL: Record<QuestionType, string> = {
   multi_select: 'Multi-select',
   open_ended: 'Open-ended',
   true_false: 'True / false',
+  mixed: 'Mixed',
 }
 
 const TYPE_COLOR: Record<QuestionType, string> = {
@@ -17,6 +18,7 @@ const TYPE_COLOR: Record<QuestionType, string> = {
   multi_select: '#a855f7',
   open_ended: '#f59e0b',
   true_false: '#10b981',
+  mixed: '#6b7280',
 }
 
 const SIZE = 180

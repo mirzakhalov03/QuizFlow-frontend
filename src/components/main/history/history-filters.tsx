@@ -80,6 +80,7 @@ function Segmented({ label, value, options, onChange }: SegmentedProps) {
           <button
             key={opt.value}
             type="button"
+            aria-pressed={value === opt.value}
             onClick={() => onChange(opt.value)}
             className={cn(
               'px-2.5 py-1.5 text-sm transition-colors sm:px-3',

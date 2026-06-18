@@ -61,7 +61,7 @@ export default function ScoreOverTimeChart({ points }: Props) {
           ))}
         </svg>
 
-        <div className="overflow-x-auto">
+        <div className="min-w-0 flex-1 overflow-x-auto">
           <svg
             viewBox={`0 0 ${chartWidth} ${HEIGHT}`}
             width={chartWidth}

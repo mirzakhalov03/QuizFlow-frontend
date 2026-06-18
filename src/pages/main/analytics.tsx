@@ -53,12 +53,16 @@ export default function Analytics() {
       ? [rawFolderStats[0]]
       : rawFolderStats
 
-  const selectedStat = folderStats[selectedFolderIndex] ?? folderStats[0] ?? EMPTY_STAT
+  // folderStats can shrink (folder deleted, no attempts in current folder) so
+  // the stored index may overshoot. Clamp before any lookup or display so the
+  // dropdown and stats stay in sync.
+  const activeIndex = Math.min(selectedFolderIndex, Math.max(0, folderStats.length - 1))
+  const selectedStat = folderStats[activeIndex] ?? EMPTY_STAT
   const quizStats = summary.quizStats ?? []
   const scoreOverTime = summary.scoreOverTime ?? []
 
   // Index 0 is "All" — show everything; otherwise restrict by folder.
-  const isAll = selectedFolderIndex === 0
+  const isAll = activeIndex === 0
   const visibleQuizStats = isAll
     ? quizStats
     : quizStats.filter((q) => q.folderId === selectedStat.folderId)
@@ -78,7 +82,7 @@ export default function Analytics() {
         <span className="text-muted-foreground text-sm">Showing:</span>
         <FolderSelector
           folders={folderStats}
-          selectedIndex={selectedFolderIndex}
+          selectedIndex={activeIndex}
           onSelect={setSelectedFolderIndex}
         />
       </div>
