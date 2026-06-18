@@ -32,6 +32,7 @@ export default function ExportPdfModal({ isOpen, onClose, onExport, isExporting 
           {/* Study Mode (Without Answers) */}
           <button
             type="button"
+            aria-pressed={!withAnswers}
             onClick={() => setWithAnswers(false)}
             className={`focus:ring-primary/20 flex flex-col items-start gap-3 rounded-xl border p-4 text-left transition-all duration-200 focus:ring-2 focus:outline-none ${
               !withAnswers
@@ -57,6 +58,7 @@ export default function ExportPdfModal({ isOpen, onClose, onExport, isExporting 
           {/* Answer Key (With Answers) */}
           <button
             type="button"
+            aria-pressed={!withAnswers}
             onClick={() => setWithAnswers(true)}
             className={`focus:ring-primary/20 flex flex-col items-start gap-3 rounded-xl border p-4 text-left transition-all duration-200 focus:ring-2 focus:outline-none ${
               withAnswers
