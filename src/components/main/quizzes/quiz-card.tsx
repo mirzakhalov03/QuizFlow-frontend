@@ -30,8 +30,22 @@ function getKeyInfo(quiz: Quiz) {
   return { label, color: colors[index] }
 }
 
+const MODEL_MAPPING: Record<string, { label: string; color: string }> = {
+  'google/gemini-3.5-flash': { label: 'Gemini 3.5 Flash', color: '#14B8A6' },
+  'openai/gpt-4o-mini': { label: 'GPT-4o Mini', color: '#10B981' },
+  'deepseek/seek-chat-v3': { label: 'DeepSeek V3', color: '#3B82F6' },
+  'deepseek/deepseek-chat-v3': { label: 'DeepSeek V3', color: '#3B82F6' },
+  'meta-llama/llama-3.3-70b-instruct': { label: 'Llama 3.3 70B', color: '#A855F7' },
+}
+
+function getModelInfo(quiz: Quiz) {
+  const modelName = quiz.properties?.model || 'google/gemini-3.5-flash'
+  return MODEL_MAPPING[modelName] ?? { label: modelName, color: '#64748B' }
+}
+
 export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const { label: keyLabel, color: keyColor } = getKeyInfo(quiz)
+  const { label: modelLabel, color: modelColor } = getModelInfo(quiz)
 
   const {
     shareToken,
@@ -104,6 +118,23 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
                       />
                       <span className="truncate" title={keyLabel}>
                         {keyLabel}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-1 pt-1 border-t border-border/30">
+                    <div className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">
+                      AI Model
+                    </div>
+                    <div className="flex items-center gap-1.5 font-medium text-foreground">
+                      <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{
+                          backgroundColor: modelColor,
+                          boxShadow: `0 0 5px ${modelColor}80`,
+                        }}
+                      />
+                      <span className="truncate" title={modelLabel}>
+                        {modelLabel}
                       </span>
                     </div>
                   </div>

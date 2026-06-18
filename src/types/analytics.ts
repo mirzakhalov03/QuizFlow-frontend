@@ -28,11 +28,19 @@ export type KeyUsageSummary = {
   percentage: number
 }
 
+export type ModelUsageSummary = {
+  modelName: string
+  tokensUsed: number
+  quizCount: number
+  percentage: number
+}
+
 export type AnalyticsSummary = {
   totalQuizzesTaken: number
   averageScore: number
   totalTokensUsed: number
   keyUsageBreakdown: KeyUsageSummary[]
+  modelUsageBreakdown: ModelUsageSummary[]
   scoreOverTime: ScorePoint[]
   breakdownByType: TypeBreakdown[]
   history: QuizHistoryItem[]
