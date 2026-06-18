@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/ui/confirm-dialog'
 import { DropdownMenu, DropdownItem } from '@/components/ui/dropdown-menu'
 import MoveToFolderModal from '../library/move-to-folder-modal'
 import ShareQuizModal from './share-quiz-modal'
+import ExportPdfModal from './export-pdf-modal'
 
 dayjs.extend(relativeTime)
 
@@ -53,6 +54,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
     isModalOpen,
     isConfirmOpen,
     isMoveModalOpen,
+    isExportModalOpen,
     isExporting,
     isDeleting,
     isSharing,
@@ -62,11 +64,13 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
     handleShare,
     handleMove,
     handleExportPdf,
+    exportPdf,
     copyToClipboard,
     generateShareLink,
     closeShareModal,
     closeConfirm,
     closeMoveModal,
+    closeExportModal,
   } = useQuizCardActions(quiz)
 
   return (
@@ -239,6 +243,12 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         currentFolderId={quiz.folderId}
         isOpen={isMoveModalOpen}
         onClose={closeMoveModal}
+      />
+      <ExportPdfModal
+        isOpen={isExportModalOpen}
+        onClose={closeExportModal}
+        onExport={exportPdf}
+        isExporting={isExporting}
       />
     </>
   )

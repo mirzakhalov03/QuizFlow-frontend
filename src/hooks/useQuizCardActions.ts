@@ -25,6 +25,7 @@ export function useQuizCardActions(quiz: Quiz) {
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
 
   const { mutate: deleteQuiz, isPending: isDeleting } = useDelete({
     onSuccess: () => {
@@ -84,12 +85,16 @@ export function useQuizCardActions(quiz: Quiz) {
     setIsMoveModalOpen(true)
   }
 
-  const handleExportPdf = async (e: React.MouseEvent) => {
+  const handleExportPdf = (e: React.MouseEvent) => {
     e.stopPropagation()
+    setIsExportModalOpen(true)
+  }
+
+  const exportPdf = async (withAnswers: boolean) => {
     if (isExporting) return
     setIsExporting(true)
     try {
-      await openQuizPdf(quiz.id)
+      await openQuizPdf(quiz.id, withAnswers)
     } finally {
       setIsExporting(false)
     }
@@ -120,6 +125,7 @@ export function useQuizCardActions(quiz: Quiz) {
     isModalOpen,
     isConfirmOpen,
     isMoveModalOpen,
+    isExportModalOpen,
     isExporting,
     isDeleting,
     isSharing,
@@ -129,10 +135,12 @@ export function useQuizCardActions(quiz: Quiz) {
     handleShare,
     handleMove,
     handleExportPdf,
+    exportPdf,
     copyToClipboard,
     generateShareLink,
     closeShareModal: () => setIsModalOpen(false),
     closeConfirm: () => setIsConfirmOpen(false),
     closeMoveModal: () => setIsMoveModalOpen(false),
+    closeExportModal: () => setIsExportModalOpen(false),
   }
 }
