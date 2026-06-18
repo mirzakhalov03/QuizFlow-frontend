@@ -38,6 +38,25 @@ export type QuizHistoryItem = {
   date: string
 }
 
+export type HistoryItem = {
+  resultId: string
+  quizId: string
+  quizTitle: string
+  folderId: string | null
+  folderName: string | null
+  score: number
+  correctAnswers: number
+  totalQuestions: number
+  completedAt: string
+}
+
+export type HistoryResponse = {
+  items: HistoryItem[]
+}
+
+export type HistorySort = 'recent' | 'best' | 'worst'
+export type HistoryLimit = 5 | 10 | 50
+
 export type KeyUsageSummary = {
   keyId: string | null
   keyName: string
