@@ -33,21 +33,25 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
   const segmentsData = useMemo(() => {
     const list = []
     let cumulativeOffset = 0
+    const hasMultiple = activeData.length > 1
+    const currentGap = hasMultiple ? GAP : 0
+
     for (let i = 0; i < activeData.length; i++) {
       const item = activeData[i]
       const ratio = totalTokens > 0 ? item.tokensUsed / totalTokens : 0
-      const arcLength = Math.max(ratio * CIRCUMFERENCE - GAP, 0)
+      const arcLength = hasMultiple
+        ? Math.max(ratio * CIRCUMFERENCE - currentGap, 0)
+        : CIRCUMFERENCE
       const offset = CIRCUMFERENCE - cumulativeOffset
-      cumulativeOffset += arcLength + GAP
+      cumulativeOffset += arcLength + currentGap
       list.push({
-        id: item.keyId ?? '__default__',
+        id: item.keyId ?? `__default__-${i}`,
         arcLength,
         offset,
       })
     }
     return list
   }, [activeData, totalTokens])
-
   if (activeData.length === 0) {
     return (
       <div className="border-border bg-background rounded-lg border p-8 text-center">
@@ -67,7 +71,7 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
 
       <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8">
         {/* Donut chart */}
-        <div className="relative mx-auto flex aspect-square w-full max-w-[240px] items-center justify-center">
+        <div className="relative mx-auto flex aspect-square w-full max-w-60 items-center justify-center">
           <svg
             viewBox={`0 0 ${SIZE} ${SIZE}`}
             className="h-full w-full"
@@ -100,7 +104,6 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
                     strokeWidth={isHovered ? STROKE + 4 : STROKE}
                     strokeDasharray={`${item.arcLength} ${CIRCUMFERENCE - item.arcLength}`}
                     strokeDashoffset={item.offset}
-                    strokeLinecap="round"
                     className="transition-all duration-300"
                     style={{ opacity: hoveredKey && !isHovered ? 0.35 : 1 }}
                     onMouseEnter={() => setHoveredKey(item.id)}
@@ -127,10 +130,9 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
         <div className="flex flex-col gap-2.5">
           {activeData.map((item, i) => {
             const color = PALETTE[i % PALETTE.length]
-            const id = item.keyId ?? '__default__'
+            const id = item.keyId ?? `__default__-${i}`
             const isDefault = item.keyId === null
             const isHovered = hoveredKey === id
-
             return (
               <div
                 key={id}
@@ -143,7 +145,7 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
                 onMouseEnter={() => setHoveredKey(id)}
                 onMouseLeave={() => setHoveredKey(null)}
               >
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex min-w-0 items-center gap-2.5">
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
                     style={{ backgroundColor: color }}
@@ -154,7 +156,7 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
                         {item.keyName}
                       </span>
                       {isDefault && (
-                        <span className="bg-primary/15 text-primary shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none">
+                        <span className="bg-primary/15 text-primary shrink-0 rounded px-1.5 py-0.5 text-[10px] leading-none font-semibold">
                           Default
                         </span>
                       )}
@@ -166,10 +168,7 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
                   </div>
                 </div>
 
-                <span
-                  className="ml-3 shrink-0 text-lg font-bold tabular-nums"
-                  style={{ color }}
-                >
+                <span className="ml-3 shrink-0 text-lg font-bold tabular-nums" style={{ color }}>
                   {item.percentage}%
                 </span>
               </div>

@@ -33,7 +33,6 @@ function getKeyInfo(quiz: Quiz) {
 const MODEL_MAPPING: Record<string, { label: string; color: string }> = {
   'google/gemini-3.5-flash': { label: 'Gemini 3.5 Flash', color: '#14B8A6' },
   'openai/gpt-4o-mini': { label: 'GPT-4o Mini', color: '#10B981' },
-  'deepseek/seek-chat-v3': { label: 'DeepSeek V3', color: '#3B82F6' },
   'deepseek/deepseek-chat-v3': { label: 'DeepSeek V3', color: '#3B82F6' },
   'meta-llama/llama-3.3-70b-instruct': { label: 'Llama 3.3 70B', color: '#A855F7' },
 }
@@ -90,25 +89,25 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       >
         <div className="flex items-center justify-between gap-2">
           <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{quiz.title}</h3>
-          <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+          <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
             {/* Info Icon & Custom Dropdown/Tooltip */}
-            <div className="relative group/info flex items-center justify-center">
+            <div className="group/info relative flex items-center justify-center">
               <button
                 type="button"
-                className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/30 rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none flex items-center justify-center h-7 w-7"
+                className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/30 flex h-7 w-7 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none"
               >
                 <Info className="h-4 w-4" />
               </button>
-              <div className="pointer-events-none absolute right-0 top-8 z-30 w-52 origin-top-right scale-95 opacity-0 rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-md transition-all duration-200 group-hover/info:pointer-events-auto group-hover/info:scale-100 group-hover/info:opacity-100">
+              <div className="border-border bg-popover text-popover-foreground pointer-events-none absolute top-8 right-0 z-30 w-52 origin-top-right scale-95 rounded-lg border p-3 opacity-0 shadow-md transition-all duration-200 group-focus-within/info:pointer-events-auto group-focus-within/info:scale-100 group-focus-within/info:opacity-100 group-hover/info:pointer-events-auto group-hover/info:scale-100 group-hover/info:opacity-100">
                 <div className="space-y-2 text-xs font-normal">
-                  <div className="font-semibold text-foreground border-b border-border/50 pb-1">
+                  <div className="text-foreground border-border/50 border-b pb-1 font-semibold">
                     Generation Details
                   </div>
                   <div className="space-y-1">
-                    <div className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">
+                    <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
                       API Key
                     </div>
-                    <div className="flex items-center gap-1.5 font-medium text-foreground">
+                    <div className="text-foreground flex items-center gap-1.5 font-medium">
                       <span
                         className="h-1.5 w-1.5 shrink-0 rounded-full"
                         style={{
@@ -121,11 +120,11 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
                       </span>
                     </div>
                   </div>
-                  <div className="space-y-1 pt-1 border-t border-border/30">
-                    <div className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">
+                  <div className="border-border/30 space-y-1 border-t pt-1">
+                    <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
                       AI Model
                     </div>
-                    <div className="flex items-center gap-1.5 font-medium text-foreground">
+                    <div className="text-foreground flex items-center gap-1.5 font-medium">
                       <span
                         className="h-1.5 w-1.5 shrink-0 rounded-full"
                         style={{
@@ -139,11 +138,11 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
                     </div>
                   </div>
                   {quiz.tokenUsage && (
-                    <div className="space-y-1 pt-1 border-t border-border/30">
-                      <div className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">
+                    <div className="border-border/30 space-y-1 border-t pt-1">
+                      <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
                         Token Usage
                       </div>
-                      <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 font-medium text-foreground text-[11px]">
+                      <div className="text-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px] font-medium">
                         <span className="text-muted-foreground">Prompt:</span>
                         <span className="text-right tabular-nums">
                           {quiz.tokenUsage.prompt_tokens.toLocaleString()}
@@ -152,10 +151,10 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
                         <span className="text-right tabular-nums">
                           {quiz.tokenUsage.completion_tokens.toLocaleString()}
                         </span>
-                        <span className="text-foreground font-semibold border-t border-border/30 mt-0.5 pt-0.5">
+                        <span className="text-foreground border-border/30 mt-0.5 border-t pt-0.5 font-semibold">
                           Total:
                         </span>
-                        <span className="text-right tabular-nums font-semibold border-t border-border/30 mt-0.5 pt-0.5">
+                        <span className="border-border/30 mt-0.5 border-t pt-0.5 text-right font-semibold tabular-nums">
                           {quiz.tokenUsage.total_tokens.toLocaleString()}
                         </span>
                       </div>
