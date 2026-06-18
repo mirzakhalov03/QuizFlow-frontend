@@ -47,7 +47,7 @@ export default function PublicQuizView() {
       <div className="space-y-16">
         {quiz.questions?.map((question, index) => (
           <div key={question.id} className="space-y-6">
-            <div className="flex items-start text-xl leading-snug font-semibold">
+            <div role="heading" aria-level={3} className="flex items-start text-xl leading-snug font-semibold">
               <span className="text-primary mr-3 shrink-0">Q{index + 1}.</span>
               <MarkdownText text={question.text} className="flex-1" />
             </div>
