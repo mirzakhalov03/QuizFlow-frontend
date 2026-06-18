@@ -36,14 +36,14 @@ export default function HistoryFilters({
   ]
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm">Folder:</span>
         <CustomSelect
           options={folderOptions}
           value={folderId ?? ALL}
           onChange={(v) => onFolderChange(v === ALL ? null : v)}
-          className="min-w-40"
+          className="min-w-32 sm:min-w-40"
         />
       </div>
 
@@ -82,7 +82,7 @@ function Segmented({ label, value, options, onChange }: SegmentedProps) {
             type="button"
             onClick={() => onChange(opt.value)}
             className={cn(
-              'px-3 py-1.5 text-sm transition-colors',
+              'px-2.5 py-1.5 text-sm transition-colors sm:px-3',
               value === opt.value
                 ? 'bg-primary text-primary-foreground'
                 : 'hover:bg-muted text-foreground'

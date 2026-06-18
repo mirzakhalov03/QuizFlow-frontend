@@ -74,7 +74,7 @@ export default function Analytics() {
         <p className="text-muted-foreground">Your progress across every quiz you've taken.</p>
       </header>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <span className="text-muted-foreground text-sm">Showing:</span>
         <FolderSelector
           folders={folderStats}

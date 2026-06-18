@@ -4,9 +4,11 @@ type Props = {
   points: ScorePoint[]
 }
 
-const WIDTH = 640
+const MIN_CHART_WIDTH = 600
+const PX_PER_POINT = 56
 const HEIGHT = 220
-const PADDING = { top: 16, right: 16, bottom: 32, left: 40 }
+const AXIS_WIDTH = 40
+const PADDING = { top: 16, right: 16, bottom: 32, left: 8 }
 
 export default function ScoreOverTimeChart({ points }: Props) {
   if (points.length === 0) {
@@ -17,7 +19,14 @@ export default function ScoreOverTimeChart({ points }: Props) {
     )
   }
 
-  const innerW = WIDTH - PADDING.left - PADDING.right
+  // The chart SVG grows with point count so labels never crowd; minimum width
+  // keeps short series from looking sparse. The wrapper around it scrolls
+  // horizontally on mobile while the y-axis stays pinned.
+  const chartWidth = Math.max(
+    MIN_CHART_WIDTH,
+    PADDING.left + PADDING.right + points.length * PX_PER_POINT,
+  )
+  const innerW = chartWidth - PADDING.left - PADDING.right
   const innerH = HEIGHT - PADDING.top - PADDING.bottom
 
   const xFor = (i: number) =>
@@ -31,67 +40,80 @@ export default function ScoreOverTimeChart({ points }: Props) {
   return (
     <div className="border-border bg-background rounded-lg border p-4">
       <h3 className="mb-3 text-sm font-semibold">Score over time</h3>
-      <svg
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="h-auto w-full"
-        role="img"
-        aria-label="Line chart of quiz scores over time"
-      >
-        {yTicks.map((tick) => {
-          const y = yFor(tick)
-          return (
-            <g key={tick}>
-              <line
-                x1={PADDING.left}
-                x2={WIDTH - PADDING.right}
-                y1={y}
-                y2={y}
-                className="stroke-border"
-                strokeWidth={1}
-                strokeDasharray="3 3"
-              />
-              <text
-                x={PADDING.left - 6}
-                y={y}
-                textAnchor="end"
-                dominantBaseline="central"
-                className="fill-muted-foreground text-[10px]"
-              >
-                {tick}%
-              </text>
-            </g>
-          )
-        })}
-
-        <path d={path} className="stroke-primary" fill="none" strokeWidth={2} />
-
-        {points.map((p, i) => (
-          <circle
-            key={`${p.date}-${i}`}
-            cx={xFor(i)}
-            cy={yFor(p.score)}
-            r={3}
-            className="fill-primary"
-          >
-            <title>{`${p.date}: ${p.score}%`}</title>
-          </circle>
-        ))}
-
-        {points.map((p, i) => {
-          if (points.length > 8 && i % Math.ceil(points.length / 8) !== 0) return null
-          return (
+      <div className="flex">
+        <svg
+          width={AXIS_WIDTH}
+          height={HEIGHT}
+          className="flex-shrink-0"
+          aria-hidden="true"
+        >
+          {yTicks.map((tick) => (
             <text
-              key={`${p.date}-${i}`}
-              x={xFor(i)}
-              y={HEIGHT - PADDING.bottom + 14}
-              textAnchor="middle"
+              key={tick}
+              x={AXIS_WIDTH - 6}
+              y={yFor(tick)}
+              textAnchor="end"
+              dominantBaseline="central"
               className="fill-muted-foreground text-[10px]"
             >
-              {formatDateLabel(p.date)}
+              {tick}%
             </text>
-          )
-        })}
-      </svg>
+          ))}
+        </svg>
+
+        <div className="overflow-x-auto">
+          <svg
+            viewBox={`0 0 ${chartWidth} ${HEIGHT}`}
+            width={chartWidth}
+            height={HEIGHT}
+            className="h-auto max-w-none"
+            role="img"
+            aria-label="Line chart of quiz scores over time"
+          >
+            {yTicks.map((tick) => {
+              const y = yFor(tick)
+              return (
+                <line
+                  key={tick}
+                  x1={0}
+                  x2={chartWidth}
+                  y1={y}
+                  y2={y}
+                  className="stroke-border"
+                  strokeWidth={1}
+                  strokeDasharray="3 3"
+                />
+              )
+            })}
+
+            <path d={path} className="stroke-primary" fill="none" strokeWidth={2} />
+
+            {points.map((p, i) => (
+              <circle
+                key={`${p.date}-${i}`}
+                cx={xFor(i)}
+                cy={yFor(p.score)}
+                r={3}
+                className="fill-primary"
+              >
+                <title>{`${p.date}: ${p.score}%`}</title>
+              </circle>
+            ))}
+
+            {points.map((p, i) => (
+              <text
+                key={`${p.date}-${i}-label`}
+                x={xFor(i)}
+                y={HEIGHT - PADDING.bottom + 14}
+                textAnchor="middle"
+                className="fill-muted-foreground text-[10px]"
+              >
+                {formatDateLabel(p.date)}
+              </text>
+            ))}
+          </svg>
+        </div>
+      </div>
     </div>
   )
 }

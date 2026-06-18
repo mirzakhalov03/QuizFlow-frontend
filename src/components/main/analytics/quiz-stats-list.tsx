@@ -16,9 +16,9 @@ export default function QuizStatsList({ rows }: Props) {
           No quizzes in this folder yet.
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="max-h-80 overflow-auto">
           <table className="w-full text-sm">
-            <thead className="text-muted-foreground text-xs uppercase">
+            <thead className="text-muted-foreground bg-background sticky top-0 text-xs uppercase">
               <tr className="border-border border-b">
                 <th className="px-4 py-2 text-left font-medium">Quiz</th>
                 <th className="px-4 py-2 text-right font-medium">Attempts</th>
