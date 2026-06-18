@@ -1,33 +1,32 @@
 import { useForm, useController } from 'react-hook-form'
-import { Settings2, Sparkles, ChevronLeft, X } from 'lucide-react'
+import { ChevronLeft, X } from 'lucide-react'
 
 import { quizService } from '@/api/services/quiz.service'
-import { FormSelect } from '@/components/form/form-select'
 import FieldLabel from '@/components/form/form-label'
-import FormInput from '@/components/form/input'
-import FormTextarea from '@/components/form/textarea'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
 import { toast } from '@/lib/toast'
-import type { QuestionType } from '@/types/quiz'
-import { questionCounts, questionTypes } from '@/components/main/quizzes/utils'
+import { extractApiErrorMessage } from '@/lib/api-error'
+import {
+  DEFAULT_MODEL,
+  toTimerSeconds,
+  type QuizSettingsValues,
+} from '@/components/main/quizzes/utils'
+import QuizSettingsFields from '@/components/main/quizzes/quiz-settings-fields'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
 import { useModal } from '@/hooks/useModal'
 import { useNotionPages } from '@/hooks/useNotionPages'
 
-type NotionFormValues = {
+type NotionFormValues = QuizSettingsValues & {
   pageIds: string[]
-  title: string
-  type: QuestionType
-  questionCount: string
-  userInstructions?: string
 }
 
 type NotionQuizFormProps = {
   onBack: () => void
+  folderId?: string
 }
 
-export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
+export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps) {
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
@@ -38,10 +37,14 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   const form = useForm<NotionFormValues>({
     defaultValues: {
       pageIds: [],
-      title: '',
       type: 'multiple_choice',
       questionCount: '5',
+      difficulty: 'medium',
+      model: DEFAULT_MODEL,
+      apiKeyId: '',
+      isTimerEnabled: false,
       userInstructions: '',
+      folderId: folderId || 'none',
     },
   })
 
@@ -54,27 +57,34 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
 
   const onSubmit = (values: NotionFormValues) => {
     const tempId = crypto.randomUUID()
+    const targetFolderId = values.folderId !== 'none' ? values.folderId : undefined
 
     closeModal()
     reset()
-    addJob({ jobId: tempId, title: values.title, type: values.type })
+    addJob({
+      jobId: tempId,
+      title: 'Generating quiz…',
+      type: values.type,
+      folderId: targetFolderId,
+    })
     ;(async () => {
       try {
         const result = await quizService.createQuiz('notion', {
           pageIds: values.pageIds,
-          title: values.title,
-          type: values.type,
+          type: values.type === 'mixed' ? undefined : values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
+          folderId: values.folderId !== 'none' ? values.folderId : undefined,
+          difficulty: values.difficulty,
+          isTimerEnabled: values.isTimerEnabled,
+          timerDuration: toTimerSeconds(values.isTimerEnabled, values.timerDuration),
+          model: values.model,
+          apiKeyId: values.apiKeyId || undefined,
         })
 
         setJobReady(tempId, result.jobId)
       } catch (err: unknown) {
-        const e = err as { response?: { data?: { message?: string; detail?: string } } }
-        const message =
-          e?.response?.data?.message ??
-          e?.response?.data?.detail ??
-          (err instanceof Error ? err.message : 'Generation failed. Please try again.')
+        const message = extractApiErrorMessage(err)
         markJobFailed(tempId, message)
         toast.error(message)
       }
@@ -116,7 +126,9 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <FieldLabel required>Add Notion Pages</FieldLabel>
+        <FieldLabel required isError={!!fieldState.error}>
+          Add Notion Pages
+        </FieldLabel>
         <select
           className="border-border bg-background focus:ring-primary/40 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none disabled:opacity-50"
           value=""
@@ -158,59 +170,7 @@ export default function NotionQuizForm({ onBack }: NotionQuizFormProps) {
         {fieldState.error && <p className="text-destructive text-xs">{fieldState.error.message}</p>}
       </div>
 
-      <FormInput
-        name="title"
-        methods={form}
-        label="Quiz Title"
-        placeholder="e.g. Chapter 5 Review"
-        required
-      />
-
-      <div className="bg-muted/40 space-y-3 rounded-xl p-3">
-        <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
-          <Settings2 className="h-3.5 w-3.5" />
-          Quiz Settings
-        </p>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <FormSelect
-            label="Question Type"
-            options={questionTypes}
-            name="type"
-            control={control}
-            required
-          />
-          <FormSelect
-            label="Question Count"
-            options={questionCounts}
-            name="questionCount"
-            control={control}
-            required
-          />
-        </div>
-      </div>
-
-      <FormTextarea
-        label="Custom Instructions"
-        methods={form}
-        name="userInstructions"
-        placeholder="e.g. Focus on important sections, make questions harder… (optional)"
-      />
-
-      <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          leftIcon={<ChevronLeft size={16} />}
-          className="flex-1"
-        >
-          Back
-        </Button>
-        <Button type="submit" className="flex-1" rightIcon={<Sparkles className="h-4 w-4" />}>
-          Generate Quiz
-        </Button>
-      </div>
+      <QuizSettingsFields form={form} onBack={onBack} folderId={folderId} />
     </form>
   )
 }

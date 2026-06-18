@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, ListChecks, LogOut, User } from 'lucide-react'
+import { BarChart3, History, Library, ListChecks, LogOut, User } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
+import ConfirmDialog from '@/components/ui/confirm-dialog'
 import Logo from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
@@ -12,13 +13,15 @@ import { useUserProfileStore } from '@/store/userProfileStore'
 import { useGlobalStore } from '@/store/global-store'
 import QuizTimer from '@/components/main/quiz-solving/quiz-timer'
 import QuizProgress from '@/components/main/quiz-solving/quiz-progress'
-import type { QuizSolvingHeader } from '@/pages/main/quizSolvingUI'
-import { QUIZ_SOLVING_HEADER_KEY } from '@/pages/main/quizSolvingUI'
+import type { QuizSolvingHeader } from '@/pages/main/quiz-solving/context'
+import { QUIZ_SOLVING_HEADER_KEY } from '@/pages/main/quiz-solving/context'
 import OnboardingModal from '@/components/main/onboarding/onboarding-modal'
 
 const navItems = [
   { label: 'Analytics', to: PATHS.app.analytics, icon: BarChart3 },
+  { label: 'History', to: PATHS.app.history, icon: History },
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
+  { label: 'Library', to: PATHS.app.library, icon: Library },
   { label: 'Profile', to: PATHS.app.account, icon: User },
 ]
 
@@ -31,8 +34,17 @@ export default function AppLayout() {
     fetchProfile()
   }, [fetchProfile])
 
-  const onLogout = async () => {
-    await logout(navigate)
+  const [confirmingLogout, setConfirmingLogout] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+
+  const handleConfirmLogout = async () => {
+    setLoggingOut(true)
+    try {
+      await logout(navigate)
+    } finally {
+      setLoggingOut(false)
+      setConfirmingLogout(false)
+    }
   }
 
   const quizHeader = useGlobalStore(
@@ -81,7 +93,7 @@ export default function AppLayout() {
           <Button
             variant="ghost"
             size="md"
-            onClick={onLogout}
+            onClick={() => setConfirmingLogout(true)}
             className="w-full justify-start text-red-500"
             leftIcon={<LogOut size={18} />}
           >
@@ -113,6 +125,11 @@ export default function AppLayout() {
             </div>
           )}
           <div className="ml-auto flex items-center gap-2">
+            {quizHeader?.isTimerEnabled && (
+              <div className="lg:hidden">
+                <QuizTimer timeRemaining={quizHeader.timeRemaining} />
+              </div>
+            )}
             <ThemeToggle />
             <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
               {profilePicture ? (
@@ -125,7 +142,7 @@ export default function AppLayout() {
             </div>
             <button
               type="button"
-              onClick={onLogout}
+              onClick={() => setConfirmingLogout(true)}
               aria-label="Logout"
               className="hover:bg-muted rounded-md p-1.5 lg:hidden"
             >
@@ -146,21 +163,37 @@ export default function AppLayout() {
           <NavLink
             key={to}
             to={to}
-            end
-            className={({ isActive }) =>
-              cn(
-                'flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs transition-colors',
-                isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-              )
-            }
+            className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
           >
-            <Icon size={20} />
-            <span>{label}</span>
+            {({ isActive }) => (
+              <span
+                className={cn(
+                  'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
+                  isActive
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Icon size={20} />
+                <span>{label}</span>
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
 
       <OnboardingModal />
+
+      <ConfirmDialog
+        isOpen={confirmingLogout}
+        onClose={() => setConfirmingLogout(false)}
+        onConfirm={handleConfirmLogout}
+        title="Log out?"
+        description="You'll need to sign in again to access your account."
+        confirmLabel="Log out"
+        variant="destructive"
+        loading={loggingOut}
+      />
     </div>
   )
 }

@@ -11,9 +11,37 @@ export type TypeBreakdown = {
   averageScore: number
 }
 
+export type QuizHistoryItem = {
+  quizId: string
+  quizTitle: string
+  correctAnswers: number
+  totalQuestions: number
+  score: number
+  date: string
+}
+
+export type KeyUsageSummary = {
+  keyId: string | null
+  keyName: string
+  tokensUsed: number
+  quizCount: number
+  percentage: number
+}
+
+export type ModelUsageSummary = {
+  modelName: string
+  tokensUsed: number
+  quizCount: number
+  percentage: number
+}
+
 export type AnalyticsSummary = {
   totalQuizzesTaken: number
   averageScore: number
+  totalTokensUsed: number
+  keyUsageBreakdown: KeyUsageSummary[]
+  modelUsageBreakdown: ModelUsageSummary[]
   scoreOverTime: ScorePoint[]
   breakdownByType: TypeBreakdown[]
+  history: QuizHistoryItem[]
 }

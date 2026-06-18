@@ -60,10 +60,16 @@ export function useQuizTimer(
   // timer changes). Done during render via a tracked value instead of an effect,
   // which avoids a cascading re-render.
   // https://react.dev/learn/you-might-not-need-an-effect
+  // Guards `onExpire` to exactly one call per countdown. Reset whenever the timer
+  // (re)starts with time on the clock (e.g. duration loads, or is reconfigured).
+  const expiredRef = useRef(false)
+
   const [syncedDuration, setSyncedDuration] = useState(durationSeconds)
   if (syncedDuration !== durationSeconds) {
     setSyncedDuration(durationSeconds)
-    setTimeRemaining(computeInitialTime(storageKey, durationSeconds))
+    const fresh = computeInitialTime(storageKey, durationSeconds)
+    setTimeRemaining(fresh)
+    if (fresh > 0) expiredRef.current = false
   }
 
   const onExpireRef = useRef(onExpire)
@@ -75,12 +81,13 @@ export function useQuizTimer(
     if (!enabled || timeRemaining <= 0) return
 
     const interval = setInterval(() => {
+      // The updater must stay pure — StrictMode double-invokes it in dev, and
+      // any side effect here (e.g. submitting the quiz) would fire twice. So we
+      // only compute the next value; expiry is handled in the effect below.
       setTimeRemaining((prev) => {
         const next = prev - 1
         if (next <= 0) {
-          clearInterval(interval)
           localStorage.removeItem(storageKey)
-          onExpireRef.current()
           return 0
         }
         localStorage.setItem(
@@ -96,6 +103,14 @@ export function useQuizTimer(
     // functional updater, so re-subscribing every tick would reset the timer.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, storageKey, durationSeconds])
+
+  // Fire expiry once, as a committed-state effect rather than from inside the
+  // updater — this is what guarantees a single auto-submit.
+  useEffect(() => {
+    if (!enabled || timeRemaining > 0 || expiredRef.current) return
+    expiredRef.current = true
+    onExpireRef.current()
+  }, [enabled, timeRemaining])
 
   return { timeRemaining, isRunning: enabled && timeRemaining > 0 }
 }

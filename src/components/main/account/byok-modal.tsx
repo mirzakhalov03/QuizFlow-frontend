@@ -8,19 +8,21 @@ import { usePost } from '@/hooks/usePost'
 import { toast } from '@/lib/toast'
 import { ByokKey } from '@/types/byok'
 import { useGlobalStore } from '@/store/global-store'
+import { useModal } from '@/hooks/useModal'
 import { BYOK_BY_ID, BYOK } from '@/constants/api-endpoints'
 
 const PROVIDER_OPTIONS = [
-  { value: 'openai', label: 'OpenAI' },
-  { value: 'anthropic', label: 'Anthropic' },
-  { value: 'google', label: 'Google' },
   { value: 'openrouter', label: 'OpenRouter' },
-  { value: 'other', label: 'Other' },
+  { value: 'openai', label: 'OpenAI - Coming soon', disabled: true },
+  { value: 'anthropic', label: 'Anthropic - Coming soon', disabled: true },
+  { value: 'google', label: 'Google - Coming soon', disabled: true },
+  { value: 'other', label: 'Other - Coming soon', disabled: true },
 ]
 
 export default function ByokModal() {
   const queryClient = useQueryClient()
   const { getData } = useGlobalStore()
+  const { closeModal } = useModal('byok-modal')
   const item = getData<ByokKey>(BYOK)
   const form = useForm<ByokKey>({
     defaultValues: {
@@ -33,6 +35,7 @@ export default function ByokModal() {
     queryClient.invalidateQueries({ queryKey: [BYOK] })
     toast.success(item ? 'Key updated successfully!' : 'New key added!')
     reset()
+    closeModal()
   }
   const { mutate: editMutate, isPending: isUpdating } = usePatch({ onSuccess })
   const { mutate: addMutate, isPending: isCreating } = usePost({ onSuccess })

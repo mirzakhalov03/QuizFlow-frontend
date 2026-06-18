@@ -14,6 +14,7 @@ export type Quiz = {
   id: string
   title: string
   userId: string
+  folderId: string | null
   type: QuestionType | null
   difficulty: string | null
   isTimerEnabled: boolean
@@ -29,6 +30,13 @@ export type Quiz = {
   updatedAt: string
   uploadedAt: string | null
   shareToken?: string | null
+  apiKeyId?: string | null
+  apiKeyName?: string | null
+  properties?: {
+    model?: string
+    source?: unknown
+    generatedBy?: string
+  } | null
 }
 
 export type QuizJob = {
@@ -71,8 +79,11 @@ export type QuizWithQuestions = Quiz & {
 export type SubmitAnswer = {
   questionId: string
   selectedOptionId?: string
+  selectedOptionIds?: string[]
   textAnswer?: string
 }
+
+export type GradingStatus = 'complete' | 'pending' | 'failed'
 
 export type QuizResult = {
   id: string
@@ -81,4 +92,16 @@ export type QuizResult = {
   totalQuestions: number
   correctAnswers: number
   wrongAnswers: number
+  gradingStatus: GradingStatus
+}
+
+export type AnswerVerdict = {
+  questionId: string
+  isCorrect: boolean
+}
+
+export type QuizResultResponse = {
+  result: QuizResult
+  verdicts: AnswerVerdict[]
+  answers: SubmitAnswer[]
 }

@@ -19,13 +19,20 @@ const ForgotPassword = lazyPage(() => import('@/pages/auth/forgot-password'))
 const ResetPassword = lazyPage(() => import('@/pages/auth/reset-password'))
 
 const Analytics = lazyPage(() => import('@/pages/main/analytics'))
+const History = lazyPage(() => import('@/pages/main/history'))
 const Account = lazyPage(() => import('@/pages/main/account'))
 const Quizzes = lazyPage(() => import('@/pages/main/quizzes'))
-const QuizSolvingUI = lazyPage(() => import('@/pages/main/quizSolvingUI'))
+const Library = lazyPage(() => import('@/pages/main/library'))
+const LibraryFolder = lazyPage(() => import('@/pages/main/library-folder'))
+const QuizSolvingLayout = lazyPage(() => import('@/pages/main/quiz-solving/layout'))
+const QuizIntroView = lazyPage(() => import('@/pages/main/quiz-solving/intro-view'))
+const QuizQuestionView = lazyPage(() => import('@/pages/main/quiz-solving/question-view'))
+const QuizResultView = lazyPage(() => import('@/pages/main/quiz-solving/result-view'))
 
 const PublicQuizView = lazyPage(() => import('@/pages/public/quiz-view'))
 
 const IntegrationSuccess = lazyPage(() => import('@/pages/integrations/success'))
+const IntegrationFailure = lazyPage(() => import('@/pages/integrations/failure'))
 
 const NotFound = lazyPage(() => import('@/pages/not-found'))
 
@@ -47,12 +54,11 @@ export const routes: RouteObject[] = [
       {
         path: PATHS.auth.root,
         element: <AuthLayout />,
-        loader: requireGuest,
         children: [
           { index: true, element: <Navigate to={PATHS.auth.login} replace /> },
-          { path: 'login', lazy: Login },
-          { path: 'register', lazy: Register },
-          { path: 'forgot-password', lazy: ForgotPassword },
+          { path: 'login', lazy: Login, loader: requireGuest },
+          { path: 'register', lazy: Register, loader: requireGuest },
+          { path: 'forgot-password', lazy: ForgotPassword, loader: requireGuest },
           { path: 'reset-password', lazy: ResetPassword },
         ],
       },
@@ -64,13 +70,25 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <Navigate to={PATHS.app.quizzes} replace /> },
           { path: 'analytics', lazy: Analytics },
+          { path: 'history', lazy: History },
           { path: 'account', lazy: Account },
           { path: 'quizzes', lazy: Quizzes },
-          { path: 'quizzes/:id', lazy: QuizSolvingUI },
+          { path: 'library', lazy: Library },
+          { path: 'library/:folderId', lazy: LibraryFolder },
+          {
+            path: 'quizzes/:id',
+            lazy: QuizSolvingLayout,
+            children: [
+              { index: true, lazy: QuizIntroView },
+              { path: 'question/:questionId', lazy: QuizQuestionView },
+              { path: 'result', lazy: QuizResultView },
+            ],
+          },
         ],
       },
 
       { path: 'integrations/success', lazy: IntegrationSuccess },
+      { path: 'integrations/failure', lazy: IntegrationFailure },
 
       { path: '*', lazy: NotFound },
     ],

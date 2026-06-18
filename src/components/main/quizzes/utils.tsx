@@ -1,5 +1,26 @@
 import type { QuestionType } from '@/types/quiz'
 
+/**
+ * The quiz-settings fields shared by both the file-upload and Notion quiz forms.
+ * Each form's own value type extends this with its source field (`files` /
+ * `pageIds`), so `QuizSettingsFields` can render against any of them.
+ */
+export type QuizSettingsValues = {
+  type: QuestionType
+  questionCount: string
+  difficulty: string
+  model: string
+  apiKeyId: string
+  isTimerEnabled: boolean
+  timerDuration?: number
+  userInstructions?: string
+  folderId: string
+}
+
+/** Timer minutes → seconds for the create-quiz API; undefined when the timer is off. */
+export const toTimerSeconds = (enabled: boolean, minutes?: number): number | undefined =>
+  enabled ? (minutes ?? 0) * 60 : undefined
+
 export const questionTypes = [
   { label: 'Multiple Choice', value: 'multiple_choice' },
   { label: 'True/False', value: 'true_false' },

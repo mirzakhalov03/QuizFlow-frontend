@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AppRouter } from '@/router/router'
 import { ThemeProvider } from './layouts/theme'
 import { AuthInitializer } from './functions/authInitializer'
@@ -27,7 +26,6 @@ createRoot(document.getElementById('root')!).render(
           <AppRouter />
         </AuthInitializer>
       </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </StrictMode>
 )

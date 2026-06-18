@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { PasswordInput } from '@/components/form/password-input'
 import { PATHS } from '@/lib/path'
 import { cn } from '@/lib/utils'
 import { authService } from '@/api/services/auth.service'
@@ -90,14 +91,7 @@ export default function Login() {
             Forgot?
           </Link>
         </div>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          autoComplete="current-password"
-          className={inputClass}
-        />
+        <PasswordInput id="password" name="password" required autoComplete="current-password" />
       </div>
 
       <Button type="submit" loading={loading} className="w-full">
