@@ -43,29 +43,53 @@ export default function MarkdownText({ text, className = '', as: Component = 'di
             const language = match[1] || 'text'
             const code = match[2].trim()
             return (
-              <SyntaxHighlighter
+              <div
                 key={index}
-                language={language}
-                style={isDark ? oneDark : oneLight}
-                className="rounded-lg border"
-                customStyle={{
-                  margin: '0.75rem 0',
-                  fontSize: '0.875rem',
-                  lineHeight: '1.5',
-                  backgroundColor: 'transparent',
-                }}
+                className="my-4 overflow-hidden rounded-lg border border-border bg-muted/30 dark:bg-zinc-900/40"
               >
-                {code}
-              </SyntaxHighlighter>
+                {match[1] && (
+                  <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-1.5 text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
+                    <span>{match[1]}</span>
+                  </div>
+                )}
+                <SyntaxHighlighter
+                  language={language}
+                  style={isDark ? oneDark : oneLight}
+                  customStyle={{
+                    margin: 0,
+                    padding: '1rem',
+                    fontSize: '0.8125rem',
+                    lineHeight: '1.6',
+                    backgroundColor: 'transparent',
+                  }}
+                >
+                  {code}
+                </SyntaxHighlighter>
+              </div>
             )
           }
         }
 
         if (!part) return null
 
+        // Support inline code like `const x = 1`
+        const inlineParts = part.split(/(`[^`]+`)/g)
         return (
           <span key={index} className="whitespace-pre-wrap">
-            {part}
+            {inlineParts.map((inlinePart, i) => {
+              if (inlinePart.startsWith('`') && inlinePart.endsWith('`')) {
+                const code = inlinePart.slice(1, -1)
+                return (
+                  <code
+                    key={i}
+                    className="bg-muted text-foreground mx-1 rounded-md border border-border px-1.5 py-0.5 font-mono text-[0.85em] font-medium"
+                  >
+                    {code}
+                  </code>
+                )
+              }
+              return inlinePart
+            })}
           </span>
         )
       })}

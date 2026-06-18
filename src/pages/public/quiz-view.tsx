@@ -4,6 +4,7 @@ import { PUBLIC_QUIZ_BY_TOKEN } from '@/constants/api-endpoints'
 import type { QuizWithQuestions } from '@/types/quiz'
 import type { ApiResponse } from '@/types/api'
 import Spinner from '@/components/ui/spinner'
+import MarkdownText from '@/components/main/quiz-solving/markdown-text'
 
 export default function PublicQuizView() {
   const { shareToken } = useParams<{ shareToken: string }>()
@@ -46,10 +47,10 @@ export default function PublicQuizView() {
       <div className="space-y-16">
         {quiz.questions?.map((question, index) => (
           <div key={question.id} className="space-y-6">
-            <h3 className="flex items-start text-xl leading-snug font-semibold">
+            <div className="flex items-start text-xl leading-snug font-semibold">
               <span className="text-primary mr-3 shrink-0">Q{index + 1}.</span>
-              {question.text}
-            </h3>
+              <MarkdownText text={question.text} className="flex-1" />
+            </div>
 
             <div className="grid gap-3 pl-0 md:pl-10">
               {question.options?.map((option) => (
@@ -57,7 +58,7 @@ export default function PublicQuizView() {
                   key={option.id}
                   className="bg-card border-border rounded-xl border p-4 text-sm md:text-base"
                 >
-                  {option.text}
+                  <MarkdownText text={option.text} />
                 </div>
               ))}
             </div>
