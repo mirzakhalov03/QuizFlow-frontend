@@ -3,12 +3,30 @@ import type { QuestionType } from './quiz'
 export type ScorePoint = {
   date: string
   score: number
+  quizId: string
+  quizTitle: string
 }
 
 export type TypeBreakdown = {
   type: QuestionType
   quizCount: number
+}
+
+export type FolderStat = {
+  folderId: string | null
+  folderName: string
   averageScore: number
+  bestScore: number
+  attemptCount: number
+}
+
+export type QuizStat = {
+  quizId: string
+  quizTitle: string
+  folderId: string | null
+  averageScore: number
+  bestScore: number
+  attemptCount: number
 }
 
 export type QuizHistoryItem = {
@@ -42,6 +60,8 @@ export type AnalyticsSummary = {
   keyUsageBreakdown: KeyUsageSummary[]
   modelUsageBreakdown: ModelUsageSummary[]
   scoreOverTime: ScorePoint[]
-  breakdownByType: TypeBreakdown[]
+  typeBreakdown: TypeBreakdown[]
+  folderStats: FolderStat[]
+  quizStats: QuizStat[]
   history: QuizHistoryItem[]
 }

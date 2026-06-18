@@ -2,7 +2,7 @@ import AnalyticsStats from '@/components/main/analytics/analytics-stats'
 import ApiKeyAnalytics from '@/components/main/analytics/api-key-analytics'
 import ModelAnalytics from '@/components/main/analytics/model-analytics'
 import ScoreOverTimeChart from '@/components/main/analytics/score-over-time-chart'
-import TypeBreakdownTable from '@/components/main/analytics/type-breakdown-table'
+import TypePieChart from '@/components/main/analytics/type-pie-chart'
 import Spinner from '@/components/ui/spinner'
 import { ANALYTICS_SUMMARY } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
@@ -42,7 +42,7 @@ export default function Analytics() {
 
       <AnalyticsStats summary={summary} />
       <ScoreOverTimeChart points={summary.scoreOverTime ?? []} />
-      <TypeBreakdownTable rows={summary.breakdownByType ?? []} />
+      <TypePieChart rows={summary.typeBreakdown ?? []} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ApiKeyAnalytics
           data={summary.keyUsageBreakdown ?? []}
