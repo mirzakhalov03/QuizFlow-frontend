@@ -82,7 +82,7 @@ export default function MarkdownText({ text, className = '', as: Component = 'di
                 return (
                   <code
                     key={i}
-                    className="bg-muted text-foreground mx-1 rounded-md border border-border px-1.5 py-0.5 font-mono text-[0.85em] font-medium"
+                    className="bg-muted text-foreground rounded-md border border-border px-1.5 py-0.5 font-mono text-[0.85em] font-medium"
                   >
                     {code}
                   </code>
