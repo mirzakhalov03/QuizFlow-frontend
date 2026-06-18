@@ -7,6 +7,7 @@ import Modal from '@/components/custom/modal'
 import ConnectedApps from '@/components/main/account/connected-apps'
 import SetPassword from '@/components/main/account/set-password'
 import ByokSection from '@/components/main/account/byok-section'
+import AiFeedbackSection from '@/components/main/account/ai-feedback-section'
 
 import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
@@ -174,6 +175,8 @@ export default function Account() {
           <ConnectedApps />
         </div>
       </section>
+
+      <AiFeedbackSection />
 
       <ByokSection />
 

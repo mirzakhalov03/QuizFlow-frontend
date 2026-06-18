@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { userProfileService } from '../api/services/userProfile.service'
+import { userProfileService, type AiFeedbackRecord } from '../api/services/userProfile.service'
 
 type ProfileData = {
   bio: string | null
@@ -17,6 +17,8 @@ type UserProfileState = {
   bio: string | null
   profilePicture: string | null
   isOnboarded: boolean | null
+  aiFeedback: AiFeedbackRecord | null
+  aiFeedbackGeneratedAt: string | null
   loading: boolean
   updating: boolean
 
@@ -32,6 +34,8 @@ export const useUserProfileStore = create<UserProfileState>((set) => ({
   bio: null,
   profilePicture: null,
   isOnboarded: null,
+  aiFeedback: null,
+  aiFeedbackGeneratedAt: null,
   loading: false,
   updating: false,
 
@@ -54,6 +58,8 @@ export const useUserProfileStore = create<UserProfileState>((set) => ({
         bio: data.bio,
         profilePicture: data.profilePicture,
         isOnboarded: data.isOnboarded,
+        aiFeedback: data.aiFeedback,
+        aiFeedbackGeneratedAt: data.aiFeedbackGeneratedAt,
       })
     } finally {
       set({ loading: false })
