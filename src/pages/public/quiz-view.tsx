@@ -90,11 +90,7 @@ export default function PublicQuizView() {
     if (quiz?.isOwner) navigate(PATHS.app.quiz(quiz.id), { replace: true })
   }, [quiz?.isOwner, quiz?.id, navigate])
 
-  // Anonymous attempts are ephemeral — clear any persisted timer on entry so a
-  // returning solver always starts fresh instead of resuming (or instantly
-  // auto-submitting on) a prior attempt's leftover countdown. Runs before the
-  // timer's duration-sync resume reads storage, since the quiz fetch resolves
-  // after this mount effect.
+ 
   useEffect(() => {
     if (shareToken) localStorage.removeItem(`public-quiz-timer-${shareToken}`)
   }, [shareToken])
@@ -104,8 +100,7 @@ export default function PublicQuizView() {
     result?.review.forEach((r) => m.set(r.questionId, r))
     return m
   }, [result])
-
-  // While loading, or while the owner-redirect effect runs, show the spinner.
+ 
   if (isLoading || quiz?.isOwner) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -247,7 +242,6 @@ export default function PublicQuizView() {
           Created by {quiz.owner.fullName} via QuizFlow
         </p>
       </div>
-
       <div className="flex flex-col gap-4">
         {quiz.questions.map((question, index) => (
           <PublicResultQuestion
