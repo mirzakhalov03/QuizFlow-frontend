@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import AiFeedbackCard from '@/components/main/analytics/ai-feedback-card'
 import AnalyticsStats from '@/components/main/analytics/analytics-stats'
 import ApiKeyAnalytics from '@/components/main/analytics/api-key-analytics'
 import FolderSelector from '@/components/main/analytics/folder-selector'
@@ -9,6 +10,7 @@ import TypePieChart from '@/components/main/analytics/type-pie-chart'
 import Spinner from '@/components/ui/spinner'
 import { ANALYTICS_SUMMARY } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
+import { useUserProfileStore } from '@/store/userProfileStore'
 import type { ApiResponse } from '@/types/api'
 import type { AnalyticsSummary, FolderStat } from '@/types/analytics'
 
@@ -22,6 +24,13 @@ const EMPTY_STAT: FolderStat = {
 
 export default function Analytics() {
   const [selectedFolderIndex, setSelectedFolderIndex] = useState(0)
+
+  // Ensure the AI feedback card has data even if the user lands here directly
+  // (deduped + no-op once the profile is already loaded).
+  const fetchProfile = useUserProfileStore((s) => s.fetchProfile)
+  useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
 
   const { data, isLoading, isError } = useGet<ApiResponse<AnalyticsSummary>>(ANALYTICS_SUMMARY, {
     options: { staleTime: 0 },
@@ -73,6 +82,8 @@ export default function Analytics() {
 
   return (
     <div className="space-y-6">
+      <AiFeedbackCard />
+
       <header>
         <h1 className="text-xl font-semibold sm:text-2xl">Analytics</h1>
         <p className="text-muted-foreground">Your progress across every quiz you've taken.</p>
