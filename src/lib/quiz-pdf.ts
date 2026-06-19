@@ -8,7 +8,7 @@ import { toast } from '@/lib/toast'
  * is opened synchronously on the click so it isn't caught by popup blockers,
  * then pointed at the blob once the request resolves.
  */
-export async function openQuizPdf(quizId: string) {
+export async function openQuizPdf(quizId: string, withAnswers: boolean = true) {
   // Opened synchronously on the click so it isn't caught by popup blockers.
   // No `noopener` — we need to keep the reference to point it at the blob later.
   const tab = window.open('', '_blank')
@@ -20,7 +20,9 @@ export async function openQuizPdf(quizId: string) {
 
   try {
     // `responseType: 'blob'` already gives us a Blob, so no need to re-wrap it.
-    const res = await api.get(QUIZ_PDF(quizId), { responseType: 'blob' })
+    const res = await api.get(`${QUIZ_PDF(quizId)}?withAnswers=${withAnswers}`, {
+      responseType: 'blob',
+    })
     const url = URL.createObjectURL(res.data)
 
     const download = () => {
