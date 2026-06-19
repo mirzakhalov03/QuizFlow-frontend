@@ -1,4 +1,4 @@
-import type { Question } from '@/types/quiz'
+import type { SolvableQuestion } from '@/types/quiz'
 import MultipleChoice from './question-types/multiple-choice'
 import MultiSelect from './question-types/multi-select'
 import TrueFalse from './question-types/true-false'
@@ -6,7 +6,7 @@ import OpenEnded from './question-types/open-ended'
 import MarkdownText from './markdown-text'
 
 type Props = {
-  question: Question
+  question: SolvableQuestion
   index: number
   value: string | string[] | undefined
   onChange: (value: string | string[]) => void
