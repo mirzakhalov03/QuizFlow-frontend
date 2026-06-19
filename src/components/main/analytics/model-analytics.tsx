@@ -51,7 +51,7 @@ export default function ModelAnalytics({ data }: Props) {
 
   if (activeData.length === 0) {
     return (
-      <div className="border-border bg-background flex min-h-[350px] flex-col items-center justify-center rounded-lg border p-8 text-center">
+      <div className="border-border bg-background flex min-h-87.5 flex-col items-center justify-center rounded-lg border p-8 text-center">
         <div className="text-muted-foreground mb-3 flex h-10 w-10 items-center justify-center rounded-full opacity-40">
           <Cpu size={20} />
         </div>
@@ -63,7 +63,7 @@ export default function ModelAnalytics({ data }: Props) {
   }
 
   return (
-    <div className="border-border bg-background flex min-h-[350px] flex-col rounded-lg border p-4 sm:p-6">
+    <div className="border-border bg-background flex min-h-87.5 flex-col rounded-lg border p-4 sm:p-6">
       <h3 className="mb-4 text-sm font-semibold sm:mb-6">Token usage by AI model</h3>
 
       <div className="flex flex-1 flex-col justify-center gap-4">
