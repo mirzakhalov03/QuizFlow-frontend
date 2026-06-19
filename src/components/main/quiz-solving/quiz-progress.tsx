@@ -1,7 +1,7 @@
-import type { Question } from '@/types/quiz'
+import type { SolvableQuestion } from '@/types/quiz'
 
 type Props = {
-  questions: Question[]
+  questions: SolvableQuestion[]
   answers: Record<string, string | string[]>
   activeIndex: number
   onSelect: (index: number) => void

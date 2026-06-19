@@ -43,16 +43,13 @@ export default function Analytics() {
       <AnalyticsStats summary={summary} />
       <ScoreOverTimeChart points={summary.scoreOverTime ?? []} />
       <TypeBreakdownTable rows={summary.breakdownByType ?? []} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ApiKeyAnalytics
           data={summary.keyUsageBreakdown ?? []}
           totalTokens={summary.totalTokensUsed ?? 0}
         />
-        <ModelAnalytics
-          data={summary.modelUsageBreakdown ?? []}
-        />
+        <ModelAnalytics data={summary.modelUsageBreakdown ?? []} />
       </div>
     </div>
   )
 }
-

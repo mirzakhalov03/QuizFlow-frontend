@@ -1,4 +1,4 @@
-import type { Question, SubmitAnswer } from '@/types/quiz'
+import type { SolvableQuestion, SubmitAnswer } from '@/types/quiz'
 
 type AnswersState = Record<string, string | string[] | undefined>
 
@@ -6,7 +6,10 @@ type AnswersState = Record<string, string | string[] | undefined>
  * Maps the local answers state into the API submit payload. Drops unanswered
  * questions (so we never send an empty option id, which fails UUID validation).
  */
-export function buildSubmitAnswers(questions: Question[], answers: AnswersState): SubmitAnswer[] {
+export function buildSubmitAnswers(
+  questions: SolvableQuestion[],
+  answers: AnswersState
+): SubmitAnswer[] {
   const payload: SubmitAnswer[] = []
 
   for (const question of questions) {

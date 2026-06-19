@@ -48,6 +48,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
 
   const {
     shareToken,
+    isPublic,
     publicUrl,
     copied,
     isModalOpen,
@@ -56,6 +57,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
     isExporting,
     isDeleting,
     isSharing,
+    isDisabling,
     openQuiz,
     openDeleteConfirm,
     confirmDelete,
@@ -64,6 +66,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
     handleExportPdf,
     copyToClipboard,
     generateShareLink,
+    disableShareLink,
     closeShareModal,
     closeConfirm,
     closeMoveModal,
@@ -216,12 +219,15 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
       <ShareQuizModal
         isOpen={isModalOpen}
         onClose={closeShareModal}
+        isPublic={isPublic}
         isSharing={isSharing}
+        isDisabling={isDisabling}
         shareToken={shareToken}
         publicUrl={publicUrl}
         copied={copied}
         onCopy={copyToClipboard}
-        onRetry={generateShareLink}
+        onEnable={generateShareLink}
+        onDisable={disableShareLink}
       />
 
       <ConfirmDialog
