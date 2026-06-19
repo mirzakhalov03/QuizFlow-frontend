@@ -1,10 +1,23 @@
 import { api } from '@/api/axios-instance'
 
+export type AiFeedback = {
+  summary: string
+  weakTopics: string[]
+  recommendations: string[]
+}
+
+// The worker stores the full chatJSON result, wrapping the feedback under `data`.
+export type AiFeedbackRecord = {
+  data: AiFeedback
+}
+
 export type UserProfile = {
   userId: string
   bio: string | null
   profilePicture: string | null
   isOnboarded: boolean | null
+  aiFeedback: AiFeedbackRecord | null
+  aiFeedbackGeneratedAt: string | null
 }
 
 export const userProfileService = {
