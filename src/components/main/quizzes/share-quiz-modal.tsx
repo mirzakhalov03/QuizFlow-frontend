@@ -8,41 +8,51 @@ import Spinner from '@/components/ui/spinner'
 type ShareQuizModalProps = {
   isOpen: boolean
   onClose: () => void
+  isPublic: boolean
   isSharing: boolean
+  isDisabling: boolean
   shareToken: string | null
   publicUrl: string
   copied: boolean
   onCopy: () => void
-  onRetry: () => void
+  onEnable: () => void
+  onDisable: () => void
 }
 
 export default function ShareQuizModal({
   isOpen,
   onClose,
+  isPublic,
   isSharing,
+  isDisabling,
   shareToken,
   publicUrl,
   copied,
   onCopy,
-  onRetry,
+  onEnable,
+  onDisable,
 }: ShareQuizModalProps) {
+  const isLive = isPublic && !!shareToken
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title="Share Quiz"
-      description="Anyone with this link can view the quiz questions."
+      description="Anyone with the link can solve this quiz and see their score."
     >
       <div className="flex flex-col gap-4 py-4">
         {isSharing ? (
           <div className="flex h-20 items-center justify-center">
             <Spinner size="md" />
           </div>
-        ) : !shareToken ? (
+        ) : !isLive ? (
           <div className="flex flex-col items-center gap-3 py-4 text-center">
-            <p className="text-destructive text-sm">Failed to generate share link.</p>
-            <Button size="sm" onClick={onRetry}>
-              Retry
+            <p className="text-muted-foreground text-sm">
+              Sharing is off. Turn it on to get a public link anyone can solve.
+            </p>
+            <Button size="sm" onClick={onEnable}>
+              Enable sharing
             </Button>
           </div>
         ) : (
@@ -58,9 +68,18 @@ export default function ShareQuizModal({
               </Button>
             </div>
             <p className="text-muted-foreground text-xs">
-              Note: This link allows read-only access. Users cannot submit answers or see correct
-              ones.
+              Solvers can answer and see their score and the correct answers — but never your
+              explanations.
             </p>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={onDisable}
+              disabled={isDisabling}
+              className="self-start"
+            >
+              {isDisabling ? 'Disabling…' : 'Disable sharing'}
+            </Button>
           </>
         )}
       </div>
