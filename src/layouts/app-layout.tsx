@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, History, Library, ListChecks, LogOut, User } from 'lucide-react'
+import { BarChart3, History, Library, ListChecks, LogOut, CircleUser } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
@@ -22,7 +22,7 @@ const navItems = [
   { label: 'History', to: PATHS.app.history, icon: History },
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
   { label: 'Library', to: PATHS.app.library, icon: Library },
-  { label: 'Profile', to: PATHS.app.account, icon: User },
+  { label: 'Account', to: PATHS.app.account, icon: CircleUser },
 ]
 
 export default function AppLayout() {
