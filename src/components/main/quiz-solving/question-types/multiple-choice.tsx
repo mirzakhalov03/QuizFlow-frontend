@@ -1,8 +1,8 @@
-import type { QuestionOption } from '@/types/quiz'
+import type { SolvableOption } from '@/types/quiz'
 import MarkdownText from '../markdown-text'
 
 type Props = {
-  options: QuestionOption[]
+  options: SolvableOption[]
   value: string | undefined
   onChange: (optionId: string) => void
 }

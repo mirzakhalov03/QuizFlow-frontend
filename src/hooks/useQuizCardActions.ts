@@ -4,7 +4,12 @@ import { useQueryClient } from '@tanstack/react-query'
 
 import { useDelete } from '@/hooks/useDelete'
 import { usePatch } from '@/hooks/usePatch'
-import { QUIZ_BY_ID, QUIZ_LIST, QUIZ_SHARE_ENABLE } from '@/constants/api-endpoints'
+import {
+  QUIZ_BY_ID,
+  QUIZ_LIST,
+  QUIZ_SHARE_DISABLE,
+  QUIZ_SHARE_ENABLE,
+} from '@/constants/api-endpoints'
 import { toast } from '@/lib/toast'
 import { openQuizPdf } from '@/lib/quiz-pdf'
 import { PATHS } from '@/lib/path'
@@ -20,11 +25,13 @@ export function useQuizCardActions(quiz: Quiz) {
   const navigate = useNavigate()
 
   const [shareToken, setShareToken] = useState<string | null>(quiz.shareToken || null)
+  const [isPublic, setIsPublic] = useState<boolean>(quiz.isPublic ?? false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
 
   const { mutate: deleteQuiz, isPending: isDeleting } = useDelete({
     onSuccess: () => {
@@ -42,6 +49,7 @@ export function useQuizCardActions(quiz: Quiz) {
     onSuccess: (data: { data: { shareToken: string } }) => {
       const token = data.data.shareToken
       setShareToken(token)
+      setIsPublic(true)
       // Update the quiz list cache with the new token
       queryClient.setQueriesData<PaginatedResponse<Quiz>>({ queryKey: [QUIZ_LIST] }, (old) => {
         if (!old) return old
@@ -50,7 +58,7 @@ export function useQuizCardActions(quiz: Quiz) {
           data: {
             ...old.data,
             items: old.data.items.map((item) =>
-              item.id === quiz.id ? { ...item, shareToken: token } : item
+              item.id === quiz.id ? { ...item, shareToken: token, isPublic: true } : item
             ),
           },
         }
@@ -61,7 +69,30 @@ export function useQuizCardActions(quiz: Quiz) {
     },
   })
 
+  const { mutate: disableShare, isPending: isDisabling } = usePatch({
+    onSuccess: () => {
+      setIsPublic(false)
+      queryClient.setQueriesData<PaginatedResponse<Quiz>>({ queryKey: [QUIZ_LIST] }, (old) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            items: old.data.items.map((item) =>
+              item.id === quiz.id ? { ...item, isPublic: false } : item
+            ),
+          },
+        }
+      })
+      toast.success('Sharing disabled')
+    },
+    onError: () => {
+      toast.error('Failed to disable sharing')
+    },
+  })
+
   const generateShareLink = () => enableShare(QUIZ_SHARE_ENABLE(quiz.id), {})
+  const disableShareLink = () => disableShare(QUIZ_SHARE_DISABLE(quiz.id), {})
 
   const openQuiz = () => navigate(PATHS.app.quiz(quiz.id))
 
@@ -74,9 +105,7 @@ export function useQuizCardActions(quiz: Quiz) {
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (isSharing) return
     setIsModalOpen(true)
-    if (!shareToken) generateShareLink()
   }
 
   const handleMove = (e: React.MouseEvent) => {
@@ -84,12 +113,16 @@ export function useQuizCardActions(quiz: Quiz) {
     setIsMoveModalOpen(true)
   }
 
-  const handleExportPdf = async (e: React.MouseEvent) => {
+  const handleExportPdf = (e: React.MouseEvent) => {
     e.stopPropagation()
+    setIsExportModalOpen(true)
+  }
+
+  const exportPdf = async (withAnswers: boolean) => {
     if (isExporting) return
     setIsExporting(true)
     try {
-      await openQuizPdf(quiz.id)
+      await openQuizPdf(quiz.id, withAnswers)
     } finally {
       setIsExporting(false)
     }
@@ -115,24 +148,30 @@ export function useQuizCardActions(quiz: Quiz) {
 
   return {
     shareToken,
+    isPublic,
     publicUrl,
     copied,
     isModalOpen,
     isConfirmOpen,
     isMoveModalOpen,
+    isExportModalOpen,
     isExporting,
     isDeleting,
     isSharing,
+    isDisabling,
     openQuiz,
     openDeleteConfirm,
     confirmDelete,
     handleShare,
     handleMove,
     handleExportPdf,
+    exportPdf,
     copyToClipboard,
     generateShareLink,
+    disableShareLink,
     closeShareModal: () => setIsModalOpen(false),
     closeConfirm: () => setIsConfirmOpen(false),
     closeMoveModal: () => setIsMoveModalOpen(false),
+    closeExportModal: () => setIsExportModalOpen(false),
   }
 }
