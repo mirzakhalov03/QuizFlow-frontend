@@ -40,9 +40,18 @@ export default function Account() {
   const [draftBio, setDraftBio] = useState('')
   const email = user?.email
 
-  const activeTab = searchParams.get('tab') || 'profile'
-  const setActiveTab = (tab: string) => setSearchParams({ tab })
+  const tabParam = searchParams.get('tab')
+  const activeTab = ['profile', 'integrations', 'byok', 'security'].includes(tabParam || '')
+    ? (tabParam as string)
+    : 'profile'
 
+  const setActiveTab = (tab: string) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev)
+      params.set('tab', tab)
+      return params
+    })
+  }
   useEffect(() => {
     if (user?.fullName) setDraftFullName(user.fullName)
   }, [user?.fullName])
@@ -125,8 +134,9 @@ export default function Account() {
       </header>
 
       {/* HORIZONTAL TAB MENU */}
-      <nav 
-        className="flex w-full border-b border-border overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" 
+      <nav
+        role="tablist"
+        className="border-border flex w-full overflow-x-auto border-b [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-label="Settings sections"
       >
         {tabs.map((tab) => {
@@ -135,13 +145,15 @@ export default function Account() {
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={isActive}
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex flex-1 items-center justify-center gap-2 pb-3 text-sm font-medium transition-all duration-200 border-b-2 -mb-[2px] shrink-0 min-w-max px-4 sm:px-0',
+                'relative -mb-0.5 flex min-w-max flex-1 shrink-0 items-center justify-center gap-2 border-b-2 px-4 pb-3 text-sm font-medium transition-all duration-200 sm:px-0',
                 isActive
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
+                  ? 'border-primary text-primary z-10'
+                  : 'text-muted-foreground hover:text-foreground border-transparent'
               )}
             >
               <Icon size={16} />
