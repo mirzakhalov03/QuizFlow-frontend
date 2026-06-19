@@ -20,3 +20,5 @@ export const BYOK = '/byok'
 export const BYOK_BY_ID = (id: string) => `/byok/${id}`
 
 export const ANALYTICS_SUMMARY = '/analytics/summary'
+export const QUIZ_HISTORY = '/quiz-results/history'
+export const FOLDERS = '/folders'
