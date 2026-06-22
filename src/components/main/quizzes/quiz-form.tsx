@@ -67,7 +67,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
 
         const result = await quizService.createQuiz('file', {
           keys,
-          type: values.type === 'mixed' ? undefined : values.type,
+          type: values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,

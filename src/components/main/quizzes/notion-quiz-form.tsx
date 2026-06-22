@@ -71,7 +71,7 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
       try {
         const result = await quizService.createQuiz('notion', {
           pageIds: values.pageIds,
-          type: values.type === 'mixed' ? undefined : values.type,
+          type: values.type,
           questionCount: parseInt(values.questionCount, 10),
           userInstructions: values.userInstructions || undefined,
           folderId: values.folderId !== 'none' ? values.folderId : undefined,
