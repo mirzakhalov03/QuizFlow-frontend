@@ -15,6 +15,7 @@ export type QuizSettingsValues = {
   timerDuration?: number
   userInstructions?: string
   folderId: string
+  optionsPerQuestion: number
 }
 
 /** Timer minutes → seconds for the create-quiz API; undefined when the timer is off. */

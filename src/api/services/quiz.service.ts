@@ -13,6 +13,7 @@ type BaseQuizPayload = {
   title?: string
   type?: QuestionType | undefined
   questionCount: number
+  optionsPerQuestion?: number //changed
   userInstructions?: string
   isTimerEnabled?: boolean
   timerDuration?: number
