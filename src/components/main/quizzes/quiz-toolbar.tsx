@@ -14,9 +14,9 @@ const SORT_OPTIONS: { label: string; value: SortOption }[] = [
   { label: 'Oldest first', value: 'oldest' },
 ]
 
-// Only the question types the backend can store/filter on (excludes "mixed",
-// which is a generation option, not a persisted type).
-const FILTERABLE_TYPES = questionTypes.filter((t) => t.value !== 'mixed')
+// All quiz types the backend can store and filter on. Mixed quizzes persist
+// type 'mixed', so it's a valid filter value alongside the single types.
+const FILTERABLE_TYPES = questionTypes
 
 type Props = {
   search: string
