@@ -9,7 +9,7 @@ export type ScorePoint = {
 
 export type TypeBreakdown = {
   type: QuestionType
-  quizCount: number
+  questionCount: number
 }
 
 export type FolderStat = {

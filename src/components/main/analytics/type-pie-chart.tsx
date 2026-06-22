@@ -45,7 +45,7 @@ function arcPath(startAngle: number, endAngle: number) {
 }
 
 export default function TypePieChart({ rows }: Props) {
-  const total = rows.reduce((sum, r) => sum + r.quizCount, 0)
+  const total = rows.reduce((sum, r) => sum + r.questionCount, 0)
 
   return (
     <div className="border-border bg-background rounded-lg border">
@@ -55,7 +55,7 @@ export default function TypePieChart({ rows }: Props) {
 
       {total === 0 ? (
         <div className="text-muted-foreground p-6 text-center text-sm">
-          Take a quiz to see your quiz-library composition.
+          Create a quiz to see your question-type breakdown.
         </div>
       ) : (
         <div className="flex flex-col items-center gap-6 p-6 sm:flex-row sm:items-center sm:gap-8">
@@ -65,14 +65,14 @@ export default function TypePieChart({ rows }: Props) {
             height={SIZE}
             className="flex-shrink-0"
             role="img"
-            aria-label="Pie chart of quizzes by question type"
+            aria-label="Pie chart of questions by question type"
           >
             {(() => {
               let cumulative = 0
               return rows
-                .filter((r) => r.quizCount > 0)
+                .filter((r) => r.questionCount > 0)
                 .map((r) => {
-                  const sweep = (r.quizCount / total) * 360
+                  const sweep = (r.questionCount / total) * 360
                   const path = arcPath(cumulative, cumulative + sweep)
                   cumulative += sweep
                   return (
@@ -90,7 +90,7 @@ export default function TypePieChart({ rows }: Props) {
 
           <ul className="flex-1 space-y-2 text-sm">
             {rows.map((r) => {
-              const percent = total > 0 ? Math.round((r.quizCount / total) * 100) : 0
+              const percent = total > 0 ? Math.round((r.questionCount / total) * 100) : 0
               return (
                 <li key={r.type} className="flex items-center justify-between gap-3">
                   <span className="flex items-center gap-2">
@@ -101,7 +101,7 @@ export default function TypePieChart({ rows }: Props) {
                     <span>{TYPE_LABEL[r.type]}</span>
                   </span>
                   <span className="text-muted-foreground tabular-nums">
-                    {r.quizCount} ({percent}%)
+                    {r.questionCount} ({percent}%)
                   </span>
                 </li>
               )
