@@ -14,7 +14,7 @@ dist-ssr
 claude.md
 docs
 .claude
-
+.gemini
 # Editor directories and files
 .vscode/*
 .idea

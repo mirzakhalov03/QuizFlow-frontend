@@ -23,7 +23,7 @@ function Card({
   children: ReactNode
 }) {
   return (
-    <div className="border-border bg-background rounded-2xl border p-5 shadow-sm sm:p-6">
+    <div className="border-border bg-background hover:shadow-md rounded-2xl border p-5 shadow-sm transition-shadow duration-300 sm:p-6 lg:p-8">
       <div className="flex items-center gap-2">
         <KeyRound size={18} className="text-muted-foreground" />
         <h2 className="text-lg font-semibold">{title}</h2>

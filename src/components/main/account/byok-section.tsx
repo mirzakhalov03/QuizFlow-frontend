@@ -62,7 +62,7 @@ export default function ByokSection() {
   const item = getData(BYOK)
 
   return (
-    <div className="border-border bg-background rounded-2xl border p-5 shadow-sm sm:p-6">
+    <div className="border-border bg-background hover:shadow-md rounded-2xl border p-5 shadow-sm transition-shadow duration-300 sm:p-6 lg:p-8">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">AI API Keys (BYOK)</h2>
