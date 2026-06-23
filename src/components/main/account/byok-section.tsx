@@ -62,7 +62,7 @@ export default function ByokSection() {
   const item = getData(BYOK)
 
   return (
-    <div className="border-border bg-background hover:shadow-md rounded-2xl border p-5 shadow-sm transition-shadow duration-300 sm:p-6 lg:p-8">
+    <div className="border-border bg-background rounded-2xl border p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6 lg:p-8">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">AI API Keys (BYOK)</h2>
@@ -71,7 +71,7 @@ export default function ByokSection() {
           </p>
         </div>
         <Button size="sm" onClick={handleAdd} leftIcon={<Plus size={16} />}>
-          Add Key
+          <span className="hidden sm:inline">Add Key</span>
         </Button>
       </div>
 
