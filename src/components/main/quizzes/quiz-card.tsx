@@ -3,6 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { ArrowRight, Clock, FileDown, Menu, Share2, Trash2, FolderInput, Info } from 'lucide-react'
 
 import type { Quiz } from '@/types/quiz'
+import { getModelByValue, DEFAULT_MODEL } from '@/lib/models'
 import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
 import { useQuizCardActions } from '@/hooks/useQuizCardActions'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
@@ -31,16 +32,9 @@ function getKeyInfo(quiz: Quiz) {
   return { label, color: colors[index] }
 }
 
-const MODEL_MAPPING: Record<string, { label: string; color: string }> = {
-  'google/gemini-3.5-flash': { label: 'Gemini 3.5 Flash', color: '#14B8A6' },
-  'openai/gpt-4o-mini': { label: 'GPT-4o Mini', color: '#10B981' },
-  'deepseek/deepseek-chat-v3': { label: 'DeepSeek V3', color: '#3B82F6' },
-  'meta-llama/llama-3.3-70b-instruct': { label: 'Llama 3.3 70B', color: '#A855F7' },
-}
-
 function getModelInfo(quiz: Quiz) {
-  const modelName = quiz.properties?.model || 'google/gemini-3.5-flash'
-  return MODEL_MAPPING[modelName] ?? { label: modelName, color: '#64748B' }
+  const modelName = quiz.properties?.model || DEFAULT_MODEL
+  return getModelByValue(modelName)
 }
 
 export default function QuizCard({ quiz }: { quiz: Quiz }) {
@@ -198,9 +192,9 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
 
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[quiz.type ?? 'mixed']}`}
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[quiz.type]}`}
           >
-            {TYPE_LABELS[quiz.type ?? 'mixed']}
+            {TYPE_LABELS[quiz.type]}
           </span>
 
           {quiz.isTimerEnabled && quiz.timerDuration && (

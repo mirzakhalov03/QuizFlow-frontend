@@ -1,42 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Cpu } from 'lucide-react'
+import { Cpu, Info } from 'lucide-react'
 import type { ModelUsageSummary } from '@/types/analytics'
+import { getModelByValue } from '@/lib/models'
 
 type Props = {
   data: ModelUsageSummary[]
-}
-
-const MODEL_MAPPING: Record<string, { label: string; color: string; provider: string }> = {
-  'google/gemini-3.5-flash': {
-    label: 'Gemini 3.5 Flash',
-    color: '#14B8A6', // Neon Teal
-    provider: 'Google',
-  },
-  'openai/gpt-4o-mini': {
-    label: 'GPT-4o Mini',
-    color: '#10B981', // Neon Green
-    provider: 'OpenAI',
-  },
-  'deepseek/deepseek-chat-v3': {
-    label: 'DeepSeek V3',
-    color: '#3B82F6', // Neon Blue
-    provider: 'DeepSeek',
-  },
-  'meta-llama/llama-3.3-70b-instruct': {
-    label: 'Llama 3.3 70B',
-    color: '#A855F7', // Neon Violet
-    provider: 'Meta',
-  },
-}
-
-function getModelDetails(modelName: string) {
-  return (
-    MODEL_MAPPING[modelName] ?? {
-      label: modelName,
-      color: '#64748B', // Slate
-      provider: 'AI Provider',
-    }
-  )
+  totalTokens: number
 }
 
 function formatTokens(n: number): string {
@@ -45,13 +14,14 @@ function formatTokens(n: number): string {
   return String(n)
 }
 
-export default function ModelAnalytics({ data }: Props) {
+export default function ModelAnalytics({ data, totalTokens }: Props) {
   const [hoveredModel, setHoveredModel] = useState<string | null>(null)
+
   const activeData = useMemo(() => data.filter((m) => m.tokensUsed > 0), [data])
 
   if (activeData.length === 0) {
     return (
-      <div className="border-border bg-background flex min-h-87.5 flex-col items-center justify-center rounded-lg border p-8 text-center">
+      <div className="border-border bg-background flex flex-col items-center justify-center rounded-lg border p-8 text-center">
         <div className="text-muted-foreground mb-3 flex h-10 w-10 items-center justify-center rounded-full opacity-40">
           <Cpu size={20} />
         </div>
@@ -63,65 +33,124 @@ export default function ModelAnalytics({ data }: Props) {
   }
 
   return (
-    <div className="border-border bg-background flex min-h-87.5 flex-col rounded-lg border p-4 sm:p-6">
-      <h3 className="mb-4 text-sm font-semibold sm:mb-6">Token usage by AI model</h3>
+    <div className="border-border bg-background flex flex-col rounded-lg border p-4 sm:p-6">
+      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      <div className="mb-4 flex items-baseline justify-between sm:mb-5">
+        <h3 className="text-sm font-semibold">Token usage by AI model</h3>
+        <span className="text-muted-foreground text-xs tabular-nums">
+          {formatTokens(totalTokens)} total
+        </span>
+      </div>
 
-      <div className="flex flex-1 flex-col justify-center gap-4">
+      {/* ── Segmented bar ───────────────────────────────────────────────────── */}
+      <div
+        className="mb-5 flex h-4 w-full overflow-hidden rounded-full"
+        role="img"
+        aria-label="Segmented bar chart of token usage by AI model"
+      >
+        {activeData.map((item, i) => {
+          const { color } = getModelByValue(item.modelName)
+          const isHovered = hoveredModel === item.modelName
+          const isFirst = i === 0
+          const isLast = i === activeData.length - 1
+          // Tiny 1px transparent gap between segments
+          const marginRight = isLast ? 0 : 1
+
+          return (
+            <div
+              key={item.modelName}
+              className="h-full transition-all duration-300"
+              style={{
+                width: `${item.percentage}%`,
+                backgroundColor: color,
+                opacity: hoveredModel && !isHovered ? 0.25 : 1,
+                marginRight,
+                borderRadius:
+                  isFirst && isLast
+                    ? '9999px'
+                    : isFirst
+                      ? '9999px 0 0 9999px'
+                      : isLast
+                        ? '0 9999px 9999px 0'
+                        : undefined,
+                boxShadow: isHovered ? `0 0 10px ${color}80` : undefined,
+                transform: isHovered ? 'scaleY(1.15)' : 'scaleY(1)',
+              }}
+              onMouseEnter={() => setHoveredModel(item.modelName)}
+              onMouseLeave={() => setHoveredModel(null)}
+            />
+          )
+        })}
+      </div>
+
+      {/* ── Legend ──────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-2">
         {activeData.map((item) => {
-          const { label, color, provider } = getModelDetails(item.modelName)
+          const { label, color, provider } = getModelByValue(item.modelName)
           const isHovered = hoveredModel === item.modelName
 
           return (
             <div
               key={item.modelName}
-              className="bg-muted/30 border-border/50 hover:bg-muted/50 cursor-default space-y-3 rounded-xl border p-4 transition-all duration-300"
+              className="flex items-center gap-6 rounded-lg px-3 py-2.5 transition-all duration-200 sm:gap-6"
               style={{
-                opacity: hoveredModel && !isHovered ? 0.45 : 1,
-                transform: isHovered ? 'translateX(3px)' : 'translateX(0)',
-                borderColor: isHovered ? color : undefined,
-                boxShadow: isHovered ? `0 0 12px ${color}1A` : undefined,
+                backgroundColor: isHovered ? `${color}12` : undefined,
+                borderLeft: `3px solid ${color}`,
+                opacity: hoveredModel && !isHovered ? 0.4 : 1,
               }}
               onMouseEnter={() => setHoveredModel(item.modelName)}
               onMouseLeave={() => setHoveredModel(null)}
             >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex min-w-0 items-center gap-2">
-                  <span
-                    className="h-2 w-2 shrink-0 animate-pulse rounded-full"
-                    style={{
-                      backgroundColor: color,
-                      boxShadow: `0 0 6px ${color}80`,
-                    }}
-                  />
-                  <span className="text-foreground truncate text-sm font-semibold">{label}</span>
-                  <span className="bg-muted border-border/50 text-muted-foreground shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase">
-                    {provider}
-                  </span>
-                </div>
-                <div className="shrink-0 text-right">
-                  <span className="text-sm font-bold tabular-nums" style={{ color }}>
-                    {item.percentage}%
-                  </span>
-                </div>
-              </div>
+              {/* Percentage */}
+              <span className="w-9 shrink-0 text-sm font-bold tabular-nums" style={{ color }}>
+                {item.percentage}%
+              </span>
 
-              {/* Progress bar container */}
-              <div className="bg-muted/70 h-2 w-full overflow-hidden rounded-full">
-                <div
-                  className="h-full rounded-full transition-all duration-500 ease-out"
-                  style={{
-                    width: `${item.percentage}%`,
-                    backgroundColor: color,
-                    boxShadow: isHovered ? `0 0 12px ${color}70` : `0 0 8px ${color}40`,
-                  }}
-                />
-              </div>
+              {/* Name — always visible */}
+              <span className="text-foreground min-w-0 flex-1 truncate text-xs font-semibold">
+                {label}
+              </span>
 
-              <div className="text-muted-foreground flex items-center justify-between text-[11px]">
-                <span>{formatTokens(item.tokensUsed)} tokens</span>
-                <span>
-                  {item.quizCount} {item.quizCount === 1 ? 'quiz' : 'quizzes'}
+              {/* Provider + tokens + quizzes — right-aligned, hidden on mobile */}
+              <div className="hidden shrink-0 items-center gap-3 sm:flex">
+                <span className="bg-muted border-border/50 text-muted-foreground rounded border px-1 py-px text-[8px] font-semibold tracking-wider uppercase">
+                  {provider}
                 </span>
+                <span className="text-muted-foreground text-[11px] tabular-nums">
+                  {formatTokens(item.tokensUsed)} · {item.quizCount}{' '}
+                  {item.quizCount === 1 ? 'quiz' : 'quizzes'}
+                </span>
+              </div>
+
+              {/* Info icon with tooltip — visible only on mobile */}
+              <div className="group/tip relative flex shrink-0 sm:hidden">
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+                  aria-label={`Details for ${label}`}
+                >
+                  <Info className="h-3.5 w-3.5" />
+                </button>
+                <div className="border-border bg-popover text-popover-foreground pointer-events-none absolute right-0 bottom-full z-30 mb-1.5 w-40 origin-bottom-right scale-95 rounded-lg border p-2.5 opacity-0 shadow-md transition-all duration-200 group-focus-within/tip:pointer-events-auto group-focus-within/tip:scale-100 group-focus-within/tip:opacity-100 group-hover/tip:pointer-events-auto group-hover/tip:scale-100 group-hover/tip:opacity-100">
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">Provider:</span>
+                      <span className="text-foreground font-medium">{provider}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">Tokens:</span>
+                      <span className="text-foreground font-medium tabular-nums">
+                        {formatTokens(item.tokensUsed)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">Quizzes:</span>
+                      <span className="text-foreground font-medium tabular-nums">
+                        {item.quizCount}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )

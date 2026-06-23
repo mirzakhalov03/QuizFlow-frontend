@@ -15,7 +15,7 @@ export type Quiz = {
   title: string
   userId: string
   folderId: string | null
-  type: QuestionType | null
+  type: QuestionType
   difficulty: string | null
   isTimerEnabled: boolean
   timerDuration: number | null

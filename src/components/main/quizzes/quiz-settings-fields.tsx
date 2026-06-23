@@ -84,6 +84,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
             name={'model' as Path<T>}
             control={control}
             required
+            groupKey="provider"
           />
         </div>
 

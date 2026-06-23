@@ -234,7 +234,7 @@ export default function MoveToFolderModal({
                   disabled={!newFolderName.trim()}
                   className="h-10 shrink-0 px-4"
                 >
-                  Create
+                  Create & Move
                 </Button>
               </div>
             </div>
