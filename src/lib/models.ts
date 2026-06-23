@@ -15,25 +15,63 @@ export const AI_MODELS: AIModel[] = [
     value: 'google/gemini-3.5-flash',
     label: 'Gemini 3.5 Flash',
     provider: 'Google',
-    color: '#14B8A6', // Neon Teal
+    color: '#14B8A6',
   },
   {
-    value: 'openai/gpt-4o-mini',
-    label: 'GPT-4o Mini',
+    value: 'google/gemini-2.5-flash',
+    label: 'Google 2.5 Flash',
+    provider: 'Google',
+    color: '#14B8A6',
+  },
+
+  {
+    value: 'openai/gpt-4.1-mini',
+    label: 'GPT-4.1 Mini',
     provider: 'OpenAI',
-    color: '#10B981', // Neon Green
+    color: '#10B981',
+  },
+  {
+    value: 'openai/gpt-4o',
+    label: 'GPT-4o',
+    provider: 'OpenAI',
+    color: '#10B981',
   },
   {
     value: 'deepseek/deepseek-chat-v3',
     label: 'DeepSeek V3',
     provider: 'DeepSeek',
-    color: '#3B82F6', // Neon Blue
+    color: '#3B82F6',
+  },
+  {
+    value: 'deepseek/deepseek-r1',
+    label: 'DeepSeek R1',
+    provider: 'DeepSeek',
+    color: '#3B82F6',
   },
   {
     value: 'meta-llama/llama-3.3-70b-instruct',
     label: 'Llama 3.3 70B',
     provider: 'Meta',
-    color: '#A855F7', // Neon Violet
+    color: '#A855F7',
+  },
+  {
+    value: 'meta-llama/llama-4-maverick',
+    label: 'Llama 4 Maverick',
+    provider: 'Meta',
+    color: '#A855F7',
+  },
+
+  {
+    value: 'mistralai/mistral-small-2603',
+    label: 'Mistral Small 4',
+    provider: 'Mistral',
+    color: '#F97316',
+  },
+  {
+    value: 'anthropic/claude-3-haiku',
+    label: 'Claude 3 Haiku',
+    provider: 'Anthropic',
+    color: '#B45309',
   },
 ]
 
