@@ -30,7 +30,7 @@ export default function MultiSelect({ options, value, onChange }: Props) {
           }`}
         >
           <Checkbox checked={value.includes(option.id)} className="pointer-events-none shrink-0" />
-          <MarkdownText text={option.text} className="flex-1" as="span" />
+          <MarkdownText text={option.text} className="flex-1 min-w-0" as="span" />
         </button>
       ))}
     </div>
