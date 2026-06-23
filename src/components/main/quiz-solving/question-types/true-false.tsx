@@ -13,10 +13,18 @@ export default function TrueFalse({ options, value, onChange }: Props) {
       {options.map((option) => {
         const selected = value === option.id
         return (
-          <button
+          <div
             key={option.id}
+            role="button"
+            tabIndex={0}
             onClick={() => onChange(option.id)}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg border py-3 text-sm font-medium transition-colors ${
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onChange(option.id)
+              }
+            }}
+            className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-3 text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               selected
                 ? 'border-primary bg-primary/10 text-primary'
                 : 'border-border hover:border-primary/50 hover:bg-muted/50'
@@ -29,8 +37,8 @@ export default function TrueFalse({ options, value, onChange }: Props) {
             >
               {selected && <div className="bg-primary h-2 w-2 rounded-full" />}
             </div>
-            <MarkdownText text={option.text} as="span" />
-          </button>
+            <MarkdownText text={option.text} as="div" />
+          </div>
         )
       })}
     </div>

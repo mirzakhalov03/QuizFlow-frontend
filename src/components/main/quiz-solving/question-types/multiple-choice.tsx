@@ -13,10 +13,18 @@ export default function MultipleChoice({ options, value, onChange }: Props) {
       {options.map((option) => {
         const selected = value === option.id
         return (
-          <button
+          <div
             key={option.id}
+            role="button"
+            tabIndex={0}
             onClick={() => onChange(option.id)}
-            className={`flex items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onChange(option.id)
+              }
+            }}
+            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               selected
                 ? 'border-primary bg-primary/10 font-medium'
                 : 'border-border hover:border-primary/50 hover:bg-muted/50'
@@ -29,8 +37,8 @@ export default function MultipleChoice({ options, value, onChange }: Props) {
             >
               {selected && <div className="bg-primary h-2 w-2 rounded-full" />}
             </div>
-            <MarkdownText text={option.text} className="flex-1 min-w-0" as="span" />
-          </button>
+            <MarkdownText text={option.text} className="flex-1 min-w-0" as="div" />
+          </div>
         )
       })}
     </div>

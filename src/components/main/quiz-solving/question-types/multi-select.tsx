@@ -19,20 +19,31 @@ export default function MultiSelect({ options, value, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-2">
-      {options.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => toggle(option.id)}
-          className={`flex items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
-            value.includes(option.id)
-              ? 'border-primary bg-primary/10 text-foreground font-medium'
-              : 'border-border hover:border-primary/50 hover:bg-muted/50'
-          }`}
-        >
-          <Checkbox checked={value.includes(option.id)} className="pointer-events-none shrink-0" />
-          <MarkdownText text={option.text} className="flex-1 min-w-0" as="span" />
-        </button>
-      ))}
+      {options.map((option) => {
+        const isChecked = value.includes(option.id)
+        return (
+          <div
+            key={option.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => toggle(option.id)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                toggle(option.id)
+              }
+            }}
+            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              isChecked
+                ? 'border-primary bg-primary/10 text-foreground font-medium'
+                : 'border-border hover:border-primary/50 hover:bg-muted/50'
+            }`}
+          >
+            <Checkbox checked={isChecked} className="pointer-events-none shrink-0" />
+            <MarkdownText text={option.text} className="flex-1 min-w-0" as="div" />
+          </div>
+        )
+      })}
     </div>
   )
 }
