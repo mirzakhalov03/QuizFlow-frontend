@@ -73,7 +73,9 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
           keys,
           type: values.type === 'mixed' ? undefined : values.type,
           questionCount: parseInt(values.questionCount, 10),
-          optionsPerQuestion: values.optionsPerQuestion,
+          optionsPerQuestion: ['multiple_choice', 'mixed'].includes(values.type)
+            ? values.optionsPerQuestion
+            : undefined,
           userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
