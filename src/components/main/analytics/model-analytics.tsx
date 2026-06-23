@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Cpu } from 'lucide-react'
+import { Cpu, Info } from 'lucide-react'
 import type { ModelUsageSummary } from '@/types/analytics'
 import { getModelByValue } from '@/lib/models'
 
@@ -92,7 +92,7 @@ export default function ModelAnalytics({ data, totalTokens }: Props) {
           return (
             <div
               key={item.modelName}
-              className="flex items-center gap-6 rounded-lg px-3 py-2.5 transition-all duration-200"
+              className="flex items-center gap-6 rounded-lg px-3 py-2.5 transition-all duration-200 sm:gap-6"
               style={{
                 backgroundColor: isHovered ? `${color}12` : undefined,
                 borderLeft: `3px solid ${color}`,
@@ -106,19 +106,52 @@ export default function ModelAnalytics({ data, totalTokens }: Props) {
                 {item.percentage}%
               </span>
 
-              {/* Name + provider */}
-              <div className="flex min-w-0 flex-1 items-center gap-1.5">
-                <span className="text-foreground truncate text-xs font-semibold">{label}</span>
-                <span className="bg-muted border-border/50 text-muted-foreground shrink-0 rounded border px-1 py-px text-[8px] font-semibold tracking-wider uppercase">
+              {/* Name — always visible */}
+              <span className="text-foreground min-w-0 flex-1 truncate text-xs font-semibold">
+                {label}
+              </span>
+
+              {/* Provider + tokens + quizzes — right-aligned, hidden on mobile */}
+              <div className="hidden shrink-0 items-center gap-3 sm:flex">
+                <span className="bg-muted border-border/50 text-muted-foreground rounded border px-1 py-px text-[8px] font-semibold tracking-wider uppercase">
                   {provider}
+                </span>
+                <span className="text-muted-foreground text-[11px] tabular-nums">
+                  {formatTokens(item.tokensUsed)} · {item.quizCount}{' '}
+                  {item.quizCount === 1 ? 'quiz' : 'quizzes'}
                 </span>
               </div>
 
-              {/* Tokens + quizzes */}
-              <span className="text-muted-foreground shrink-0 text-[11px] tabular-nums">
-                {formatTokens(item.tokensUsed)} · {item.quizCount}{' '}
-                {item.quizCount === 1 ? 'quiz' : 'quizzes'}
-              </span>
+              {/* Info icon with tooltip — visible only on mobile */}
+              <div className="group/tip relative flex shrink-0 sm:hidden">
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+                  aria-label={`Details for ${label}`}
+                >
+                  <Info className="h-3.5 w-3.5" />
+                </button>
+                <div className="border-border bg-popover text-popover-foreground pointer-events-none absolute right-0 bottom-full z-30 mb-1.5 w-40 origin-bottom-right scale-95 rounded-lg border p-2.5 opacity-0 shadow-md transition-all duration-200 group-focus-within/tip:pointer-events-auto group-focus-within/tip:scale-100 group-focus-within/tip:opacity-100 group-hover/tip:pointer-events-auto group-hover/tip:scale-100 group-hover/tip:opacity-100">
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">Provider:</span>
+                      <span className="text-foreground font-medium">{provider}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">Tokens:</span>
+                      <span className="text-foreground font-medium tabular-nums">
+                        {formatTokens(item.tokensUsed)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">Quizzes:</span>
+                      <span className="text-foreground font-medium tabular-nums">
+                        {item.quizCount}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )
         })}
