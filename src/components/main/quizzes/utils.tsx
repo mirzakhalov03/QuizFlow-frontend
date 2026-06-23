@@ -1,6 +1,6 @@
 import type { QuestionType } from '@/types/quiz'
 import { DEFAULT_MODEL } from '@/lib/models'
-export { AI_MODELS as aiModels, DEFAULT_MODEL } from '@/lib/models'
+export { SORTED_AI_MODELS as aiModels, DEFAULT_MODEL } from '@/lib/models'
 
 /**
  * The quiz-settings fields shared by both the file-upload and Notion quiz forms.

@@ -70,7 +70,9 @@ export default function ScoreOverTimeChart({ points }: Props) {
   const plotW = innerW - PLOT_MARGIN_X * 2
 
   const xFor = (i: number) =>
-    PADDING.left + PLOT_MARGIN_X + (points.length === 1 ? plotW / 2 : (i * plotW) / (points.length - 1))
+    PADDING.left +
+    PLOT_MARGIN_X +
+    (points.length === 1 ? plotW / 2 : (i * plotW) / (points.length - 1))
   const yFor = (score: number) => PADDING.top + innerH - (score / 100) * innerH
 
   const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xFor(i)} ${yFor(p.score)}`).join(' ')

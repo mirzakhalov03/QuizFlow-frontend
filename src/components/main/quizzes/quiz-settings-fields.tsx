@@ -37,12 +37,6 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
   const { byokKeys, folderOptions, byokOptions } = useQuizFormOptions(form)
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' as Path<T> }) ?? false
 
-  const sortedAiModels = [...aiModels].sort((a, b) => {
-    const providerCompare = a.provider.localeCompare(b.provider)
-    if (providerCompare !== 0) return providerCompare
-    return a.label.localeCompare(b.label)
-  })
-
   return (
     <>
       <div className="bg-muted/40 space-y-3 rounded-xl p-3">
@@ -86,7 +80,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
           />
           <FormSelect
             label="AI Model"
-            options={sortedAiModels}
+            options={aiModels}
             name={'model' as Path<T>}
             control={control}
             required

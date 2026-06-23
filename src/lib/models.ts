@@ -87,18 +87,28 @@ const UNKNOWN_MODEL: AIModel = {
 export const DEFAULT_MODEL = AI_MODELS[0].value
 
 /**
- * Look up an AI model by its API value string.
- * Returns a fallback descriptor (with the raw value as the label) if the model
- * is not found in the registry, so the UI always has something useful to show.
- */
-export function getModelByValue(value: string): AIModel {
-  return AI_MODELS.find((m) => m.value === value) ?? { ...UNKNOWN_MODEL, value, label: value }
-}
-
-/**
  * A lookup map keyed by model value, derived from AI_MODELS.
  * Useful for O(1) access when iterating over many items.
  */
 export const MODEL_MAP: Readonly<Record<string, AIModel>> = Object.fromEntries(
   AI_MODELS.map((m) => [m.value, m])
 )
+
+/**
+ * Look up an AI model by its API value string.
+ * Returns a fallback descriptor (with the raw value as the label) if the model
+ * is not found in the registry, so the UI always has something useful to show.
+ */
+export function getModelByValue(value: string): AIModel {
+  return MODEL_MAP[value] ?? { ...UNKNOWN_MODEL, value, label: value }
+}
+
+/**
+ * Pre-sorted list of AI models by provider and then by label.
+ * Sorted once at the module level to avoid redundant sorting on every render.
+ */
+export const SORTED_AI_MODELS: AIModel[] = [...AI_MODELS].sort((a, b) => {
+  const providerCompare = a.provider.localeCompare(b.provider)
+  if (providerCompare !== 0) return providerCompare
+  return a.label.localeCompare(b.label)
+})

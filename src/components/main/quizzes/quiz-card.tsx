@@ -192,7 +192,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
 
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[quiz.type ?? 'mixed']}`}
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[quiz.type]}`}
           >
             {TYPE_LABELS[quiz.type]}
           </span>
