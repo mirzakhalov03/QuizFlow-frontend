@@ -1,4 +1,6 @@
 import type { QuestionType } from '@/types/quiz'
+import { DEFAULT_MODEL } from '@/lib/models'
+export { AI_MODELS as aiModels, DEFAULT_MODEL } from '@/lib/models'
 
 /**
  * The quiz-settings fields shared by both the file-upload and Notion quiz forms.
@@ -37,15 +39,6 @@ export const questionCounts = [
   { label: '25 Questions', value: '25' },
   { label: '30 Questions', value: '30' },
 ]
-
-export const aiModels = [
-  { label: 'Gemini 3.5 Flash', value: 'google/gemini-3.5-flash' },
-  { label: 'GPT-4o Mini', value: 'openai/gpt-4o-mini' },
-  { label: 'DeepSeek V3', value: 'deepseek/deepseek-chat-v3' },
-  { label: 'Llama 3.3 70B', value: 'meta-llama/llama-3.3-70b-instruct' },
-]
-
-export const DEFAULT_MODEL = aiModels[0].value
 
 /**
  * The model selector mixes built-in models with the user's BYOK keys. BYOK

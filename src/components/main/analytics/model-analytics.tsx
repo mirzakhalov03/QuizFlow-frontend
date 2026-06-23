@@ -1,42 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Cpu } from 'lucide-react'
 import type { ModelUsageSummary } from '@/types/analytics'
+import { getModelByValue } from '@/lib/models'
 
 type Props = {
   data: ModelUsageSummary[]
-}
-
-const MODEL_MAPPING: Record<string, { label: string; color: string; provider: string }> = {
-  'google/gemini-3.5-flash': {
-    label: 'Gemini 3.5 Flash',
-    color: '#14B8A6', // Neon Teal
-    provider: 'Google',
-  },
-  'openai/gpt-4o-mini': {
-    label: 'GPT-4o Mini',
-    color: '#10B981', // Neon Green
-    provider: 'OpenAI',
-  },
-  'deepseek/deepseek-chat-v3': {
-    label: 'DeepSeek V3',
-    color: '#3B82F6', // Neon Blue
-    provider: 'DeepSeek',
-  },
-  'meta-llama/llama-3.3-70b-instruct': {
-    label: 'Llama 3.3 70B',
-    color: '#A855F7', // Neon Violet
-    provider: 'Meta',
-  },
-}
-
-function getModelDetails(modelName: string) {
-  return (
-    MODEL_MAPPING[modelName] ?? {
-      label: modelName,
-      color: '#64748B', // Slate
-      provider: 'AI Provider',
-    }
-  )
 }
 
 function formatTokens(n: number): string {
@@ -68,7 +36,7 @@ export default function ModelAnalytics({ data }: Props) {
 
       <div className="flex flex-1 flex-col justify-center gap-4">
         {activeData.map((item) => {
-          const { label, color, provider } = getModelDetails(item.modelName)
+          const { label, color, provider } = getModelByValue(item.modelName)
           const isHovered = hoveredModel === item.modelName
 
           return (
