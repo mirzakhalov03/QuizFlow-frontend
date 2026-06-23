@@ -9,7 +9,7 @@ type Props = {
 
 export default function FolderSelector({ folders, selectedIndex, onSelect }: Props) {
   const options = folders.map((f, i) => ({
-    label: `${f.folderName} (${f.attemptCount})`,
+    label: `${f.folderName} (${f.attemptCount} quizzes)`,
     value: String(i),
   }))
 

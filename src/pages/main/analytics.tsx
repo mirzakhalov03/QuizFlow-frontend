@@ -107,7 +107,10 @@ export default function Analytics() {
           data={summary.keyUsageBreakdown ?? []}
           totalTokens={summary.totalTokensUsed ?? 0}
         />
-        <ModelAnalytics data={summary.modelUsageBreakdown ?? []} />
+        <ModelAnalytics
+          data={summary.modelUsageBreakdown ?? []}
+          totalTokens={summary.totalTokensUsed ?? 0}
+        />
       </div>
     </div>
   )

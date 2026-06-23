@@ -66,10 +66,11 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
   }
 
   return (
-    <div className="border-border bg-background rounded-lg border p-4 sm:p-6">
+    <div className="border-border bg-background flex flex-col rounded-lg border p-4 sm:p-6">
       <h3 className="mb-4 text-sm font-semibold sm:mb-6">Token usage by API key</h3>
 
-      <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8">
+      <div className="flex flex-1 items-center">
+      <div className="grid w-full grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8">
         {/* Donut chart */}
         <div className="relative mx-auto flex aspect-square w-full max-w-60 items-center justify-center">
           <svg
@@ -175,6 +176,7 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
             )
           })}
         </div>
+      </div>
       </div>
     </div>
   )
