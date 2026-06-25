@@ -80,6 +80,14 @@ export default function Analytics() {
     ? scoreOverTime
     : scoreOverTime.filter((p) => allowedQuizIds.has(p.quizId))
 
+  // The pie scopes to the selected folder; "All" uses the overall rollup.
+  // A folder with no owned questions falls back to an empty breakdown, which
+  // renders the chart's "create a quiz" empty state.
+  const typeBreakdownByFolder = summary.typeBreakdownByFolder ?? []
+  const visibleTypeBreakdown = isAll
+    ? (summary.typeBreakdown ?? [])
+    : (typeBreakdownByFolder.find((f) => f.folderId === selectedStat.folderId)?.typeBreakdown ?? [])
+
   return (
     <div className="space-y-6">
       <AiFeedbackCard />
@@ -100,7 +108,7 @@ export default function Analytics() {
 
       <AnalyticsStats stat={selectedStat} />
       <ScoreOverTimeChart points={visibleScorePoints} />
-      <TypePieChart rows={summary.typeBreakdown ?? []} />
+      <TypePieChart rows={visibleTypeBreakdown} />
       <QuizStatsList rows={visibleQuizStats} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ApiKeyAnalytics

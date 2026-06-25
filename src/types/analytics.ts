@@ -12,6 +12,11 @@ export type TypeBreakdown = {
   questionCount: number
 }
 
+export type FolderTypeBreakdown = {
+  folderId: string | null
+  typeBreakdown: TypeBreakdown[]
+}
+
 export type FolderStat = {
   folderId: string | null
   folderName: string
@@ -80,6 +85,7 @@ export type AnalyticsSummary = {
   modelUsageBreakdown: ModelUsageSummary[]
   scoreOverTime: ScorePoint[]
   typeBreakdown: TypeBreakdown[]
+  typeBreakdownByFolder: FolderTypeBreakdown[]
   folderStats: FolderStat[]
   quizStats: QuizStat[]
   history: QuizHistoryItem[]
