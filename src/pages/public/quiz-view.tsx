@@ -215,6 +215,13 @@ export default function PublicQuizView() {
         ? 'text-primary'
         : 'text-destructive'
 
+  const feedbackText =
+    band === 'high'
+      ? `${pct}% — Outstanding work, ${name}! 🎉`
+      : band === 'mid'
+        ? `${pct}% — Good effort, ${name}! Keep it up.`
+        : `${pct}% — Don't give up, ${name}! Review and try again.`
+
   const handleClone = () => {
     if (!shareToken || isCloning) return
     setIsCloning(true)
@@ -236,7 +243,7 @@ export default function PublicQuizView() {
           {result?.correctAnswers}/{result?.totalQuestions}
         </p>
         <p className="text-muted-foreground text-sm">
-          {pct}% — nice work, {name}!
+          {feedbackText}
         </p>
         <p className="text-muted-foreground text-xs">
           Created by {quiz.owner.fullName} via QuizFlow
