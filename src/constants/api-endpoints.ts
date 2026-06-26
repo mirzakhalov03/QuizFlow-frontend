@@ -13,6 +13,8 @@ export const PRESIGNED_URL = '/upload/presigned-url'
 export const PUBLIC_QUIZ_BY_TOKEN = (token: string) => `/public/quizzes/${token}`
 export const PUBLIC_QUIZ_SUBMIT = (token: string) => `/public/quizzes/${token}/submit`
 
+export const CONTACT = '/contact'
+
 export const INTEGRATIONS = '/integrations'
 export const INTEGRATION_BY_PROVIDER = (provider: string) => `/integrations/${provider}`
 

@@ -6,7 +6,9 @@ export default function PublicLayout() {
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1">
+      {/* Content fills at least the viewport so the footer always sits below the
+          fold — it's only revealed once the user scrolls. */}
+      <main className="min-h-screen flex-1">
         <Outlet />
       </main>
       <Footer />

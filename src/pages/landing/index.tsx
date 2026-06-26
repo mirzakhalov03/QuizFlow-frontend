@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { CirclePlay } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PATHS } from '@/lib/path'
 import FeaturesSection from '@/components/landing/FeaturesSection'
@@ -54,16 +53,6 @@ export default function Landing() {
               <Link to={PATHS.auth.register} className="sm:w-auto">
                 <Button size="lg" className="w-full px-7 sm:w-auto">
                   Get Started for Free
-                </Button>
-              </Link>
-              <Link to={PATHS.features} className="sm:w-auto">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                  leftIcon={<CirclePlay size={18} />}
-                >
-                  See how it works
                 </Button>
               </Link>
             </div>
