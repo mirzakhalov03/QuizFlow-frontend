@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import { ArrowRight, Check, Clock, Hash, Pencil, Sparkles, X } from 'lucide-react'
+import { ArrowRight, Check, Clock, Hash, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { usePatch } from '@/hooks/usePatch'
 import { QUIZ_BY_ID, QUIZ_LIST } from '@/constants/api-endpoints'
 import { toast } from '@/lib/toast'
 import { TYPE_LABELS } from '@/components/main/quizzes/utils'
+import { PublishModal } from '@/components/main/marketplace/publish-modal'
 import type { QuestionType, QuizWithQuestions } from '@/types/quiz'
 import { pickIntroQuote } from './intro-quotes'
 import MarkdownText from './markdown-text'
@@ -43,6 +44,7 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
 
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(quiz.title)
+  const [publishOpen, setPublishOpen] = useState(false)
 
   // Stable per mount so it doesn't reshuffle on every keystroke while renaming.
   const quote = useMemo(() => pickIntroQuote(), [])
@@ -224,16 +226,28 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
             <Sparkles className="h-3.5 w-3.5 shrink-0" />
             {quote}
           </p>
-          <Button
-            onClick={beginCountdown}
-            disabled={isCountingDown || quiz.questions.length === 0}
-            className="min-w-32 self-start"
-            rightIcon={isCountingDown ? undefined : <ArrowRight className="h-4 w-4" />}
-          >
-            {isCountingDown ? countdown : "Let's go..."}
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              onClick={beginCountdown}
+              disabled={isCountingDown || quiz.questions.length === 0}
+              className="min-w-32"
+              rightIcon={isCountingDown ? undefined : <ArrowRight className="h-4 w-4" />}
+            >
+              {isCountingDown ? countdown : "Let's go..."}
+            </Button>
+            <button
+              type="button"
+              onClick={() => setPublishOpen(true)}
+              className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition"
+            >
+              <Share2 className="h-4 w-4" />
+              Publish
+            </button>
+          </div>
         </div>
       </div>
+
+      <PublishModal quizId={quiz.id} open={publishOpen} onClose={() => setPublishOpen(false)} />
     </div>
   )
 }

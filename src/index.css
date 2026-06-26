@@ -187,13 +187,63 @@
   .hourglass-flip {
     animation: hourglass-flip 2.2s ease-in-out infinite;
   }
+
+  /* Hero preview: each auto-cycling scene fades + lifts in when it becomes
+     active; children stagger via inline animation-delay. */
+  @keyframes scene-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .scene-in {
+    animation: scene-in 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  @keyframes scene-item-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .scene-item {
+    opacity: 0;
+    animation: scene-item-in 460ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+
+  /* Slow vertical scan sweep over the document "processing" scene. */
+  @keyframes scan-sweep {
+    0% {
+      transform: translateY(-120%);
+    }
+    100% {
+      transform: translateY(900%);
+    }
+  }
+
+  .scan-sweep {
+    animation: scan-sweep 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .enter-fade-up,
   .enter-fade-right,
   .hero-breathe,
-  .hourglass-flip {
+  .hourglass-flip,
+  .scene-in,
+  .scene-item,
+  .scan-sweep {
     opacity: 1;
     transform: none;
     animation: none;

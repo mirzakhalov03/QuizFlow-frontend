@@ -156,7 +156,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
               }
 
               return (
-                <div className="border-border bg-background max-h-36 overflow-y-auto rounded-lg border p-1 space-y-1">
+                <div className="border-border bg-background max-h-36 space-y-1 overflow-y-auto rounded-lg border p-1">
                   {quizzes.map((quiz) => {
                     const isChecked = selectedIds.has(quiz.id)
                     return (

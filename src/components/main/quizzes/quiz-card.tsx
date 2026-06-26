@@ -1,6 +1,17 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ArrowRight, Clock, FileDown, Menu, Share2, Trash2, FolderInput, Info } from 'lucide-react'
+import { useState } from 'react'
+import {
+  ArrowRight,
+  Clock,
+  FileDown,
+  Menu,
+  Share2,
+  Store,
+  Trash2,
+  FolderInput,
+  Info,
+} from 'lucide-react'
 
 import type { Quiz } from '@/types/quiz'
 import { getModelByValue, DEFAULT_MODEL } from '@/lib/models'
@@ -8,6 +19,7 @@ import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
 import { useQuizCardActions } from '@/hooks/useQuizCardActions'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
 import { DropdownMenu, DropdownItem } from '@/components/ui/dropdown-menu'
+import { PublishModal } from '@/components/main/marketplace/publish-modal'
 import MoveToFolderModal from '../library/move-to-folder-modal'
 import ShareQuizModal from './share-quiz-modal'
 import ExportPdfModal from './export-pdf-modal'
@@ -40,6 +52,7 @@ function getModelInfo(quiz: Quiz) {
 export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const { label: keyLabel, color: keyColor } = getKeyInfo(quiz)
   const { label: modelLabel, color: modelColor } = getModelInfo(quiz)
+  const [isPublishOpen, setIsPublishOpen] = useState(false)
 
   const {
     shareToken,
@@ -183,6 +196,9 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
               <DropdownItem icon={Share2} onClick={handleShare}>
                 Share
               </DropdownItem>
+              <DropdownItem icon={Store} onClick={() => setIsPublishOpen(true)}>
+                Publish
+              </DropdownItem>
               <DropdownItem icon={Trash2} onClick={openDeleteConfirm} destructive>
                 Delete
               </DropdownItem>
@@ -249,6 +265,11 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         onClose={closeExportModal}
         onExport={exportPdf}
         isExporting={isExporting}
+      />
+      <PublishModal
+        quizId={quiz.id}
+        open={isPublishOpen}
+        onClose={() => setIsPublishOpen(false)}
       />
     </>
   )

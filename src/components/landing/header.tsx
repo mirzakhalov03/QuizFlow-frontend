@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/use-authstore'
 const links = [
   { label: 'Home', to: PATHS.landing },
   { label: 'Features', to: PATHS.features },
+  { label: 'Explore', to: PATHS.marketplace },
   { label: 'Contact', to: PATHS.contact },
   { label: 'Pricing', to: PATHS.pricing },
 ]

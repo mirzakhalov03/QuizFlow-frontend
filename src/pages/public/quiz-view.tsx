@@ -243,7 +243,7 @@ export default function PublicQuizView() {
         <p className={`font-heading text-5xl font-bold tabular-nums ${bandText}`}>
           {result?.correctAnswers}/{result?.totalQuestions}
         </p>
-        <p className="text-muted-foreground text-sm">{feedbackText}</p>
+        <p className="text-muted-foreground text-sm">{feedbackText()}</p>
         <p className="text-muted-foreground text-xs">
           Created by {quiz.owner.fullName} via QuizFlow
         </p>

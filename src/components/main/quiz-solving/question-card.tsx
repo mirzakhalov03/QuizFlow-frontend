@@ -24,7 +24,7 @@ export default function QuestionCard({ question, index, value, onChange }: Props
         </span>
         <MarkdownText
           text={question.text}
-          className="flex-1 min-w-0 pt-0.5 text-sm leading-relaxed font-bold"
+          className="min-w-0 flex-1 pt-0.5 text-sm leading-relaxed font-bold"
         />
       </div>
 

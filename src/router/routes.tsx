@@ -31,6 +31,9 @@ const QuizResultView = lazyPage(() => import('@/pages/main/quiz-solving/result-v
 
 const PublicQuizView = lazyPage(() => import('@/pages/public/quiz-view'))
 
+const Marketplace = lazyPage(() => import('@/pages/main/marketplace'))
+const MarketplaceListing = lazyPage(() => import('@/pages/main/marketplace-listing'))
+
 const IntegrationSuccess = lazyPage(() => import('@/pages/integrations/success'))
 const IntegrationFailure = lazyPage(() => import('@/pages/integrations/failure'))
 
@@ -48,6 +51,8 @@ export const routes: RouteObject[] = [
           { path: PATHS.contact, lazy: Contact },
           { path: PATHS.pricing, lazy: Pricing },
           { path: 'public/quizzes/:shareToken', lazy: PublicQuizView },
+          { path: 'marketplace', lazy: Marketplace },
+          { path: 'marketplace/:quizId', lazy: MarketplaceListing },
         ],
       },
 
@@ -75,6 +80,8 @@ export const routes: RouteObject[] = [
           { path: 'quizzes', lazy: Quizzes },
           { path: 'library', lazy: Library },
           { path: 'library/:folderId', lazy: LibraryFolder },
+          { path: 'marketplace', lazy: Marketplace },
+          { path: 'marketplace/:quizId', lazy: MarketplaceListing },
           {
             path: 'quizzes/:id',
             lazy: QuizSolvingLayout,

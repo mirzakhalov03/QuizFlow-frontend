@@ -6,11 +6,12 @@ import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
 const MAX_CHARS = 1000
 
 const ERROR_MESSAGES: Record<string, string> = {
-  'not-allowed': 'Microphone access denied. Please allow microphone access in your browser settings.',
+  'not-allowed':
+    'Microphone access denied. Please allow microphone access in your browser settings.',
   'audio-capture': 'No microphone found. Please connect a microphone and try again.',
-  'network': 'Speech recognition requires an internet connection.',
+  network: 'Speech recognition requires an internet connection.',
   'no-speech': 'No speech detected. Try speaking closer to your mic.',
-  'unknown': 'Speech recognition failed. Please try again.',
+  unknown: 'Speech recognition failed. Please try again.',
 }
 
 type Props = {
@@ -48,9 +49,7 @@ export default function OpenEnded({ value, onChange }: Props) {
             aria-label={isRecording ? 'Stop voice input' : 'Start voice input'}
             title={isRecording ? 'Stop recording' : 'Speak your answer'}
             className={`absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-              isRecording
-                ? 'bg-red-500/10 hover:bg-red-500/20'
-                : 'hover:bg-muted'
+              isRecording ? 'bg-red-500/10 hover:bg-red-500/20' : 'hover:bg-muted'
             }`}
           >
             {isRecording ? (

@@ -110,7 +110,7 @@ export default function Analytics() {
       <ScoreOverTimeChart points={visibleScorePoints} />
       <TypePieChart rows={visibleTypeBreakdown} />
       <QuizStatsList rows={visibleQuizStats} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ApiKeyAnalytics
           data={summary.keyUsageBreakdown ?? []}
           totalTokens={summary.totalTokensUsed ?? 0}

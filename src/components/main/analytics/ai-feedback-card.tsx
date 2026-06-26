@@ -67,7 +67,7 @@ export default function AiFeedbackCard() {
                 {weakTopics.map((topic) => (
                   <span
                     key={topic}
-                    className="bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-full px-3 py-1 text-xs font-medium"
+                    className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
                   >
                     {topic}
                   </span>
@@ -85,7 +85,7 @@ export default function AiFeedbackCard() {
               <ul className="space-y-2.5">
                 {recommendations.map((rec) => (
                   <li key={rec} className="flex gap-2.5 text-sm leading-relaxed">
-                    <ArrowRight size={16} className="text-emerald-500 mt-0.5 shrink-0" />
+                    <ArrowRight size={16} className="mt-0.5 shrink-0 text-emerald-500" />
                     <span className="text-foreground/90">{rec}</span>
                   </li>
                 ))}

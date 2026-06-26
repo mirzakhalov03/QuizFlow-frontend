@@ -22,3 +22,7 @@ export const BYOK_BY_ID = (id: string) => `/byok/${id}`
 export const ANALYTICS_SUMMARY = '/analytics/summary'
 export const QUIZ_HISTORY = '/quiz-results/history'
 export const FOLDERS = '/folders'
+
+export const MARKETPLACE = '/marketplace'
+export const MARKETPLACE_LISTING = (quizId: string) => `/marketplace/${quizId}`
+export const MARKETPLACE_RATINGS = (quizId: string) => `/marketplace/${quizId}/ratings`

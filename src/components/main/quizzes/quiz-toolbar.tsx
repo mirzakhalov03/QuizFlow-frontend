@@ -117,7 +117,7 @@ function FilterDropdown({
       </Button>
 
       {open && (
-        <div className="bg-popover text-popover-foreground border-border absolute left-0 z-50 mt-1 min-w-44 rounded-md border shadow-lg sm:left-auto sm:right-0">
+        <div className="bg-popover text-popover-foreground border-border absolute left-0 z-50 mt-1 min-w-44 rounded-md border shadow-lg sm:right-0 sm:left-auto">
           <div className="border-border text-muted-foreground border-b px-3 py-2 text-xs font-medium">
             Quiz Type
           </div>
