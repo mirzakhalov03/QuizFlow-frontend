@@ -40,6 +40,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
       model: DEFAULT_MODEL,
       folderId: folderId || 'none',
       apiKeyId: '',
+      optionsPerQuestion: 4,
     },
   })
 
@@ -113,7 +114,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
           maxSize={25}
           maxLength={5}
           hideError={false}
-          dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
+          dropAccept={isObsidian ? ['MD'] : ['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']} 
         />
         <p className="text-muted-foreground text-xs">
           {isObsidian
