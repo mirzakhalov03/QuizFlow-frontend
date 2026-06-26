@@ -1,4 +1,4 @@
-import { useWatch, type Path, type UseFormReturn } from 'react-hook-form'
+import { useWatch, Controller, type Path, type UseFormReturn } from 'react-hook-form'
 import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
 
 import { FormSelect } from '@/components/form/form-select'
@@ -69,6 +69,8 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
             required
           />
         </div>
+
+        <OptionsPerQuestionField form={form} /> 
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormSelect
@@ -143,5 +145,54 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
         </Button>
       </div>
     </>
+  )
+}
+
+
+const OPTIONS_RANGE = [2, 3, 4, 5, 6] as const
+const OPTION_BASED_TYPES: QuizSettingsValues['type'][] = ['multiple_choice', 'multi_select']
+
+function OptionsPerQuestionField<T extends QuizSettingsValues>({ form }: { form: UseFormReturn<T> }) {
+  const selectedType = useWatch({ control: form.control, name: 'type' as Path<T> }) as string
+
+  if (!OPTION_BASED_TYPES.includes(selectedType as QuizSettingsValues['type'])) return null
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="text-sm font-medium text-foreground">
+        Options per question
+        <span className="ml-1 text-xs font-normal text-muted-foreground">
+          (Multiple choice &amp; Multi-select)
+        </span>
+      </label>
+      <Controller
+        name={'optionsPerQuestion' as Path<T>}
+        control={form.control}
+        defaultValue={4 as never}
+        render={({ field }) => (
+          <div className="flex gap-2" role="group" aria-label="Number of options per question">
+            {OPTIONS_RANGE.map((n) => (
+              <button
+                key={n}
+                type="button"
+                aria-pressed={field.value === n}
+                onClick={() => field.onChange(n)}
+                className={[
+                  'h-9 w-9 rounded-md border text-sm font-medium transition-colors',
+                  field.value === n
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-input bg-background text-foreground hover:bg-accent',
+                ].join(' ')}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        )}
+      />
+      <p className="text-xs text-muted-foreground">
+        Each eligible question will have exactly this many answer choices.
+      </p>
+    </div>
   )
 }
