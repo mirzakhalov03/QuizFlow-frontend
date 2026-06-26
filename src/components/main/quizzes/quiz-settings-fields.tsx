@@ -16,7 +16,7 @@ import {
 } from '@/components/main/quizzes/utils'
 import { useGet } from '@/hooks/useGet'
 import { QUIZ_LIST } from '@/constants/api-endpoints'
-import type { PaginatedResponse } from '@/types/api'
+import type { ApiResponse, PaginatedResponse } from '@/types/api'
 import type { Quiz } from '@/types/quiz'
 import { Checkbox } from '@/components/ui/checkbox'
 
