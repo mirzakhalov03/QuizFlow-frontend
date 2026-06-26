@@ -38,6 +38,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
       model: DEFAULT_MODEL,
       folderId: folderId || 'none',
       apiKeyId: '',
+      avoidQuizIds: [],
     },
   })
 
@@ -76,6 +77,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
           model: values.model,
           apiKeyId: values.apiKeyId || undefined,
           folderId: values.folderId !== 'none' ? values.folderId : undefined,
+          avoidQuizIds: values.avoidQuizIds && values.avoidQuizIds.length > 0 ? values.avoidQuizIds : undefined,
         })
 
         setJobReady(tempId, result.jobId)
