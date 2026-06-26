@@ -42,7 +42,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
   const { byokKeys, folderOptions, byokOptions } = useQuizFormOptions(form)
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' as Path<T> }) ?? false
 
-  const { data: quizzesData } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
+  const { data: quizzesData } = useGet<ApiResponse<PaginatedResponse<Quiz>>>(QUIZ_LIST, {
     params: { limit: 500 },
   })
   const quizzes = quizzesData?.data?.items || []
