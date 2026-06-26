@@ -1,5 +1,5 @@
-import { useWatch, type Path, type UseFormReturn } from 'react-hook-form'
-import { Settings2, Sparkles, ChevronLeft } from 'lucide-react'
+import { Controller, useWatch, type Path, type UseFormReturn } from 'react-hook-form'
+import { Settings2, Sparkles, ChevronLeft, FileQuestion } from 'lucide-react'
 
 import { FormSelect } from '@/components/form/form-select'
 import { FormCheckbox } from '@/components/form/form-checkbox'
@@ -14,6 +14,11 @@ import {
   questionTypes,
   type QuizSettingsValues,
 } from '@/components/main/quizzes/utils'
+import { useGet } from '@/hooks/useGet'
+import { QUIZ_LIST } from '@/constants/api-endpoints'
+import type { PaginatedResponse } from '@/types/api'
+import type { Quiz } from '@/types/quiz'
+import { Checkbox } from '@/components/ui/checkbox'
 
 type QuizSettingsFieldsProps<T extends QuizSettingsValues> = {
   form: UseFormReturn<T>
@@ -36,6 +41,11 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
   const { control } = form
   const { byokKeys, folderOptions, byokOptions } = useQuizFormOptions(form)
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' as Path<T> }) ?? false
+
+  const { data: quizzesData } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
+    params: { limit: 500 },
+  })
+  const quizzes = quizzesData?.data?.items || []
 
   return (
     <>
@@ -120,6 +130,55 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
           />
         )}
       </div>
+
+      {quizzes.length > 0 && (
+        <div className="bg-muted/40 space-y-3 rounded-xl p-3">
+          <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
+            <FileQuestion className="h-3.5 w-3.5" />
+            Avoid Repeating Questions
+          </p>
+          <p className="text-muted-foreground text-xs">
+            Select quizzes whose questions you want to avoid repeating in the new quiz.
+          </p>
+          <Controller
+            name={'avoidQuizIds' as Path<T>}
+            control={control}
+            render={({ field }) => {
+              const selectedIds = new Set(field.value || [])
+              const handleToggle = (id: string) => {
+                const newSelected = new Set(selectedIds)
+                if (newSelected.has(id)) {
+                  newSelected.delete(id)
+                } else {
+                  newSelected.add(id)
+                }
+                field.onChange(Array.from(newSelected))
+              }
+
+              return (
+                <div className="border-border bg-background max-h-36 overflow-y-auto rounded-lg border p-1 space-y-1">
+                  {quizzes.map((quiz) => {
+                    const isChecked = selectedIds.has(quiz.id)
+                    return (
+                      <label
+                        key={quiz.id}
+                        className="hover:bg-muted/50 flex cursor-pointer items-center gap-2.5 rounded px-2 py-1.5 text-sm transition-colors"
+                      >
+                        <Checkbox
+                          checked={isChecked}
+                          onCheckedChange={() => handleToggle(quiz.id)}
+                          id={`avoid-${quiz.id}`}
+                        />
+                        <span className="truncate font-medium">{quiz.title}</span>
+                      </label>
+                    )
+                  })}
+                </div>
+              )
+            }}
+          />
+        </div>
+      )}
 
       <FormTextarea
         label="Custom Instructions"
