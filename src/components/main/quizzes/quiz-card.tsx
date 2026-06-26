@@ -266,11 +266,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         onExport={exportPdf}
         isExporting={isExporting}
       />
-      <PublishModal
-        quizId={quiz.id}
-        open={isPublishOpen}
-        onClose={() => setIsPublishOpen(false)}
-      />
+      <PublishModal quizId={quiz.id} open={isPublishOpen} onClose={() => setIsPublishOpen(false)} />
     </>
   )
 }

@@ -18,8 +18,7 @@ const DWELL_MS = 3600
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(
     () =>
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   )
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -86,7 +85,7 @@ function ProcessScene() {
 
       <div className="border-border bg-card/60 scene-item relative mt-4 flex-1 overflow-hidden rounded-xl border p-4">
         {/* Scan sweep */}
-        <div className="via-primary/15 pointer-events-none absolute inset-x-0 top-0 h-10 bg-linear-to-b from-transparent to-transparent [animation-delay:300ms] scan-sweep" />
+        <div className="via-primary/15 scan-sweep pointer-events-none absolute inset-x-0 top-0 h-10 bg-linear-to-b from-transparent to-transparent [animation-delay:300ms]" />
         <div className="relative space-y-3">
           {[92, 78, 85, 64, 88, 71, 80].map((w, i) => (
             <div
@@ -197,14 +196,7 @@ function AnalyticsScene() {
         {/* Score ring */}
         <div className="scene-item relative h-24 w-24 shrink-0">
           <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90">
-            <circle
-              cx="40"
-              cy="40"
-              r={r}
-              fill="none"
-              strokeWidth="7"
-              className="stroke-muted"
-            />
+            <circle cx="40" cy="40" r={r} fill="none" strokeWidth="7" className="stroke-muted" />
             <circle
               cx="40"
               cy="40"
