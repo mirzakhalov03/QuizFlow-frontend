@@ -20,11 +20,9 @@ type QuizFormValues = QuizSettingsValues & {
 interface QuizFormProps {
   onBack: () => void
   folderId?: string
-  sourceOverride?: 'obsidian'
 }
 
-export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormProps) {
-  const isObsidian = sourceOverride === 'obsidian'
+export default function QuizForm({ onBack, folderId }: QuizFormProps) {
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
@@ -40,7 +38,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
       model: DEFAULT_MODEL,
       folderId: folderId || 'none',
       apiKeyId: '',
-      optionsPerQuestion: 4,
+      avoidQuizIds: [],
     },
   })
 
@@ -54,7 +52,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
     reset()
     addJob({
       jobId: tempId,
-      title: isObsidian ? 'Generating quiz from Obsidian…' : 'Generating quiz…',
+      title: 'Generating quiz…',
       type: values.type,
       folderId: targetFolderId,
     })
@@ -72,7 +70,6 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
           keys,
           type: values.type,
           questionCount: parseInt(values.questionCount, 10),
-          optionsPerQuestion: values.optionsPerQuestion,
           userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
@@ -80,6 +77,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
           model: values.model,
           apiKeyId: values.apiKeyId || undefined,
           folderId: values.folderId !== 'none' ? values.folderId : undefined,
+          avoidQuizIds: values.avoidQuizIds && values.avoidQuizIds.length > 0 ? values.avoidQuizIds : undefined,
         })
 
         setJobReady(tempId, result.jobId)
@@ -93,16 +91,6 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
-      {isObsidian && (
-        <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-lg p-3 text-sm text-purple-800 dark:text-purple-300">
-          <p className="font-medium mb-0.5">How to export from Obsidian</p>
-          <p className="text-purple-700 dark:text-purple-400 text-xs">
-            In Obsidian, drag your <code>.md</code> files directly into the upload area below.
-          </p>
-        </div>
-      )}
-
       <div className="space-y-1">
         <FileUpload
           label="Source Documents"
@@ -114,12 +102,10 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
           maxSize={25}
           maxLength={5}
           hideError={false}
-          dropAccept={isObsidian ? ['MD'] : ['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']} 
+          dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
         />
         <p className="text-muted-foreground text-xs">
-          {isObsidian
-            ? 'Markdown (.md) files only · max 25 MB · up to 5 files'  
-            : 'PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files'}
+          PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files
         </p>
       </div>
 

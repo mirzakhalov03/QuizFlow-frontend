@@ -19,6 +19,7 @@ type BaseQuizPayload = {
   timerDuration?: number
   difficulty?: string
   folderId?: string
+  avoidQuizIds?: string[]
 }
 
 export type FileQuizPayload = BaseQuizPayload & {

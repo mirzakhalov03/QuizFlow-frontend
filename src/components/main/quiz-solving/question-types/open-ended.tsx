@@ -1,9 +1,17 @@
 import { useCallback } from 'react'
-import { Mic } from 'lucide-react'
+import { Mic, MicOff } from 'lucide-react'
 
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
 
 const MAX_CHARS = 1000
+
+const ERROR_MESSAGES: Record<string, string> = {
+  'not-allowed': 'Microphone access denied. Please allow microphone access in your browser settings.',
+  'audio-capture': 'No microphone found. Please connect a microphone and try again.',
+  'network': 'Speech recognition requires an internet connection.',
+  'no-speech': 'No speech detected. Try speaking closer to your mic.',
+  'unknown': 'Speech recognition failed. Please try again.',
+}
 
 type Props = {
   value: string
@@ -14,13 +22,12 @@ export default function OpenEnded({ value, onChange }: Props) {
   const handleTranscript = useCallback(
     (transcript: string) => {
       const nextValue = `${value} ${transcript}`.trim().slice(0, MAX_CHARS)
-
       onChange(nextValue)
     },
     [value, onChange]
   )
 
-  const { isSupported, isRecording, toggle } = useSpeechRecognition(handleTranscript)
+  const { isSupported, isRecording, error, toggle } = useSpeechRecognition(handleTranscript)
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -39,20 +46,37 @@ export default function OpenEnded({ value, onChange }: Props) {
             type="button"
             onClick={toggle}
             aria-label={isRecording ? 'Stop voice input' : 'Start voice input'}
-            className="absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/10"
+            title={isRecording ? 'Stop recording' : 'Speak your answer'}
+            className={`absolute right-3 bottom-3 flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+              isRecording
+                ? 'bg-red-500/10 hover:bg-red-500/20'
+                : 'hover:bg-muted'
+            }`}
           >
-            <Mic
-              className={`h-5 w-5 ${
-                isRecording ? 'animate-pulse text-red-500' : 'text-muted-foreground'
-              }`}
-            />
+            {isRecording ? (
+              <Mic className="h-5 w-5 animate-pulse text-red-500" />
+            ) : (
+              <Mic className="text-muted-foreground h-5 w-5" />
+            )}
           </button>
         )}
       </div>
 
-      <p className="text-muted-foreground text-right text-xs">
-        {value.length}/{MAX_CHARS}
-      </p>
+      <div className="flex items-center justify-between gap-2">
+        {error ? (
+          <p className="text-destructive flex items-center gap-1 text-xs">
+            <MicOff className="h-3 w-3 shrink-0" />
+            {ERROR_MESSAGES[error] ?? ERROR_MESSAGES['unknown']}
+          </p>
+        ) : isRecording ? (
+          <p className="text-muted-foreground text-xs">Listening… speak now</p>
+        ) : (
+          <span />
+        )}
+        <p className="text-muted-foreground shrink-0 text-right text-xs">
+          {value.length}/{MAX_CHARS}
+        </p>
+      </div>
     </div>
   )
 }
