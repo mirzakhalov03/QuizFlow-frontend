@@ -17,6 +17,7 @@ export type QuizSettingsValues = {
   timerDuration?: number
   userInstructions?: string
   folderId: string
+  optionsPerQuestion: number
   avoidQuizIds?: string[]
 }
 

@@ -20,9 +20,11 @@ type QuizFormValues = QuizSettingsValues & {
 interface QuizFormProps {
   onBack: () => void
   folderId?: string
+  sourceOverride?: 'obsidian'
 }
 
-export default function QuizForm({ onBack, folderId }: QuizFormProps) {
+export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormProps) {
+  const isObsidian = sourceOverride === 'obsidian'
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
@@ -38,6 +40,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
       model: DEFAULT_MODEL,
       folderId: folderId || 'none',
       apiKeyId: '',
+      optionsPerQuestion: 4,
       avoidQuizIds: [],
     },
   })
@@ -52,7 +55,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
     reset()
     addJob({
       jobId: tempId,
-      title: 'Generating quiz…',
+      title: isObsidian ? 'Generating quiz from Obsidian…' : 'Generating quiz…',
       type: values.type,
       folderId: targetFolderId,
     })
@@ -70,6 +73,7 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
           keys,
           type: values.type,
           questionCount: parseInt(values.questionCount, 10),
+          optionsPerQuestion: values.optionsPerQuestion,
           userInstructions: values.userInstructions || undefined,
           difficulty: values.difficulty,
           isTimerEnabled: values.isTimerEnabled,
@@ -91,6 +95,16 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+      {isObsidian && (
+        <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-lg p-3 text-sm text-purple-800 dark:text-purple-300">
+          <p className="font-medium mb-0.5">How to export from Obsidian</p>
+          <p className="text-purple-700 dark:text-purple-400 text-xs">
+            In Obsidian, drag your <code>.md</code> files directly into the upload area below.
+          </p>
+        </div>
+      )}
+
       <div className="space-y-1">
         <FileUpload
           label="Source Documents"
@@ -102,10 +116,12 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
           maxSize={25}
           maxLength={5}
           hideError={false}
-          dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
+          dropAccept={isObsidian ? ['MD'] : ['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']} 
         />
         <p className="text-muted-foreground text-xs">
-          PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files
+          {isObsidian
+            ? 'Markdown (.md) files only · max 25 MB · up to 5 files'  
+            : 'PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files'}
         </p>
       </div>
 
