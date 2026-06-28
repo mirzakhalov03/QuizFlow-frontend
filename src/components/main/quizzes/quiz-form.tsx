@@ -41,6 +41,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
       folderId: folderId || 'none',
       apiKeyId: '',
       optionsPerQuestion: 4,
+      avoidQuizIds: [],
     },
   })
 
@@ -80,6 +81,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
           model: values.model,
           apiKeyId: values.apiKeyId || undefined,
           folderId: values.folderId !== 'none' ? values.folderId : undefined,
+          avoidQuizIds: values.avoidQuizIds && values.avoidQuizIds.length > 0 ? values.avoidQuizIds : undefined,
         })
 
         setJobReady(tempId, result.jobId)

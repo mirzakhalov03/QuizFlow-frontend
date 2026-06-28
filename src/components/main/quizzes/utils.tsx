@@ -18,6 +18,7 @@ export type QuizSettingsValues = {
   userInstructions?: string
   folderId: string
   optionsPerQuestion: number
+  avoidQuizIds?: string[]
 }
 
 /** Timer minutes → seconds for the create-quiz API; undefined when the timer is off. */

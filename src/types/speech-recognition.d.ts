@@ -21,6 +21,11 @@ export type SpeechRecognitionEvent = Event & {
   readonly results: SpeechRecognitionResultList
 }
 
+export type SpeechRecognitionErrorEvent = Event & {
+  readonly error: string
+  readonly message: string
+}
+
 export type SpeechRecognition = {
   continuous: boolean
   interimResults: boolean
@@ -28,10 +33,12 @@ export type SpeechRecognition = {
 
   start(): void
   stop(): void
+  abort(): void
 
   onstart: (() => void) | null
   onend: (() => void) | null
   onresult: ((event: SpeechRecognitionEvent) => void) | null
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null
 }
 
 export type SpeechRecognitionConstructor = {

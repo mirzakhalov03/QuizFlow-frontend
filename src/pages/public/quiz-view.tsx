@@ -90,7 +90,6 @@ export default function PublicQuizView() {
     if (quiz?.isOwner) navigate(PATHS.app.quiz(quiz.id), { replace: true })
   }, [quiz?.isOwner, quiz?.id, navigate])
 
- 
   useEffect(() => {
     if (shareToken) localStorage.removeItem(`public-quiz-timer-${shareToken}`)
   }, [shareToken])
@@ -100,7 +99,7 @@ export default function PublicQuizView() {
     result?.review.forEach((r) => m.set(r.questionId, r))
     return m
   }, [result])
- 
+
   if (isLoading || quiz?.isOwner) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -215,6 +214,15 @@ export default function PublicQuizView() {
         ? 'text-primary'
         : 'text-destructive'
 
+  const feedbackText = () => {
+    const trimmedName = name.trim()
+    const nameSuffix = trimmedName ? `, ${trimmedName}` : ''
+    return band === 'high'
+      ? `${pct}% — Outstanding work${nameSuffix}! 🎉`
+      : band === 'mid'
+        ? `${pct}% — Good effort${nameSuffix}! Keep it up.`
+        : `${pct}% — Don't give up${nameSuffix}! Review and try again.`
+  }
   const handleClone = () => {
     if (!shareToken || isCloning) return
     setIsCloning(true)
@@ -235,9 +243,7 @@ export default function PublicQuizView() {
         <p className={`font-heading text-5xl font-bold tabular-nums ${bandText}`}>
           {result?.correctAnswers}/{result?.totalQuestions}
         </p>
-        <p className="text-muted-foreground text-sm">
-          {pct}% — nice work, {name}!
-        </p>
+        <p className="text-muted-foreground text-sm">{feedbackText}</p>
         <p className="text-muted-foreground text-xs">
           Created by {quiz.owner.fullName} via QuizFlow
         </p>
