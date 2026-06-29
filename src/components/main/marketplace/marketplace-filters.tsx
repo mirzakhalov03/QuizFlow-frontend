@@ -1,3 +1,5 @@
+import { CustomSelect } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import {
   MARKETPLACE_CATEGORIES,
   type MarketplaceCategory,
@@ -13,6 +15,20 @@ type Props = {
   onSort: (v: MarketplaceSort) => void
 }
 
+const CATEGORY_OPTIONS = [
+  { label: 'All categories', value: '' },
+  ...MARKETPLACE_CATEGORIES.map((c) => ({
+    label: c.charAt(0).toUpperCase() + c.slice(1),
+    value: c,
+  })),
+]
+
+const SORT_OPTIONS = [
+  { label: 'Most recent', value: 'recent' },
+  { label: 'Most popular', value: 'popular' },
+  { label: 'Top rated', value: 'rating' },
+]
+
 export function MarketplaceFilters({
   search,
   onSearch,
@@ -23,33 +39,27 @@ export function MarketplaceFilters({
 }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <input
+      <Input
+        type="search"
         value={search}
         onChange={(e) => onSearch(e.target.value)}
         placeholder="Search quizzes…"
-        className="border-border bg-background h-9 min-w-48 flex-1 rounded-md border px-3 text-sm"
+        className="min-w-48 flex-1"
+        fullWidth
       />
-      <select
+      <CustomSelect
+        options={CATEGORY_OPTIONS}
         value={category}
-        onChange={(e) => onCategory(e.target.value as MarketplaceCategory | '')}
-        className="border-border bg-background h-9 rounded-md border px-2 text-sm capitalize"
-      >
-        <option value="">All categories</option>
-        {MARKETPLACE_CATEGORIES.map((c) => (
-          <option key={c} value={c} className="capitalize">
-            {c}
-          </option>
-        ))}
-      </select>
-      <select
+        onChange={(v) => onCategory(v as MarketplaceCategory | '')}
+        placeholder="All categories"
+        className="min-w-40"
+      />
+      <CustomSelect
+        options={SORT_OPTIONS}
         value={sort}
-        onChange={(e) => onSort(e.target.value as MarketplaceSort)}
-        className="border-border bg-background h-9 rounded-md border px-2 text-sm"
-      >
-        <option value="recent">Most recent</option>
-        <option value="popular">Most popular</option>
-        <option value="rating">Top rated</option>
-      </select>
+        onChange={(v) => onSort(v as MarketplaceSort)}
+        className="min-w-36"
+      />
     </div>
   )
 }
