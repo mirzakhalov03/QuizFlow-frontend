@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { api as axiosInstance } from '@/api/axios-instance'
@@ -55,6 +55,7 @@ export default function PublicQuizView() {
   const [authOpen, setAuthOpen] = useState(false)
   const [isCloning, setIsCloning] = useState(false)
   const [rateOpen, setRateOpen] = useState(false)
+  const ratePrompted = useRef(false)
   // TODO: re-enable with the "Share result" button (see below).
   // const shareCardRef = useRef<HTMLDivElement>(null)
 
@@ -119,12 +120,13 @@ export default function PublicQuizView() {
       user &&
       isListedQuiz &&
       listingIsMine === false &&
-      !rateOpen
+      !ratePrompted.current
     ) {
+      ratePrompted.current = true
       const t = setTimeout(() => setRateOpen(true), 800)
       return () => clearTimeout(t)
     }
-  }, [phase, user, isListedQuiz, listingIsMine, rateOpen])
+  }, [phase, user, isListedQuiz, listingIsMine])
 
   if (isLoading || quiz?.isOwner) {
     return (
