@@ -96,7 +96,7 @@ export default function MarketplaceListingPage() {
         )}
       </div>
 
-      {quizId && <Reviews quizId={quizId} canRate={!listing.isMine} />}
+      {quizId && <Reviews quizId={quizId} canRate={false} />}
     </div>
   )
 }
