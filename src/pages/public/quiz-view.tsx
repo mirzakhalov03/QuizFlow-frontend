@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { api as axiosInstance } from '@/api/axios-instance'
 import { useGet } from '@/hooks/useGet'
 import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
@@ -59,7 +60,6 @@ export default function PublicQuizView() {
     { name: string; answers: SubmitAnswer[] },
     ApiResponse<PublicSubmitResponse>
   >()
-  const { mutate: cloneMutation } = usePost<Record<string, never>, ApiResponse<{ id: string }>>()
 
   const handleSubmit = () => {
     if (!quiz || !shareToken || isPending) return
@@ -224,26 +224,23 @@ export default function PublicQuizView() {
         ? `${pct}% — Good effort${nameSuffix}! Keep it up.`
         : `${pct}% — Don't give up${nameSuffix}! Review and try again.`
   }
-  const handleClone = () => {
+  const handleClone = async () => {
     if (!shareToken || isCloning) return
     setIsCloning(true)
-    cloneMutation(
-      QUIZ_CLONE(shareToken),
-      {},
-      {
-        onSuccess: (res) => navigate(PATHS.app.quiz(res.data.id)),
-        onError: (err: unknown) => {
-          const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response
-            ?.data?.error?.code
-          if (code === 'ALREADY_IMPORTED') {
-            toast.error('You already have this quiz in your library')
-          } else {
-            toast.error('Could not save a copy')
-          }
-        },
-        onSettled: () => setIsCloning(false),
+    try {
+      const res = await axiosInstance.post<ApiResponse<{ id: string }>>(QUIZ_CLONE(shareToken))
+      navigate(PATHS.app.quiz(res.data.data.id))
+    } catch (err: unknown) {
+      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response
+        ?.data?.error?.code
+      if (code === 'ALREADY_IMPORTED') {
+        toast.error('You already have this quiz in your library')
+      } else {
+        toast.error('Could not save a copy')
       }
-    )
+    } finally {
+      setIsCloning(false)
+    }
   }
 
   return (
