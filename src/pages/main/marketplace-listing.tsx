@@ -85,10 +85,13 @@ export default function MarketplaceListingPage() {
         {/* You already own your own quizzes — no "save a copy" for them. */}
         {!listing.isMine && (
           <button
-            onClick={onSave}
-            className="border-border h-10 rounded-md border px-5 font-medium"
+            onClick={listing.isCloned ? undefined : onSave}
+            disabled={listing.isCloned}
+            className={`border-border h-10 rounded-md border px-5 font-medium ${
+              listing.isCloned ? 'text-muted-foreground cursor-default opacity-60' : ''
+            }`}
           >
-            Save to my library
+            {listing.isCloned ? 'Already in library' : 'Save to my library'}
           </button>
         )}
       </div>
