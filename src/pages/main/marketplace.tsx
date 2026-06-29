@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { ListingCard } from '@/components/main/marketplace/listing-card'
 import { MarketplaceFilters } from '@/components/main/marketplace/marketplace-filters'
 import Breadcrumb from '@/components/ui/breadcrumb'
+import Spinner from '@/components/ui/spinner'
 import { MARKETPLACE } from '@/constants/api-endpoints'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useGet } from '@/hooks/useGet'
@@ -68,7 +69,9 @@ export default function MarketplacePage() {
       />
 
       {isLoading ? (
-        <p className="text-muted-foreground">Loading…</p>
+        <div className="flex justify-center py-12">
+          <Spinner size="lg" />
+        </div>
       ) : items.length === 0 ? (
         <p className="text-muted-foreground">No quizzes found.</p>
       ) : mine.length > 0 ? (
