@@ -106,78 +106,80 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
           <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{quiz.title}</h3>
           <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
             {/* Info Icon & Custom Dropdown/Tooltip */}
-            <div className="group/info relative flex items-center justify-center">
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/30 flex h-7 w-7 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none"
-              >
-                <Info className="h-4 w-4" />
-              </button>
-              <div className="border-border bg-popover text-popover-foreground pointer-events-none absolute top-8 right-0 z-30 w-52 origin-top-right scale-95 rounded-lg border p-3 opacity-0 shadow-md transition-all duration-200 group-focus-within/info:pointer-events-auto group-focus-within/info:scale-100 group-focus-within/info:opacity-100 group-hover/info:pointer-events-auto group-hover/info:scale-100 group-hover/info:opacity-100">
-                <div className="space-y-2 text-xs font-normal">
-                  <div className="text-foreground border-border/50 border-b pb-1 font-semibold">
-                    Generation Details
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                      API Key
+            {!isImported && (
+              <div className="group/info relative flex items-center justify-center">
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/30 flex h-7 w-7 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  <Info className="h-4 w-4" />
+                </button>
+                <div className="border-border bg-popover text-popover-foreground pointer-events-none absolute top-8 right-0 z-30 w-52 origin-top-right scale-95 rounded-lg border p-3 opacity-0 shadow-md transition-all duration-200 group-focus-within/info:pointer-events-auto group-focus-within/info:scale-100 group-focus-within/info:opacity-100 group-hover/info:pointer-events-auto group-hover/info:scale-100 group-hover/info:opacity-100">
+                  <div className="space-y-2 text-xs font-normal">
+                    <div className="text-foreground border-border/50 border-b pb-1 font-semibold">
+                      Generation Details
                     </div>
-                    <div className="text-foreground flex items-center gap-1.5 font-medium">
-                      <span
-                        className="h-1.5 w-1.5 shrink-0 rounded-full"
-                        style={{
-                          backgroundColor: keyColor,
-                          boxShadow: `0 0 5px ${keyColor}80`,
-                        }}
-                      />
-                      <span className="truncate" title={keyLabel}>
-                        {keyLabel}
-                      </span>
+                    <div className="space-y-1">
+                      <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                        API Key
+                      </div>
+                      <div className="text-foreground flex items-center gap-1.5 font-medium">
+                        <span
+                          className="h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{
+                            backgroundColor: keyColor,
+                            boxShadow: `0 0 5px ${keyColor}80`,
+                          }}
+                        />
+                        <span className="truncate" title={keyLabel}>
+                          {keyLabel}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="border-border/30 space-y-1 border-t pt-1">
-                    <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                      AI Model
-                    </div>
-                    <div className="text-foreground flex items-center gap-1.5 font-medium">
-                      <span
-                        className="h-1.5 w-1.5 shrink-0 rounded-full"
-                        style={{
-                          backgroundColor: modelColor,
-                          boxShadow: `0 0 5px ${modelColor}80`,
-                        }}
-                      />
-                      <span className="truncate" title={modelLabel}>
-                        {modelLabel}
-                      </span>
-                    </div>
-                  </div>
-                  {quiz.tokenUsage && (
                     <div className="border-border/30 space-y-1 border-t pt-1">
                       <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                        Token Usage
+                        AI Model
                       </div>
-                      <div className="text-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px] font-medium">
-                        <span className="text-muted-foreground">Prompt:</span>
-                        <span className="text-right tabular-nums">
-                          {quiz.tokenUsage.prompt_tokens.toLocaleString()}
-                        </span>
-                        <span className="text-muted-foreground">Completion:</span>
-                        <span className="text-right tabular-nums">
-                          {quiz.tokenUsage.completion_tokens.toLocaleString()}
-                        </span>
-                        <span className="text-foreground border-border/30 mt-0.5 border-t pt-0.5 font-semibold">
-                          Total:
-                        </span>
-                        <span className="border-border/30 mt-0.5 border-t pt-0.5 text-right font-semibold tabular-nums">
-                          {quiz.tokenUsage.total_tokens.toLocaleString()}
+                      <div className="text-foreground flex items-center gap-1.5 font-medium">
+                        <span
+                          className="h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{
+                            backgroundColor: modelColor,
+                            boxShadow: `0 0 5px ${modelColor}80`,
+                          }}
+                        />
+                        <span className="truncate" title={modelLabel}>
+                          {modelLabel}
                         </span>
                       </div>
                     </div>
-                  )}
+                    {quiz.tokenUsage && (
+                      <div className="border-border/30 space-y-1 border-t pt-1">
+                        <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                          Token Usage
+                        </div>
+                        <div className="text-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px] font-medium">
+                          <span className="text-muted-foreground">Prompt:</span>
+                          <span className="text-right tabular-nums">
+                            {quiz.tokenUsage.prompt_tokens.toLocaleString()}
+                          </span>
+                          <span className="text-muted-foreground">Completion:</span>
+                          <span className="text-right tabular-nums">
+                            {quiz.tokenUsage.completion_tokens.toLocaleString()}
+                          </span>
+                          <span className="text-foreground border-border/30 mt-0.5 border-t pt-0.5 font-semibold">
+                            Total:
+                          </span>
+                          <span className="border-border/30 mt-0.5 border-t pt-0.5 text-right font-semibold tabular-nums">
+                            {quiz.tokenUsage.total_tokens.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <DropdownMenu
               trigger={<Menu className="h-4 w-4" />}
@@ -215,6 +217,12 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
           >
             {TYPE_LABELS[quiz.type]}
           </span>
+
+          {isImported && (
+            <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
+              Imported
+            </span>
+          )}
 
           {quiz.isTimerEnabled && quiz.timerDuration && (
             <span className="text-muted-foreground flex items-center gap-1 text-xs">
