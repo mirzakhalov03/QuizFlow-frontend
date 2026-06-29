@@ -4,6 +4,7 @@ import { useQuizJobPoller } from '@/hooks/useQuizJobPoller'
 import { usePendingJobsStore, type PendingJob } from '@/store/use-pending-jobs-store'
 import { TYPE_COLORS, TYPE_LABELS } from '@/components/main/quizzes/utils'
 import type { QuestionType } from '@/types/quiz'
+import { toast } from '@/lib/toast'
 
 export function PendingQuizCard({ jobId, title, type, status, error, folderId }: PendingJob) {
   const removeJob = usePendingJobsStore((s) => s.removeJob)
@@ -13,6 +14,9 @@ export function PendingQuizCard({ jobId, title, type, status, error, folderId }:
     folderId,
     onDone: () => {
       removeJob(jobId)
+      toast.success('Quiz ready!', {
+      description: `"${title}" has been generated successfully.`,
+      })
     },
     onFailed: (err) => {
       markJobFailed(jobId, err)
