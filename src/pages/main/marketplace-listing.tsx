@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { api as axiosInstance } from '@/api/axios-instance'
@@ -16,6 +17,7 @@ export default function MarketplaceListingPage() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const isAuthed = useAuthStore((s) => s.isAuthed)
+  const queryClient = useQueryClient()
   // Keep the breadcrumb's "Explore" link within the current zone.
   const exploreBase = pathname.startsWith(PATHS.app.root)
     ? PATHS.app.marketplace
@@ -45,8 +47,16 @@ export default function MarketplaceListingPage() {
     try {
       await axiosInstance.post(QUIZ_CLONE(listing.shareToken))
       toast.success('Saved to your library')
-    } catch {
-      toast.error('Could not save a copy')
+      // Refresh the listing so isCloned flips to true and button updates
+      await queryClient.invalidateQueries({ queryKey: [MARKETPLACE_LISTING(quizId!)] })
+    } catch (err: unknown) {
+      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response
+        ?.data?.error?.code
+      if (code === 'ALREADY_IMPORTED') {
+        toast.error('You already have this quiz in your library')
+      } else {
+        toast.error('Could not save a copy')
+      }
     }
   }
 
