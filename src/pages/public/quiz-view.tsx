@@ -12,7 +12,7 @@ import { getScoreBand } from '@/lib/quiz-result'
 // import { shareResultImage } from '@/lib/share-image'
 import { toast } from '@/lib/toast'
 import { PATHS } from '@/lib/path'
-import { PUBLIC_QUIZ_BY_TOKEN, PUBLIC_QUIZ_SUBMIT, QUIZ_CLONE } from '@/constants/api-endpoints'
+import { MARKETPLACE_LISTING, PUBLIC_QUIZ_BY_TOKEN, PUBLIC_QUIZ_SUBMIT, QUIZ_CLONE } from '@/constants/api-endpoints'
 import type { ApiResponse } from '@/types/api'
 import type { PublicQuiz, PublicReviewItem, PublicSubmitResponse, SubmitAnswer } from '@/types/quiz'
 
@@ -27,6 +27,7 @@ import PublicResultQuestion from '@/components/public/public-result-question'
 // TODO: re-enable with the "Share result" button (see below).
 // import ResultShareCard from '@/components/public/result-share-card'
 import AuthPromptModal from '@/components/public/auth-prompt-modal'
+import { RateQuizModal } from '@/components/main/marketplace/rate-quiz-modal'
 
 type Phase = 'intro' | 'solving' | 'results'
 
@@ -53,6 +54,7 @@ export default function PublicQuizView() {
   const [result, setResult] = useState<PublicSubmitResponse | null>(null)
   const [authOpen, setAuthOpen] = useState(false)
   const [isCloning, setIsCloning] = useState(false)
+  const [rateOpen, setRateOpen] = useState(false)
   // TODO: re-enable with the "Share result" button (see below).
   // const shareCardRef = useRef<HTMLDivElement>(null)
 
@@ -100,6 +102,29 @@ export default function PublicQuizView() {
     result?.review.forEach((r) => m.set(r.questionId, r))
     return m
   }, [result])
+
+  const { data: listingData } = useGet<{ data: { isMine: boolean } }>(
+    quiz ? MARKETPLACE_LISTING(quiz.id) : '',
+    {
+      enabled: Boolean(quiz?.id) && phase === 'results' && Boolean(user),
+      options: { retry: false },
+    }
+  )
+  const isListedQuiz = listingData?.data !== undefined
+  const listingIsMine = listingData?.data?.isMine
+
+  useEffect(() => {
+    if (
+      phase === 'results' &&
+      user &&
+      isListedQuiz &&
+      listingIsMine === false &&
+      !rateOpen
+    ) {
+      const t = setTimeout(() => setRateOpen(true), 800)
+      return () => clearTimeout(t)
+    }
+  }, [phase, user, isListedQuiz, listingIsMine, rateOpen])
 
   if (isLoading || quiz?.isOwner) {
     return (
@@ -293,6 +318,14 @@ export default function PublicQuizView() {
       </div> */}
 
       <AuthPromptModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+
+      {quiz && rateOpen && (
+        <RateQuizModal
+          quizId={quiz.id}
+          open={rateOpen}
+          onClose={() => setRateOpen(false)}
+        />
+      )}
     </div>
   )
 }
