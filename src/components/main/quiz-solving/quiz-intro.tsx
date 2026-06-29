@@ -129,10 +129,10 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
     <div className="enter-fade-up border-border mx-auto max-w-2xl overflow-hidden rounded-xl border">
       <div className="h-1.5 bg-linear-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
 
-      <div className="flex flex-col gap-6 p-8">
+      <div className="flex flex-col gap-6 p-6 sm:p-8">
         <div className="flex flex-col gap-2">
           {isEditing ? (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <input
                 autoFocus
                 value={draft}
@@ -141,26 +141,28 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
                 maxLength={MAX_TITLE_LENGTH}
                 disabled={isPending}
                 aria-label="Quiz title"
-                className="border-border focus-visible:ring-primary/40 w-full rounded-lg border bg-transparent px-3 py-1.5 text-2xl font-bold outline-none focus-visible:ring-2 disabled:opacity-60"
+                className="border-border focus-visible:ring-primary/40 min-w-0 flex-1 rounded-lg border bg-transparent px-3 py-1.5 text-2xl font-bold outline-none focus-visible:ring-2 disabled:opacity-60"
               />
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={saveTitle}
-                loading={isPending}
-                aria-label="Save title"
-              >
-                {!isPending && <Check className="h-4 w-4" />}
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={cancelEditing}
-                disabled={isPending}
-                aria-label="Cancel rename"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex shrink-0 gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={saveTitle}
+                  loading={isPending}
+                  aria-label="Save title"
+                >
+                  {!isPending && <Check className="h-4 w-4" />}
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={cancelEditing}
+                  disabled={isPending}
+                  aria-label="Cancel rename"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="group flex items-center gap-2">
