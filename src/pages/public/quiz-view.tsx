@@ -9,6 +9,7 @@ import { buildSubmitAnswers } from '@/lib/quiz-submit'
 import { getScoreBand } from '@/lib/quiz-result'
 // TODO: re-enable with the "Share result" button (see below).
 // import { shareResultImage } from '@/lib/share-image'
+import { toast } from '@/lib/toast'
 import { PATHS } from '@/lib/path'
 import { PUBLIC_QUIZ_BY_TOKEN, PUBLIC_QUIZ_SUBMIT, QUIZ_CLONE } from '@/constants/api-endpoints'
 import type { ApiResponse } from '@/types/api'
@@ -231,6 +232,15 @@ export default function PublicQuizView() {
       {},
       {
         onSuccess: (res) => navigate(PATHS.app.quiz(res.data.id)),
+        onError: (err: unknown) => {
+          const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response
+            ?.data?.error?.code
+          if (code === 'ALREADY_IMPORTED') {
+            toast.error('You already have this quiz in your library')
+          } else {
+            toast.error('Could not save a copy')
+          }
+        },
         onSettled: () => setIsCloning(false),
       }
     )
