@@ -235,19 +235,23 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
             >
               {isCountingDown ? countdown : "Let's go..."}
             </Button>
-            <button
-              type="button"
-              onClick={() => setPublishOpen(true)}
-              className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition"
-            >
-              <Share2 className="h-4 w-4" />
-              Publish
-            </button>
+            {quiz.properties?.generatedBy !== 'clone' && (
+              <button
+                type="button"
+                onClick={() => setPublishOpen(true)}
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition"
+              >
+                <Share2 className="h-4 w-4" />
+                Publish
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      <PublishModal quizId={quiz.id} open={publishOpen} onClose={() => setPublishOpen(false)} />
+      {quiz.properties?.generatedBy !== 'clone' && (
+        <PublishModal quizId={quiz.id} open={publishOpen} onClose={() => setPublishOpen(false)} />
+      )}
     </div>
   )
 }
