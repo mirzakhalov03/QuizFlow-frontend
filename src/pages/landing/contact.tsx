@@ -109,7 +109,9 @@ export default function ContactPage() {
                   maxLength: { value: 100, message: 'Name is too long' },
                 })}
               />
-              {errors.name && <span className="text-destructive text-xs">{errors.name.message}</span>}
+              {errors.name && (
+                <span className="text-destructive text-xs">{errors.name.message}</span>
+              )}
             </label>
 
             <label className="grid gap-1.5 text-sm">

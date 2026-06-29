@@ -137,7 +137,7 @@ export default function AppLayout() {
             <NavLink
               to={PATHS.app.account}
               aria-label="Account"
-              className="block h-8 w-8 shrink-0 overflow-hidden rounded-full ring-offset-background transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 lg:pointer-events-none"
+              className="ring-offset-background focus-visible:ring-primary block h-8 w-8 shrink-0 overflow-hidden rounded-full transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none lg:pointer-events-none"
             >
               {profilePicture ? (
                 <img src={profilePicture} alt="" className="h-full w-full object-cover" />
@@ -165,27 +165,27 @@ export default function AppLayout() {
           aria-label="Primary"
           className="border-border bg-background flex shrink-0 border-t lg:hidden"
         >
-        {mobileNavItems.map(({ label, to, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
-          >
-            {({ isActive }) => (
-              <span
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
-                  isActive
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <Icon size={20} />
-                <span>{label}</span>
-              </span>
-            )}
-          </NavLink>
-        ))}
+          {mobileNavItems.map(({ label, to, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
+            >
+              {({ isActive }) => (
+                <span
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
+                    isActive
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <Icon size={20} />
+                  <span>{label}</span>
+                </span>
+              )}
+            </NavLink>
+          ))}
         </nav>
       </main>
 

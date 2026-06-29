@@ -12,7 +12,12 @@ import { getScoreBand } from '@/lib/quiz-result'
 // import { shareResultImage } from '@/lib/share-image'
 import { toast } from '@/lib/toast'
 import { PATHS } from '@/lib/path'
-import { MARKETPLACE_LISTING, PUBLIC_QUIZ_BY_TOKEN, PUBLIC_QUIZ_SUBMIT, QUIZ_CLONE } from '@/constants/api-endpoints'
+import {
+  MARKETPLACE_LISTING,
+  PUBLIC_QUIZ_BY_TOKEN,
+  PUBLIC_QUIZ_SUBMIT,
+  QUIZ_CLONE,
+} from '@/constants/api-endpoints'
 import type { ApiResponse } from '@/types/api'
 import type { PublicQuiz, PublicReviewItem, PublicSubmitResponse, SubmitAnswer } from '@/types/quiz'
 
@@ -258,8 +263,8 @@ export default function PublicQuizView() {
       const res = await axiosInstance.post<ApiResponse<{ id: string }>>(QUIZ_CLONE(shareToken))
       navigate(PATHS.app.quiz(res.data.data.id))
     } catch (err: unknown) {
-      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response
-        ?.data?.error?.code
+      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data
+        ?.error?.code
       if (code === 'ALREADY_IMPORTED') {
         toast.error('You already have this quiz in your library')
       } else {
@@ -322,11 +327,7 @@ export default function PublicQuizView() {
       <AuthPromptModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
 
       {quiz && rateOpen && (
-        <RateQuizModal
-          quizId={quiz.id}
-          open={rateOpen}
-          onClose={() => setRateOpen(false)}
-        />
+        <RateQuizModal quizId={quiz.id} open={rateOpen} onClose={() => setRateOpen(false)} />
       )}
     </div>
   )

@@ -50,8 +50,8 @@ export default function MarketplaceListingPage() {
       // Refresh the listing so isCloned flips to true and button updates
       await queryClient.invalidateQueries({ queryKey: [MARKETPLACE_LISTING(quizId!)] })
     } catch (err: unknown) {
-      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response
-        ?.data?.error?.code
+      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data
+        ?.error?.code
       if (code === 'ALREADY_IMPORTED') {
         toast.error('You already have this quiz in your library')
       } else {

@@ -31,7 +31,12 @@ export default function QuizSourceSelector({ onSelect }: QuizSourceSelectorProps
         className="border-border bg-card/50 hover:border-primary/50 hover:bg-primary/5 group rounded-xl border-2 p-6 text-left transition-all duration-200"
       >
         <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 group-hover:bg-purple-200">
-          <svg className="h-5 w-5 text-purple-600" viewBox="0 0 100 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            className="h-5 w-5 text-purple-600"
+            viewBox="0 0 100 100"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path d="M73.8 9.6C67.4 3.4 59.2 0 50.7 0c-8.5 0-16.6 3.3-22.7 9.3C16.2 21 14.6 38.6 23.2 52.2L49.5 100l26.6-47.7c8.7-13.7 7.2-31.4-2.3-42.7z" />
           </svg>
         </div>
@@ -40,7 +45,6 @@ export default function QuizSourceSelector({ onSelect }: QuizSourceSelectorProps
           Export your Obsidian notes as Markdown and upload them here.
         </p>
       </button>
-
 
       <button
         onClick={() => hasNotion && onSelect('notion')}

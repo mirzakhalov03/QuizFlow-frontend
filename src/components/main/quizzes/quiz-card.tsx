@@ -278,7 +278,11 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         isExporting={isExporting}
       />
       {!isImported && (
-        <PublishModal quizId={quiz.id} open={isPublishOpen} onClose={() => setIsPublishOpen(false)} />
+        <PublishModal
+          quizId={quiz.id}
+          open={isPublishOpen}
+          onClose={() => setIsPublishOpen(false)}
+        />
       )}
     </>
   )
