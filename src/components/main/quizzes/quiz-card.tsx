@@ -53,6 +53,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const { label: keyLabel, color: keyColor } = getKeyInfo(quiz)
   const { label: modelLabel, color: modelColor } = getModelInfo(quiz)
   const [isPublishOpen, setIsPublishOpen] = useState(false)
+  const isImported = quiz.properties?.generatedBy === 'clone'
 
   const {
     shareToken,
@@ -196,9 +197,11 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
               <DropdownItem icon={Share2} onClick={handleShare}>
                 Share
               </DropdownItem>
-              <DropdownItem icon={Store} onClick={() => setIsPublishOpen(true)}>
-                Publish
-              </DropdownItem>
+              {!isImported && (
+                <DropdownItem icon={Store} onClick={() => setIsPublishOpen(true)}>
+                  Publish
+                </DropdownItem>
+              )}
               <DropdownItem icon={Trash2} onClick={openDeleteConfirm} destructive>
                 Delete
               </DropdownItem>
@@ -266,7 +269,9 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         onExport={exportPdf}
         isExporting={isExporting}
       />
-      <PublishModal quizId={quiz.id} open={isPublishOpen} onClose={() => setIsPublishOpen(false)} />
+      {!isImported && (
+        <PublishModal quizId={quiz.id} open={isPublishOpen} onClose={() => setIsPublishOpen(false)} />
+      )}
     </>
   )
 }
