@@ -31,6 +31,7 @@ export type Quiz = {
   uploadedAt: string | null
   shareToken?: string | null
   isPublic?: boolean
+  isPublished?: boolean
   apiKeyId?: string | null
   apiKeyName?: string | null
   properties?: {

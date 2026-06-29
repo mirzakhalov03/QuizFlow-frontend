@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 
+import { useQueryClient } from '@tanstack/react-query'
+
 import { marketplaceService } from '@/api/services/marketplace.service'
+import { MARKETPLACE, QUIZ_LIST } from '@/constants/api-endpoints'
 import { toast } from '@/lib/toast'
 import { MARKETPLACE_CATEGORIES, type MarketplaceCategory } from '@/types/marketplace'
 
@@ -13,6 +16,7 @@ type Props = {
 const CUSTOM_CATEGORY_MAX = 50
 
 export function PublishModal({ quizId, open, onClose }: Props) {
+  const queryClient = useQueryClient()
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState<MarketplaceCategory>('general')
   const [customCategory, setCustomCategory] = useState('')
@@ -64,6 +68,8 @@ export function PublishModal({ quizId, open, onClose }: Props) {
         await marketplaceService.publish(quizId, body)
         toast.success('Published to marketplace')
       }
+      void queryClient.invalidateQueries({ queryKey: [MARKETPLACE] })
+      void queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
       onClose()
     } catch {
       toast.error('Could not save listing')
@@ -77,6 +83,8 @@ export function PublishModal({ quizId, open, onClose }: Props) {
     try {
       await marketplaceService.unpublish(quizId)
       toast.success('Removed from marketplace')
+      void queryClient.invalidateQueries({ queryKey: [MARKETPLACE] })
+      void queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
       setListed(false)
       onClose()
     } catch {

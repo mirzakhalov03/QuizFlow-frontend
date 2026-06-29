@@ -116,14 +116,14 @@ export default function PublicQuizView() {
       options: { retry: false },
     }
   )
-  const isListedQuiz = listingData?.data !== undefined
+  const isPublishedQuiz = listingData?.data !== undefined
   const listingIsMine = listingData?.data?.isMine
 
   useEffect(() => {
     if (
       phase === 'results' &&
       user &&
-      isListedQuiz &&
+      isPublishedQuiz &&
       listingIsMine === false &&
       !ratePrompted.current
     ) {
@@ -131,7 +131,7 @@ export default function PublicQuizView() {
       const t = setTimeout(() => setRateOpen(true), 800)
       return () => clearTimeout(t)
     }
-  }, [phase, user, isListedQuiz, listingIsMine])
+  }, [phase, user, isPublishedQuiz, listingIsMine])
 
   if (isLoading || quiz?.isOwner) {
     return (
