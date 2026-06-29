@@ -44,6 +44,11 @@ export function ListingCard({
         <span className="flex items-center gap-1">
           <Users className="size-3.5" /> {listing.playCount} plays
         </span>
+        {listing.isCloned && !listing.isMine && (
+          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+            Saved
+          </span>
+        )}
         <span className="ml-auto truncate">by {listing.authorName}</span>
       </div>
     </Link>

@@ -27,6 +27,7 @@ export type ListingCard = {
   ratingAvg: number
   ratingCount: number
   isMine: boolean
+  isCloned: boolean
   listedAt: string
 }
 
