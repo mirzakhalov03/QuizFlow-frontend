@@ -1,0 +1,130 @@
+import { useForm } from 'react-hook-form'
+
+import { quizService } from '@/api/services/quiz.service'
+import FileUpload from '@/components/form/file-upload'
+import { useModal } from '@/hooks/useModal'
+import { toast } from '@/lib/toast'
+import { extractApiErrorMessage } from '@/lib/api-error'
+import {
+  DEFAULT_MODEL,
+  toTimerSeconds,
+  type QuizSettingsValues,
+} from '@/components/main/quizzes/utils'
+import QuizSettingsFields from '@/components/main/quizzes/quiz-settings-fields'
+import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
+
+type QuizFormValues = QuizSettingsValues & {
+  files: File[]
+}
+
+interface QuizFormProps {
+  onBack: () => void
+  folderId?: string
+  sourceOverride?: 'obsidian'
+}
+
+export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormProps) {
+  const isObsidian = sourceOverride === 'obsidian'
+  const { closeModal } = useModal('quiz-add')
+  const addJob = usePendingJobsStore((s) => s.addJob)
+  const setJobReady = usePendingJobsStore((s) => s.setJobReady)
+  const markJobFailed = usePendingJobsStore((s) => s.markJobFailed)
+
+  const form = useForm<QuizFormValues>({
+    defaultValues: {
+      type: 'multiple_choice',
+      questionCount: '5',
+      difficulty: 'medium',
+      isTimerEnabled: false,
+      userInstructions: '',
+      model: DEFAULT_MODEL,
+      folderId: folderId || 'none',
+      apiKeyId: '',
+      avoidQuizIds: [],
+    },
+  })
+
+  const { handleSubmit, reset } = form
+
+  const onSubmit = (values: QuizFormValues) => {
+    const tempId = crypto.randomUUID()
+    const targetFolderId = values.folderId !== 'none' ? values.folderId : undefined
+
+    closeModal()
+    reset()
+    addJob({
+      jobId: tempId,
+      title: isObsidian ? 'Generating quiz from Obsidian…' : 'Generating quiz…',
+      type: values.type,
+      folderId: targetFolderId,
+    })
+    ;(async () => {
+      try {
+        const keys = await Promise.all(
+          values.files.map(async (file) => {
+            const { uploadUrl, key } = await quizService.getPresignedUrl(file)
+            await quizService.uploadToS3(uploadUrl, file)
+            return key
+          })
+        )
+
+        const result = await quizService.createQuiz('file', {
+          keys,
+          type: values.type,
+          questionCount: parseInt(values.questionCount, 10),
+          optionsPerQuestion: values.optionsPerQuestion,
+          userInstructions: values.userInstructions || undefined,
+          difficulty: values.difficulty,
+          isTimerEnabled: values.isTimerEnabled,
+          timerDuration: toTimerSeconds(values.isTimerEnabled, values.timerDuration),
+          model: values.model,
+          apiKeyId: values.apiKeyId || undefined,
+          folderId: values.folderId !== 'none' ? values.folderId : undefined,
+          avoidQuizIds:
+            values.avoidQuizIds && values.avoidQuizIds.length > 0 ? values.avoidQuizIds : undefined,
+        })
+
+        setJobReady(tempId, result.jobId)
+      } catch (err: unknown) {
+        const message = extractApiErrorMessage(err)
+        markJobFailed(tempId, message)
+        toast.error(message)
+      }
+    })()
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {isObsidian && (
+        <div className="rounded-lg border border-purple-200 bg-purple-50 p-3 text-sm text-purple-800 dark:border-purple-800 dark:bg-purple-950/30 dark:text-purple-300">
+          <p className="mb-0.5 font-medium">How to export from Obsidian</p>
+          <p className="text-xs text-purple-700 dark:text-purple-400">
+            In Obsidian, drag your <code>.md</code> files directly into the upload area below.
+          </p>
+        </div>
+      )}
+
+      <div className="space-y-1">
+        <FileUpload
+          label="Source Documents"
+          control={form.control}
+          name="files"
+          required
+          multiple
+          isPaste={false}
+          maxSize={25}
+          maxLength={5}
+          hideError={false}
+          dropAccept={isObsidian ? ['MD'] : ['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
+        />
+        <p className="text-muted-foreground text-xs">
+          {isObsidian
+            ? 'Markdown (.md) files only · max 25 MB · up to 5 files'
+            : 'PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files'}
+        </p>
+      </div>
+
+      <QuizSettingsFields form={form} onBack={onBack} folderId={folderId} />
+    </form>
+  )
+}
