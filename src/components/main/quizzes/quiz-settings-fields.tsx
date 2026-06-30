@@ -16,7 +16,7 @@ import {
 } from '@/components/main/quizzes/utils'
 import { useGet } from '@/hooks/useGet'
 import { QUIZ_LIST } from '@/constants/api-endpoints'
-import type { ApiResponse, PaginatedResponse } from '@/types/api'
+import type { PaginatedResponse } from '@/types/api'
 import type { Quiz } from '@/types/quiz'
 import { Checkbox } from '@/components/ui/checkbox'
 
@@ -42,7 +42,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
   const { byokKeys, folderOptions, byokOptions } = useQuizFormOptions(form)
   const timerEnabled = useWatch({ control, name: 'isTimerEnabled' as Path<T> }) ?? false
 
-  const { data: quizzesData } = useGet<ApiResponse<PaginatedResponse<Quiz>>>(QUIZ_LIST, {
+  const { data: quizzesData } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
     params: { limit: 500 },
   })
   const quizzes = quizzesData?.data?.items || []
@@ -146,7 +146,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
             name={'avoidQuizIds' as Path<T>}
             control={control}
             render={({ field }) => {
-              const selectedIds = new Set(field.value || [])
+              const selectedIds = new Set<string>((field.value as string[]) || [])
               const handleToggle = (id: string) => {
                 const newSelected = new Set(selectedIds)
                 if (newSelected.has(id)) {
