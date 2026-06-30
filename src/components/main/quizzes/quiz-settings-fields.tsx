@@ -80,7 +80,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
           />
         </div>
 
-        <OptionsPerQuestionField form={form} /> 
+        <OptionsPerQuestionField form={form} />
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormSelect
@@ -158,7 +158,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
               }
 
               return (
-                <div className="border-border bg-background max-h-36 overflow-y-auto rounded-lg border p-1 space-y-1">
+                <div className="border-border bg-background max-h-36 space-y-1 overflow-y-auto rounded-lg border p-1">
                   {quizzes.map((quiz) => {
                     const isChecked = selectedIds.has(quiz.id)
                     return (
@@ -207,27 +207,29 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
   )
 }
 
-
 const OPTIONS_RANGE = [2, 3, 4, 5, 6] as const
 const OPTION_BASED_TYPES: QuizSettingsValues['type'][] = ['multiple_choice', 'multi_select']
 
-function OptionsPerQuestionField<T extends QuizSettingsValues>({ form }: { form: UseFormReturn<T> }) {
+function OptionsPerQuestionField<T extends QuizSettingsValues>({
+  form,
+}: {
+  form: UseFormReturn<T>
+}) {
   const selectedType = useWatch({ control: form.control, name: 'type' as Path<T> }) as string
 
   if (!OPTION_BASED_TYPES.includes(selectedType as QuizSettingsValues['type'])) return null
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-foreground">
+      <label className="text-foreground text-sm font-medium">
         Options per question
-        <span className="ml-1 text-xs font-normal text-muted-foreground">
+        <span className="text-muted-foreground ml-1 text-xs font-normal">
           (Multiple choice &amp; Multi-select)
         </span>
       </label>
       <Controller
         name={'optionsPerQuestion' as Path<T>}
         control={form.control}
-        defaultValue={4 as never}
         render={({ field }) => (
           <div className="flex gap-2" role="group" aria-label="Number of options per question">
             {OPTIONS_RANGE.map((n) => (
@@ -249,7 +251,7 @@ function OptionsPerQuestionField<T extends QuizSettingsValues>({ form }: { form:
           </div>
         )}
       />
-      <p className="text-xs text-muted-foreground">
+      <p className="text-muted-foreground text-xs">
         Each eligible question will have exactly this many answer choices.
       </p>
     </div>
