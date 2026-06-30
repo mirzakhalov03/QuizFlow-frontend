@@ -33,14 +33,14 @@ export default function MultiSelect({ options, value, onChange }: Props) {
                 toggle(option.id)
               }
             }}
-            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            className={`focus-visible:ring-primary flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 ${
               isChecked
                 ? 'border-primary bg-primary/10 text-foreground font-medium'
                 : 'border-border hover:border-primary/50 hover:bg-muted/50'
             }`}
           >
             <Checkbox checked={isChecked} className="pointer-events-none shrink-0" />
-            <MarkdownText text={option.text} className="flex-1 min-w-0" as="div" />
+            <MarkdownText text={option.text} className="min-w-0 flex-1" as="div" />
           </div>
         )
       })}

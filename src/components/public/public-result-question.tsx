@@ -33,7 +33,7 @@ export default function PublicResultQuestion({ question, index, review, userAnsw
         </span>
         <MarkdownText
           text={question.text}
-          className="flex-1 min-w-0 pt-0.5 text-sm leading-relaxed font-semibold"
+          className="min-w-0 flex-1 pt-0.5 text-sm leading-relaxed font-semibold"
         />
         <span
           className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${pill.cls}`}
@@ -80,7 +80,7 @@ export default function PublicResultQuestion({ question, index, review, userAnsw
                   <span className="border-muted-foreground/30 mt-0.5 h-4 w-4 shrink-0 rounded-full border" />
                 )}
                 <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
-                  <MarkdownText text={option.text} className="text-sm" />
+                  <MarkdownText text={option.text} className="flex-1 min-w-0 text-sm" />
                   {label && (
                     <span className={`shrink-0 text-xs font-medium ${label.cls}`}>
                       {label.text}

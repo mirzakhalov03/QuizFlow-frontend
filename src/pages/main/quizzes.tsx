@@ -29,6 +29,8 @@ export default function Quizzes() {
     setSort,
     filterTypes,
     toggleFilterType,
+    statusFilter,
+    toggleStatusFilter,
   } = useQuizListControls()
 
   return (
@@ -42,6 +44,8 @@ export default function Quizzes() {
         onSortChange={setSort}
         filterTypes={filterTypes}
         onToggleFilter={toggleFilterType}
+        statusFilter={statusFilter}
+        onToggleStatus={toggleStatusFilter}
       />
 
       {isLoading ? (

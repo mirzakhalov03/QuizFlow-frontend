@@ -70,113 +70,113 @@ export default function ApiKeyAnalytics({ data, totalTokens }: Props) {
       <h3 className="mb-4 text-sm font-semibold sm:mb-6">Token usage by API key</h3>
 
       <div className="flex flex-1 items-center">
-      <div className="grid w-full grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8">
-        {/* Donut chart */}
-        <div className="relative mx-auto flex aspect-square w-full max-w-60 items-center justify-center">
-          <svg
-            viewBox={`0 0 ${SIZE} ${SIZE}`}
-            className="h-full w-full"
-            role="img"
-            aria-label="Donut chart of token usage by API key"
-          >
-            {/* Background ring */}
-            <circle
-              cx={CENTER}
-              cy={CENTER}
-              r={RADIUS}
-              fill="none"
-              className="stroke-border"
-              strokeWidth={STROKE}
-            />
-            {/* Segment group, rotated so arcs start from 12 o'clock */}
-            <g transform={`rotate(-90 ${CENTER} ${CENTER})`}>
-              {segmentsData.map((item, i) => {
-                const color = PALETTE[i % PALETTE.length]
-                const isHovered = hoveredKey === item.id
+        <div className="grid w-full grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8">
+          {/* Donut chart */}
+          <div className="relative mx-auto flex aspect-square w-full max-w-60 items-center justify-center">
+            <svg
+              viewBox={`0 0 ${SIZE} ${SIZE}`}
+              className="h-full w-full"
+              role="img"
+              aria-label="Donut chart of token usage by API key"
+            >
+              {/* Background ring */}
+              <circle
+                cx={CENTER}
+                cy={CENTER}
+                r={RADIUS}
+                fill="none"
+                className="stroke-border"
+                strokeWidth={STROKE}
+              />
+              {/* Segment group, rotated so arcs start from 12 o'clock */}
+              <g transform={`rotate(-90 ${CENTER} ${CENTER})`}>
+                {segmentsData.map((item, i) => {
+                  const color = PALETTE[i % PALETTE.length]
+                  const isHovered = hoveredKey === item.id
 
-                return (
-                  <circle
-                    key={item.id}
-                    cx={CENTER}
-                    cy={CENTER}
-                    r={RADIUS}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth={isHovered ? STROKE + 4 : STROKE}
-                    strokeDasharray={`${item.arcLength} ${CIRCUMFERENCE - item.arcLength}`}
-                    strokeDashoffset={item.offset}
-                    className="transition-all duration-300"
-                    style={{ opacity: hoveredKey && !isHovered ? 0.35 : 1 }}
-                    onMouseEnter={() => setHoveredKey(item.id)}
-                    onMouseLeave={() => setHoveredKey(null)}
-                  />
-                )
-              })}
-            </g>
-          </svg>
+                  return (
+                    <circle
+                      key={item.id}
+                      cx={CENTER}
+                      cy={CENTER}
+                      r={RADIUS}
+                      fill="none"
+                      stroke={color}
+                      strokeWidth={isHovered ? STROKE + 4 : STROKE}
+                      strokeDasharray={`${item.arcLength} ${CIRCUMFERENCE - item.arcLength}`}
+                      strokeDashoffset={item.offset}
+                      className="transition-all duration-300"
+                      style={{ opacity: hoveredKey && !isHovered ? 0.35 : 1 }}
+                      onMouseEnter={() => setHoveredKey(item.id)}
+                      onMouseLeave={() => setHoveredKey(null)}
+                    />
+                  )
+                })}
+              </g>
+            </svg>
 
-          {/* Center label */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-muted-foreground text-[10px] font-medium tracking-widest uppercase">
-              Total
-            </span>
-            <span className="text-foreground text-2xl font-bold tabular-nums sm:text-3xl">
-              {formatTokens(totalTokens)}
-            </span>
-            <span className="text-muted-foreground text-[10px]">tokens</span>
+            {/* Center label */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-muted-foreground text-[10px] font-medium tracking-widest uppercase">
+                Total
+              </span>
+              <span className="text-foreground text-2xl font-bold tabular-nums sm:text-3xl">
+                {formatTokens(totalTokens)}
+              </span>
+              <span className="text-muted-foreground text-[10px]">tokens</span>
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div className="flex flex-col gap-2.5">
+            {activeData.map((item, i) => {
+              const color = PALETTE[i % PALETTE.length]
+              const id = item.keyId ?? `__default__-${i}`
+              const isDefault = item.keyId === null
+              const isHovered = hoveredKey === id
+              return (
+                <div
+                  key={id}
+                  className="bg-muted/40 hover:bg-muted/80 flex items-center justify-between rounded-lg py-3 pr-4 pl-3 transition-all duration-200"
+                  style={{
+                    borderLeft: `3px solid ${color}`,
+                    opacity: hoveredKey && !isHovered ? 0.5 : 1,
+                    transform: isHovered ? 'translateX(2px)' : 'translateX(0)',
+                  }}
+                  onMouseEnter={() => setHoveredKey(id)}
+                  onMouseLeave={() => setHoveredKey(null)}
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-foreground truncate text-sm font-medium">
+                          {item.keyName}
+                        </span>
+                        {isDefault && (
+                          <span className="bg-primary/15 text-primary shrink-0 rounded px-1.5 py-0.5 text-[10px] leading-none font-semibold">
+                            Default
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {formatTokens(item.tokensUsed)} tokens · {item.quizCount}{' '}
+                        {item.quizCount === 1 ? 'quiz' : 'quizzes'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className="ml-3 shrink-0 text-lg font-bold tabular-nums" style={{ color }}>
+                    {item.percentage}%
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
-
-        {/* Legend */}
-        <div className="flex flex-col gap-2.5">
-          {activeData.map((item, i) => {
-            const color = PALETTE[i % PALETTE.length]
-            const id = item.keyId ?? `__default__-${i}`
-            const isDefault = item.keyId === null
-            const isHovered = hoveredKey === id
-            return (
-              <div
-                key={id}
-                className="bg-muted/40 hover:bg-muted/80 flex items-center justify-between rounded-lg py-3 pr-4 pl-3 transition-all duration-200"
-                style={{
-                  borderLeft: `3px solid ${color}`,
-                  opacity: hoveredKey && !isHovered ? 0.5 : 1,
-                  transform: isHovered ? 'translateX(2px)' : 'translateX(0)',
-                }}
-                onMouseEnter={() => setHoveredKey(id)}
-                onMouseLeave={() => setHoveredKey(null)}
-              >
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: color }}
-                  />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-foreground truncate text-sm font-medium">
-                        {item.keyName}
-                      </span>
-                      {isDefault && (
-                        <span className="bg-primary/15 text-primary shrink-0 rounded px-1.5 py-0.5 text-[10px] leading-none font-semibold">
-                          Default
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-muted-foreground text-xs">
-                      {formatTokens(item.tokensUsed)} tokens · {item.quizCount}{' '}
-                      {item.quizCount === 1 ? 'quiz' : 'quizzes'}
-                    </p>
-                  </div>
-                </div>
-
-                <span className="ml-3 shrink-0 text-lg font-bold tabular-nums" style={{ color }}>
-                  {item.percentage}%
-                </span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
       </div>
     </div>
   )

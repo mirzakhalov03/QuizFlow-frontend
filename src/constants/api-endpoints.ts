@@ -13,6 +13,8 @@ export const PRESIGNED_URL = '/upload/presigned-url'
 export const PUBLIC_QUIZ_BY_TOKEN = (token: string) => `/public/quizzes/${token}`
 export const PUBLIC_QUIZ_SUBMIT = (token: string) => `/public/quizzes/${token}/submit`
 
+export const CONTACT = '/contact'
+
 export const INTEGRATIONS = '/integrations'
 export const INTEGRATION_BY_PROVIDER = (provider: string) => `/integrations/${provider}`
 
@@ -22,3 +24,7 @@ export const BYOK_BY_ID = (id: string) => `/byok/${id}`
 export const ANALYTICS_SUMMARY = '/analytics/summary'
 export const QUIZ_HISTORY = '/quiz-results/history'
 export const FOLDERS = '/folders'
+
+export const MARKETPLACE = '/marketplace'
+export const MARKETPLACE_LISTING = (quizId: string) => `/marketplace/${quizId}`
+export const MARKETPLACE_RATINGS = (quizId: string) => `/marketplace/${quizId}/ratings`

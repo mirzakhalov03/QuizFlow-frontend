@@ -62,7 +62,7 @@ export default function ConnectedApps() {
   }
 
   return (
-    <div className="border-border bg-background hover:shadow-md rounded-2xl border p-5 shadow-sm transition-shadow duration-300 sm:p-6 lg:p-8">
+    <div className="border-border bg-background rounded-2xl border p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6 lg:p-8">
       <h2 className="text-lg font-semibold">Connected apps</h2>
       <p className="text-muted-foreground mt-1 text-sm">
         Manage external services tied to your account.

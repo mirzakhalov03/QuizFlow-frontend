@@ -4,6 +4,8 @@ export const PATHS = {
   features: '/features',
   contact: '/contact',
   pricing: '/pricing',
+  marketplace: '/marketplace',
+  marketplaceListing: (quizId: string) => `/marketplace/${quizId}`,
 
   auth: {
     root: '/auth',
@@ -22,6 +24,8 @@ export const PATHS = {
     quiz: (id: string) => `/app/quizzes/${id}`,
     library: '/app/library',
     libraryFolder: (id: string) => `/app/library/${id}`,
+    marketplace: '/app/marketplace',
+    marketplaceListing: (quizId: string) => `/app/marketplace/${quizId}`,
     quizQuestion: (id: string, questionId: string) => `/app/quizzes/${id}/question/${questionId}`,
     quizResult: (id: string) => `/app/quizzes/${id}/result`,
   },

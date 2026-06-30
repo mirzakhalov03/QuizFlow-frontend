@@ -8,11 +8,11 @@ import type {
 } from '@/types/speech-recognition'
 
 export type SpeechRecognitionError =
-  | 'not-allowed'     // mic permission denied
-  | 'no-speech'       // silence timeout
-  | 'audio-capture'   // no microphone found
-  | 'network'         // network required for cloud recognition
-  | 'aborted'         // recognition was aborted
+  | 'not-allowed' // mic permission denied
+  | 'no-speech' // silence timeout
+  | 'audio-capture' // no microphone found
+  | 'network' // network required for cloud recognition
+  | 'aborted' // recognition was aborted
   | 'unknown'
 
 export function useSpeechRecognition(onTranscript: (text: string) => void) {

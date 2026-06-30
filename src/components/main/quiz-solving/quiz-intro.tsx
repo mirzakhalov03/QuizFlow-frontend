@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import { ArrowRight, Check, Clock, Hash, Pencil, Sparkles, X } from 'lucide-react'
+import { ArrowRight, Check, Clock, Hash, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { usePatch } from '@/hooks/usePatch'
 import { QUIZ_BY_ID, QUIZ_LIST } from '@/constants/api-endpoints'
 import { toast } from '@/lib/toast'
 import { TYPE_LABELS } from '@/components/main/quizzes/utils'
+import { PublishModal } from '@/components/main/marketplace/publish-modal'
+import { useAuthStore } from '@/store/use-authstore'
 import type { QuestionType, QuizWithQuestions } from '@/types/quiz'
 import { pickIntroQuote } from './intro-quotes'
 import MarkdownText from './markdown-text'
@@ -36,6 +38,8 @@ function buildTypeBreakdown(quiz: QuizWithQuestions): string {
 }
 
 export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Props) {
+  const currentUserId = useAuthStore((s) => s.user?.id)
+  const isOwner = currentUserId === quiz.userId
   const durationMinutes = quiz.timerDuration ? Math.round(quiz.timerDuration / 60) : null
 
   const queryClient = useQueryClient()
@@ -43,6 +47,7 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
 
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(quiz.title)
+  const [publishOpen, setPublishOpen] = useState(false)
 
   // Stable per mount so it doesn't reshuffle on every keystroke while renaming.
   const quote = useMemo(() => pickIntroQuote(), [])
@@ -127,10 +132,10 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
     <div className="enter-fade-up border-border mx-auto max-w-2xl overflow-hidden rounded-xl border">
       <div className="h-1.5 bg-linear-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
 
-      <div className="flex flex-col gap-6 p-8">
+      <div className="flex flex-col gap-6 p-6 sm:p-8">
         <div className="flex flex-col gap-2">
           {isEditing ? (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <input
                 autoFocus
                 value={draft}
@@ -139,26 +144,28 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
                 maxLength={MAX_TITLE_LENGTH}
                 disabled={isPending}
                 aria-label="Quiz title"
-                className="border-border focus-visible:ring-primary/40 w-full rounded-lg border bg-transparent px-3 py-1.5 text-2xl font-bold outline-none focus-visible:ring-2 disabled:opacity-60"
+                className="border-border focus-visible:ring-primary/40 min-w-0 flex-1 rounded-lg border bg-transparent px-3 py-1.5 text-2xl font-bold outline-none focus-visible:ring-2 disabled:opacity-60"
               />
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={saveTitle}
-                loading={isPending}
-                aria-label="Save title"
-              >
-                {!isPending && <Check className="h-4 w-4" />}
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={cancelEditing}
-                disabled={isPending}
-                aria-label="Cancel rename"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex shrink-0 gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={saveTitle}
+                  loading={isPending}
+                  aria-label="Save title"
+                >
+                  {!isPending && <Check className="h-4 w-4" />}
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={cancelEditing}
+                  disabled={isPending}
+                  aria-label="Cancel rename"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="group flex items-center gap-2">
@@ -224,16 +231,32 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
             <Sparkles className="h-3.5 w-3.5 shrink-0" />
             {quote}
           </p>
-          <Button
-            onClick={beginCountdown}
-            disabled={isCountingDown || quiz.questions.length === 0}
-            className="min-w-32 self-start"
-            rightIcon={isCountingDown ? undefined : <ArrowRight className="h-4 w-4" />}
-          >
-            {isCountingDown ? countdown : "Let's go..."}
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              onClick={beginCountdown}
+              disabled={isCountingDown || quiz.questions.length === 0}
+              className="min-w-32"
+              rightIcon={isCountingDown ? undefined : <ArrowRight className="h-4 w-4" />}
+            >
+              {isCountingDown ? countdown : "Let's go..."}
+            </Button>
+            {isOwner && quiz.properties?.generatedBy !== 'clone' && (
+              <button
+                type="button"
+                onClick={() => setPublishOpen(true)}
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition"
+              >
+                <Share2 className="h-4 w-4" />
+                Publish
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {isOwner && quiz.properties?.generatedBy !== 'clone' && (
+        <PublishModal quizId={quiz.id} open={publishOpen} onClose={() => setPublishOpen(false)} />
+      )}
     </div>
   )
 }

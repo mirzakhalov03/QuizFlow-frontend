@@ -60,7 +60,7 @@ export default function QuizResultQuestion({
         </span>
         <MarkdownText
           text={question.text}
-          className="flex-1 min-w-0 pt-0.5 text-sm leading-relaxed font-semibold"
+          className="min-w-0 flex-1 pt-0.5 text-sm leading-relaxed font-semibold"
         />
         <span
           className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${pill.cls}`}
@@ -121,7 +121,7 @@ function OptionRow({
       <Marker state={state} />
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <MarkdownText text={option.text} className="text-sm" />
+          <MarkdownText text={option.text} className="flex-1 min-w-0 text-sm" />
           {label && (
             <span className={`shrink-0 text-xs font-medium ${label.cls}`}>{label.text}</span>
           )}
