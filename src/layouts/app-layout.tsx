@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser } from 'lucide-react'
+import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser, PanelLeft } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
@@ -16,13 +16,14 @@ import QuizProgress from '@/components/main/quiz-solving/quiz-progress'
 import type { QuizSolvingHeader } from '@/pages/main/quiz-solving/context'
 import { QUIZ_SOLVING_HEADER_KEY } from '@/pages/main/quiz-solving/context'
 import OnboardingModal from '@/components/main/onboarding/onboarding-modal'
+import { useSidebarStore } from '@/store/use-sidebar-store'
 
 const navItems = [
-  { label: 'Analytics', to: PATHS.app.analytics, icon: BarChart3 },
-  { label: 'History', to: PATHS.app.history, icon: History },
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
+  { label: 'Analytics', to: PATHS.app.analytics, icon: BarChart3 },
   { label: 'Library', to: PATHS.app.library, icon: Library },
   { label: 'Explore', to: PATHS.app.marketplace, icon: Store },
+  { label: 'History', to: PATHS.app.history, icon: History },
   { label: 'Account', to: PATHS.app.account, icon: CircleUser },
 ]
 
@@ -39,6 +40,9 @@ export default function AppLayout() {
 
   const [confirmingLogout, setConfirmingLogout] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  
+  const sidebarOpen = useSidebarStore((s) => s.sidebarOpen)
+  const setSidebarOpen = useSidebarStore((s) => s.setSidebarOpen)
 
   const handleConfirmLogout = async () => {
     setLoggingOut(true)
@@ -69,39 +73,98 @@ export default function AppLayout() {
 
   return (
     <div className="bg-background text-foreground flex min-h-screen">
-      <aside className="border-border bg-background sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-4 border-r p-4 lg:flex">
-        <Logo to={PATHS.app.quizzes} size="lg" className="mt-1 flex justify-center" />
+      <aside
+        className={cn(
+          'border-border bg-background sticky top-0 z-50 hidden h-screen shrink-0 flex-col gap-4 border-r p-3 transition-[width] duration-300 ease-in-out lg:flex',
+          sidebarOpen ? 'w-60' : 'w-[68px]'
+        )}
+      >
+        <div className="flex items-center justify-between px-1">
+          <Logo
+            to={PATHS.app.quizzes}
+            size="lg"
+            className={cn(
+              'flex items-center transition-opacity duration-200',
+              sidebarOpen ? 'opacity-100 delay-100' : 'opacity-0 w-0 overflow-hidden'
+            )}
+          />
+          <div className="group relative">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              className={cn(
+                'text-muted-foreground hover:bg-muted hover:text-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors',
+               !sidebarOpen && 'mx-auto'
+            )}
+            >
+            <PanelLeft size={18} />
+            </button>
 
-        <nav className="mt-5 flex flex-col gap-1">
+            <span className="text-popover-foreground bg-popover border-border pointer-events-none absolute top-1/2 left-full z-50 ml-2 -translate-y-1/2 scale-95 rounded-md border px-2.5 py-1.5 text-sm font-medium whitespace-nowrap opacity-0 shadow-md transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
+              {sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+             </span>
+          </div>
+        </div>
+
+        <nav className="mt-2 flex flex-col gap-1">
           {navItems.map(({ label, to, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-2 rounded-md px-3 py-2 transition-colors',
+                  'group relative flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors',
                   isActive
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )
               }
             >
-              <Icon size={20} />
-              {label}
+              <Icon size={20} className="shrink-0" />
+
+           <>
+            <span className={cn(
+                    'overflow-hidden whitespace-nowrap transition-all duration-200',
+                    sidebarOpen
+                    ? 'max-w-[120px] opacity-100 translate-x-0'
+                    : 'max-w-0 opacity-0 -translate-x-2'
+                   )}
+              >
+            {label}
+            </span>
+
+            {!sidebarOpen && (
+              <span className="text-popover-foreground bg-popover border-border pointer-events-none absolute left-full z-50 ml-2 scale-95 rounded-md border px-2.5 py-1.5 text-sm font-medium whitespace-nowrap opacity-0 shadow-md transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
+               {label}
+              </span>
+           )}
+          </>
             </NavLink>
           ))}
         </nav>
 
         <div className="mt-auto">
-          <Button
-            variant="ghost"
-            size="md"
-            onClick={() => setConfirmingLogout(true)}
-            className="w-full justify-start text-red-500"
-            leftIcon={<LogOut size={18} />}
-          >
-            Logout
-          </Button>
+          <div className="group relative">
+            <Button
+              variant="ghost"
+              size="md"
+              onClick={() => setConfirmingLogout(true)}
+              className={cn(
+                'w-full overflow-hidden text-red-500',
+                sidebarOpen ? 'justify-start' : 'justify-center px-0'
+              )}
+              leftIcon={<LogOut size={18} className="shrink-0" />}
+            >
+              {sidebarOpen && <span className="whitespace-nowrap">Logout</span>}
+            </Button>
+
+            {!sidebarOpen && (
+              <span className="text-popover-foreground bg-popover border-border pointer-events-none absolute top-1/2 left-full z-50 ml-2 -translate-y-1/2 scale-95 rounded-md border px-2.5 py-1.5 text-sm font-medium whitespace-nowrap opacity-0 shadow-md transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
+                Logout
+              </span>
+            )}
+          </div>
         </div>
       </aside>
 
@@ -157,37 +220,37 @@ export default function AppLayout() {
             </button>
           </div>
         </div>
-        <div className="bg-secondary/15 min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="bg-secondary/15 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 lg:pl-8 sm:pb-24 lg:pb-6">
           <Outlet />
         </div>
-
-        <nav
-          aria-label="Primary"
-          className="border-border bg-background flex shrink-0 border-t lg:hidden"
-        >
-          {mobileNavItems.map(({ label, to, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
-            >
-              {({ isActive }) => (
-                <span
-                  className={cn(
-                    'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
-                    isActive
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  <Icon size={20} />
-                  <span>{label}</span>
-                </span>
-              )}
-            </NavLink>
-          ))}
-        </nav>
       </main>
+
+      <nav
+        aria-label="Primary"
+        className="border-border bg-background fixed inset-x-0 bottom-0 z-40 flex border-t lg:hidden"
+      >
+        {mobileNavItems.map(({ label, to, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
+          >
+            {({ isActive }) => (
+              <span
+                className={cn(
+                  'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
+                  isActive
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Icon size={20} />
+                <span>{label}</span>
+              </span>
+            )}
+          </NavLink>
+        ))}
+      </nav>
 
       <OnboardingModal />
 
