@@ -46,7 +46,7 @@ export default function History() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold sm:text-2xl">History</h1>
+        <h1 className="text-2xl font-bold">History</h1>
         <p className="text-muted-foreground">Every attempt you've made, filterable and sortable.</p>
       </header>
 

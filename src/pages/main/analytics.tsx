@@ -90,12 +90,13 @@ export default function Analytics() {
 
   return (
     <div className="space-y-6">
-      <AiFeedbackCard />
 
       <header>
-        <h1 className="text-xl font-semibold sm:text-2xl">Analytics</h1>
+        <h1 className="text-2xl font-bold">Analytics</h1>
         <p className="text-muted-foreground">Your progress across every quiz you've taken.</p>
       </header>
+      
+      <AiFeedbackCard />
 
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <span className="text-muted-foreground text-sm">Showing:</span>

@@ -127,7 +127,7 @@ export default function Account() {
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Account</h1>
+        <h1 className="text-2xl font-bold">Account</h1>
         <p className="text-muted-foreground text-sm">
           Manage your account preferences, developer keys, and secure connections.
         </p>
@@ -164,7 +164,7 @@ export default function Account() {
       </nav>
 
       {/* ACTIVE SETTINGS TAB CONTENT */}
-      <div className="mx-auto mt-2 w-full max-w-6xl">
+      <div className="mt-2 w-full max-w-none">
         {activeTab === 'profile' && (
           <div className="space-y-6">
             {/* Personal Details Card */}
