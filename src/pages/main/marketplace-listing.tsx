@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
@@ -5,6 +6,8 @@ import { api as axiosInstance } from '@/api/axios-instance'
 import { Reviews } from '@/components/main/marketplace/reviews'
 import { categoryLabel, DIFFICULTY_CHIP } from '@/components/main/marketplace/utils'
 import Breadcrumb from '@/components/ui/breadcrumb'
+import Button from '@/components/ui/button'
+import Spinner from '@/components/ui/spinner'
 import { MARKETPLACE_LISTING, QUIZ_CLONE } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
 import { PATHS } from '@/lib/path'
@@ -18,6 +21,7 @@ export default function MarketplaceListingPage() {
   const { pathname } = useLocation()
   const isAuthed = useAuthStore((s) => s.isAuthed)
   const queryClient = useQueryClient()
+  const [isSaving, setIsSaving] = useState(false)
   // Keep the breadcrumb's "Explore" link within the current zone.
   const exploreBase = pathname.startsWith(PATHS.app.root)
     ? PATHS.app.marketplace
@@ -28,7 +32,12 @@ export default function MarketplaceListingPage() {
   })
   const listing = data?.data
 
-  if (isLoading) return <p className="text-muted-foreground p-6">Loading…</p>
+  if (isLoading)
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner size="lg" />
+      </div>
+    )
   if (!listing) return <p className="text-muted-foreground p-6">Listing not found.</p>
 
   const requireLogin = () => {
@@ -44,6 +53,7 @@ export default function MarketplaceListingPage() {
   const onSave = async () => {
     if (!isAuthed) return requireLogin()
     if (!listing.shareToken) return
+    setIsSaving(true)
     try {
       await axiosInstance.post(QUIZ_CLONE(listing.shareToken))
       toast.success('Saved to your library')
@@ -57,56 +67,58 @@ export default function MarketplaceListingPage() {
       } else {
         toast.error('Could not save a copy')
       }
+    } finally {
+      setIsSaving(false)
     }
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6">
       <Breadcrumb items={[{ label: 'Explore', to: exploreBase }, { label: listing.title }]} />
 
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="bg-muted text-muted-foreground w-fit rounded-full px-2 py-0.5 text-xs capitalize">
-            {categoryLabel(listing)}
-          </span>
-          {listing.difficulty && (
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs capitalize ${DIFFICULTY_CHIP[listing.difficulty] ?? 'bg-muted text-muted-foreground'}`}
-            >
-              {listing.difficulty}
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="bg-muted text-muted-foreground w-fit rounded-full px-2 py-0.5 text-xs capitalize">
+              {categoryLabel(listing)}
             </span>
+            {listing.difficulty && (
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs capitalize ${DIFFICULTY_CHIP[listing.difficulty] ?? 'bg-muted text-muted-foreground'}`}
+              >
+                {listing.difficulty}
+              </span>
+            )}
+          </div>
+          <h1 className="text-2xl font-bold">{listing.title}</h1>
+          <p className="text-muted-foreground text-sm">
+            by {listing.authorName} · {listing.questionCount} questions · {listing.playCount} plays
+            · ⭐ {listing.ratingCount > 0 ? listing.ratingAvg.toFixed(1) : '—'} (
+            {listing.ratingCount})
+          </p>
+          {listing.description && <p className="mt-2">{listing.description}</p>}
+        </div>
+
+        <div className="flex gap-3">
+          <Button onClick={onTake} size="md">
+            Take quiz
+          </Button>
+          {/* You already own your own quizzes — no "save a copy" for them. */}
+          {!listing.isMine && (
+            <Button
+              variant="outline"
+              size="md"
+              loading={isSaving}
+              onClick={listing.isCloned ? undefined : onSave}
+              disabled={listing.isCloned || isSaving}
+            >
+              {listing.isCloned ? 'Already in library' : 'Save to my library'}
+            </Button>
           )}
         </div>
-        <h1 className="text-2xl font-bold">{listing.title}</h1>
-        <p className="text-muted-foreground text-sm">
-          by {listing.authorName} · {listing.questionCount} questions · {listing.playCount} plays ·
-          ⭐ {listing.ratingCount > 0 ? listing.ratingAvg.toFixed(1) : '—'} ({listing.ratingCount})
-        </p>
-        {listing.description && <p className="mt-2">{listing.description}</p>}
-      </div>
 
-      <div className="flex gap-3">
-        <button
-          onClick={onTake}
-          className="bg-primary text-primary-foreground h-10 rounded-md px-5 font-medium"
-        >
-          Take quiz
-        </button>
-        {/* You already own your own quizzes — no "save a copy" for them. */}
-        {!listing.isMine && (
-          <button
-            onClick={listing.isCloned ? undefined : onSave}
-            disabled={listing.isCloned}
-            className={`border-border h-10 rounded-md border px-5 font-medium ${
-              listing.isCloned ? 'text-muted-foreground cursor-default opacity-60' : ''
-            }`}
-          >
-            {listing.isCloned ? 'Already in library' : 'Save to my library'}
-          </button>
-        )}
+        {quizId && <Reviews quizId={quizId} canRate={!listing.isMine} />}
       </div>
-
-      {quizId && <Reviews quizId={quizId} canRate={false} />}
     </div>
   )
 }

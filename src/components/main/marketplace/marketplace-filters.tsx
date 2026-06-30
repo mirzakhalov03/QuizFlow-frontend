@@ -44,21 +44,21 @@ export function MarketplaceFilters({
         value={search}
         onChange={(e) => onSearch(e.target.value)}
         placeholder="Search quizzes…"
-        className="min-w-48 flex-1"
         fullWidth
+        itemClassName="sm:flex-1"
       />
       <CustomSelect
         options={CATEGORY_OPTIONS}
         value={category}
         onChange={(v) => onCategory(v as MarketplaceCategory | '')}
         placeholder="All categories"
-        className="min-w-40"
+        className="flex-1 sm:min-w-40 sm:flex-none"
       />
       <CustomSelect
         options={SORT_OPTIONS}
         value={sort}
         onChange={(v) => onSort(v as MarketplaceSort)}
-        className="min-w-36"
+        className="flex-1 sm:min-w-36 sm:flex-none"
       />
     </div>
   )

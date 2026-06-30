@@ -124,10 +124,10 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         role="button"
         tabIndex={0}
         aria-label={`Open quiz: ${quiz.title}`}
-        className={`group bg-card relative flex cursor-pointer flex-col gap-3 rounded-xl transition-colors hover:shadow-sm focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-primary/30 ${isPublished || isImported ? 'p-4 pb-8' : 'p-4'} ${
+        className={`group bg-card focus-visible:ring-primary/30 relative flex cursor-pointer flex-col gap-3 rounded-xl transition-colors hover:shadow-sm focus-visible:ring-2 focus-visible:outline-none ${isPublished || isImported ? 'p-4 pb-8' : 'p-4'} ${
           isPublished
             ? 'border-2 border-emerald-500/60 hover:border-emerald-500/80 focus-visible:border-emerald-500/80 dark:border-emerald-500/40'
-            : 'border border-border hover:border-primary focus-visible:border-primary'
+            : 'border-border hover:border-primary focus-visible:border-primary border'
         }`}
       >
         <div className="flex items-center justify-between gap-2">
@@ -274,7 +274,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
 
         {(isPublished || isImported) && (
           <span
-            className={`pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-t-md border-t border-r border-l px-3 py-0.5 text-[10px] font-semibold tracking-wider uppercase ${
+            className={`pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 rounded-t-md border-t border-r border-l px-3 py-0.5 text-[10px] font-semibold tracking-wider whitespace-nowrap uppercase ${
               isPublished
                 ? 'border-emerald-500/50 bg-emerald-50 text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-950/60 dark:text-emerald-400'
                 : 'border-sky-400/50 bg-sky-50 text-sky-600 dark:border-sky-500/30 dark:bg-sky-950/60 dark:text-sky-400'
@@ -355,8 +355,8 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
                 </li>
               </ul>
               <p className="text-muted-foreground text-sm">
-                Users who already saved a copy keep it. Your quiz stays in your library and
-                remains accessible via share link.
+                Users who already saved a copy keep it. Your quiz stays in your library and remains
+                accessible via share link.
               </p>
             </div>
           }

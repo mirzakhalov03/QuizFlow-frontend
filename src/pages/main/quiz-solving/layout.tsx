@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Outlet, useBlocker, useMatch, useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { PATHS } from '@/lib/path'
+import Spinner from '@/components/ui/spinner'
 import { useGet } from '@/hooks/useGet'
 import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
@@ -178,7 +179,7 @@ function QuizSolving() {
   if (isLoading || !quiz) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+        <Spinner size="lg" />
       </div>
     )
   }
