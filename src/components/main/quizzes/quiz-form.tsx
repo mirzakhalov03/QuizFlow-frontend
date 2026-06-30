@@ -20,11 +20,10 @@ type QuizFormValues = QuizSettingsValues & {
 interface QuizFormProps {
   onBack: () => void
   folderId?: string
-  sourceOverride?: 'obsidian'
 }
 
-export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormProps) {
-  const isObsidian = sourceOverride === 'obsidian'
+export default function QuizForm({ onBack, folderId, }: QuizFormProps) {
+  
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
@@ -36,6 +35,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
       questionCount: '5',
       difficulty: 'medium',
       isTimerEnabled: false,
+      optionsPerQuestion: 4,
       userInstructions: '',
       model: DEFAULT_MODEL,
       folderId: folderId || 'none',
@@ -54,7 +54,7 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
     reset()
     addJob({
       jobId: tempId,
-      title: isObsidian ? 'Generating quiz from Obsidian…' : 'Generating quiz…',
+      title: 'Generating quiz…',
       type: values.type,
       folderId: targetFolderId,
     })
@@ -95,14 +95,6 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {isObsidian && (
-        <div className="rounded-lg border border-purple-200 bg-purple-50 p-3 text-sm text-purple-800 dark:border-purple-800 dark:bg-purple-950/30 dark:text-purple-300">
-          <p className="mb-0.5 font-medium">How to export from Obsidian</p>
-          <p className="text-xs text-purple-700 dark:text-purple-400">
-            In Obsidian, drag your <code>.md</code> files directly into the upload area below.
-          </p>
-        </div>
-      )}
 
       <div className="space-y-1">
         <FileUpload
@@ -115,12 +107,11 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
           maxSize={25}
           maxLength={5}
           hideError={false}
-          dropAccept={isObsidian ? ['MD'] : ['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
+          dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
         />
         <p className="text-muted-foreground text-xs">
-          {isObsidian
-            ? 'Markdown (.md) files only · max 25 MB · up to 5 files'
-            : 'PDF, Word, PPTX, TXT or Markdown · max 25 MB · up to 5 files'}
+          PDF, Word, PPTX, TXT or Markdown (.md) files (including Obsidian notes) · max
+          25 MB · up to 5 files
         </p>
       </div>
 
