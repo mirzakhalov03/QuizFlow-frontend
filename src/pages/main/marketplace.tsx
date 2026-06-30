@@ -32,7 +32,8 @@ export default function MarketplacePage() {
   const { pathname } = useLocation()
   // The same page is mounted in both the app shell (/app/marketplace) and the
   // public zone (/marketplace); keep listing links within whichever zone we're in.
-  const basePath = pathname.startsWith(PATHS.app.root) ? PATHS.app.marketplace : PATHS.marketplace
+  const isPublic = !pathname.startsWith(PATHS.app.root)
+  const basePath = !isPublic ? PATHS.app.marketplace : PATHS.marketplace
 
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<MarketplaceCategory | ''>('')
@@ -69,7 +70,7 @@ export default function MarketplacePage() {
   const others = items.filter((l) => !l.isMine)
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className={`flex flex-col gap-6${isPublic ? ' px-4 py-8 sm:px-6 lg:px-8' : ''}`}>
       <div>
         <h1 className="text-2xl font-bold">Explore</h1>
         <p className="text-muted-foreground">Discover quizzes shared by the community.</p>
