@@ -8,7 +8,7 @@ export default function PublicLayout() {
       <Header />
       {/* Content fills at least the viewport so the footer always sits below the
           fold — it's only revealed once the user scrolls. */}
-      <main className="min-h-screen flex-1">
+      <main className="min-h-screen flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <Outlet />
       </main>
       <Footer />
