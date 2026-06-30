@@ -40,9 +40,18 @@ export default function MarketplacePage() {
   const [page, setPage] = useState(1)
   const debouncedSearch = useDebounce(search, 350)
 
-  const handleSearch = (v: string) => { setSearch(v); setPage(1) }
-  const handleCategory = (v: MarketplaceCategory | '') => { setCategory(v); setPage(1) }
-  const handleSort = (v: MarketplaceSort) => { setSort(v); setPage(1) }
+  const handleSearch = (v: string) => {
+    setSearch(v)
+    setPage(1)
+  }
+  const handleCategory = (v: MarketplaceCategory | '') => {
+    setCategory(v)
+    setPage(1)
+  }
+  const handleSort = (v: MarketplaceSort) => {
+    setSort(v)
+    setPage(1)
+  }
 
   const params = {
     q: debouncedSearch || undefined,

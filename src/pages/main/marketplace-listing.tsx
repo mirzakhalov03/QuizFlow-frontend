@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
@@ -22,6 +22,14 @@ export default function MarketplaceListingPage() {
   const isAuthed = useAuthStore((s) => s.isAuthed)
   const queryClient = useQueryClient()
   const [isSaving, setIsSaving] = useState(false)
+  const [takeCountdown, setTakeCountdown] = useState<number | null>(null)
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current)
+    }
+  }, [])
   // Keep the breadcrumb's "Explore" link within the current zone.
   const exploreBase = pathname.startsWith(PATHS.app.root)
     ? PATHS.app.marketplace
@@ -45,9 +53,24 @@ export default function MarketplaceListingPage() {
   }
 
   const onTake = () => {
-    if (!listing.shareToken) return
-    // Reuse the existing public solving flow. Logged-in takes persist server-side.
-    navigate(`/public/quizzes/${listing.shareToken}`)
+    if (!isAuthed) {
+      if (!listing.shareToken) return
+      navigate(`/public/quizzes/${listing.shareToken}`)
+      return
+    }
+    if (takeCountdown !== null) return
+    setTakeCountdown(3)
+    countdownRef.current = setInterval(() => {
+      setTakeCountdown((prev) => {
+        if (prev === null) return null
+        if (prev <= 1) {
+          clearInterval(countdownRef.current!)
+          navigate(`${PATHS.app.quiz(listing.quizId)}?autostart=1`)
+          return null
+        }
+        return prev - 1
+      })
+    }, 1000)
   }
 
   const onSave = async () => {
@@ -100,8 +123,8 @@ export default function MarketplaceListingPage() {
         </div>
 
         <div className="flex gap-3">
-          <Button onClick={onTake} size="md">
-            Take quiz
+          <Button onClick={onTake} size="md" disabled={takeCountdown !== null} className="min-w-28">
+            {isAuthed && takeCountdown !== null ? takeCountdown : 'Take quiz'}
           </Button>
           {/* You already own your own quizzes — no "save a copy" for them. */}
           {!listing.isMine && (

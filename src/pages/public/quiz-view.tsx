@@ -52,8 +52,11 @@ export default function PublicQuizView() {
   )
   const quiz = data?.data
 
-  const [phase, setPhase] = useState<Phase>('intro')
-  const [name, setName] = useState('')
+  // Authenticated users skip the name gate — use their account name and start immediately.
+  const [phase, setPhase] = useState<Phase>(() =>
+    useAuthStore.getState().user ? 'solving' : 'intro'
+  )
+  const [name, setName] = useState(() => useAuthStore.getState().user?.fullName ?? '')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({})
   const [result, setResult] = useState<PublicSubmitResponse | null>(null)

@@ -7,6 +7,7 @@ import { QUIZ_BY_ID, QUIZ_LIST } from '@/constants/api-endpoints'
 import { toast } from '@/lib/toast'
 import { TYPE_LABELS } from '@/components/main/quizzes/utils'
 import { PublishModal } from '@/components/main/marketplace/publish-modal'
+import { useAuthStore } from '@/store/use-authstore'
 import type { QuestionType, QuizWithQuestions } from '@/types/quiz'
 import { pickIntroQuote } from './intro-quotes'
 import MarkdownText from './markdown-text'
@@ -37,6 +38,8 @@ function buildTypeBreakdown(quiz: QuizWithQuestions): string {
 }
 
 export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Props) {
+  const currentUserId = useAuthStore((s) => s.user?.id)
+  const isOwner = currentUserId === quiz.userId
   const durationMinutes = quiz.timerDuration ? Math.round(quiz.timerDuration / 60) : null
 
   const queryClient = useQueryClient()
@@ -237,7 +240,7 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
             >
               {isCountingDown ? countdown : "Let's go..."}
             </Button>
-            {quiz.properties?.generatedBy !== 'clone' && (
+            {isOwner && quiz.properties?.generatedBy !== 'clone' && (
               <button
                 type="button"
                 onClick={() => setPublishOpen(true)}
@@ -251,7 +254,7 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
         </div>
       </div>
 
-      {quiz.properties?.generatedBy !== 'clone' && (
+      {isOwner && quiz.properties?.generatedBy !== 'clone' && (
         <PublishModal quizId={quiz.id} open={publishOpen} onClose={() => setPublishOpen(false)} />
       )}
     </div>
