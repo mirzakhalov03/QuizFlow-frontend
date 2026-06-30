@@ -121,7 +121,7 @@ function OptionRow({
       <Marker state={state} />
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <MarkdownText text={option.text} className="text-sm" />
+          <MarkdownText text={option.text} className="flex-1 min-w-0 text-sm" />
           {label && (
             <span className={`shrink-0 text-xs font-medium ${label.cls}`}>{label.text}</span>
           )}

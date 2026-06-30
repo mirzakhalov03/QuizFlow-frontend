@@ -81,6 +81,7 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
           timerDuration: toTimerSeconds(values.isTimerEnabled, values.timerDuration),
           model: values.model,
           apiKeyId: values.apiKeyId || undefined,
+          optionsPerQuestion: values.optionsPerQuestion,
           avoidQuizIds:
             values.avoidQuizIds && values.avoidQuizIds.length > 0 ? values.avoidQuizIds : undefined,
         })

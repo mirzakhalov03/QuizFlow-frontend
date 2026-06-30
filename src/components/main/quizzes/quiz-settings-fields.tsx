@@ -230,7 +230,6 @@ function OptionsPerQuestionField<T extends QuizSettingsValues>({
       <Controller
         name={'optionsPerQuestion' as Path<T>}
         control={form.control}
-        defaultValue={4 as never}
         render={({ field }) => (
           <div className="flex gap-2" role="group" aria-label="Number of options per question">
             {OPTIONS_RANGE.map((n) => (

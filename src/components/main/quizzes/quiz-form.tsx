@@ -40,7 +40,6 @@ export default function QuizForm({ onBack, folderId, sourceOverride }: QuizFormP
       model: DEFAULT_MODEL,
       folderId: folderId || 'none',
       apiKeyId: '',
-      optionsPerQuestion: 4,
       avoidQuizIds: [],
     },
   })
