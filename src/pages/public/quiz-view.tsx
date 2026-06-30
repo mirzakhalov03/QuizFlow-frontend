@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { api as axiosInstance } from '@/api/axios-instance'
 import { useGet } from '@/hooks/useGet'
 import { usePost } from '@/hooks/usePost'
 import { useQuizTimer } from '@/hooks/useQuizTimer'
@@ -9,8 +10,14 @@ import { buildSubmitAnswers } from '@/lib/quiz-submit'
 import { getScoreBand } from '@/lib/quiz-result'
 // TODO: re-enable with the "Share result" button (see below).
 // import { shareResultImage } from '@/lib/share-image'
+import { toast } from '@/lib/toast'
 import { PATHS } from '@/lib/path'
-import { PUBLIC_QUIZ_BY_TOKEN, PUBLIC_QUIZ_SUBMIT, QUIZ_CLONE } from '@/constants/api-endpoints'
+import {
+  MARKETPLACE_LISTING,
+  PUBLIC_QUIZ_BY_TOKEN,
+  PUBLIC_QUIZ_SUBMIT,
+  QUIZ_CLONE,
+} from '@/constants/api-endpoints'
 import type { ApiResponse } from '@/types/api'
 import type { PublicQuiz, PublicReviewItem, PublicSubmitResponse, SubmitAnswer } from '@/types/quiz'
 
@@ -25,6 +32,7 @@ import PublicResultQuestion from '@/components/public/public-result-question'
 // TODO: re-enable with the "Share result" button (see below).
 // import ResultShareCard from '@/components/public/result-share-card'
 import AuthPromptModal from '@/components/public/auth-prompt-modal'
+import { RateQuizModal } from '@/components/main/marketplace/rate-quiz-modal'
 
 type Phase = 'intro' | 'solving' | 'results'
 
@@ -44,13 +52,18 @@ export default function PublicQuizView() {
   )
   const quiz = data?.data
 
-  const [phase, setPhase] = useState<Phase>('intro')
-  const [name, setName] = useState('')
+  // Authenticated users skip the name gate — use their account name and start immediately.
+  const [phase, setPhase] = useState<Phase>(() =>
+    useAuthStore.getState().user ? 'solving' : 'intro'
+  )
+  const [name, setName] = useState(() => useAuthStore.getState().user?.fullName ?? '')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({})
   const [result, setResult] = useState<PublicSubmitResponse | null>(null)
   const [authOpen, setAuthOpen] = useState(false)
   const [isCloning, setIsCloning] = useState(false)
+  const [rateOpen, setRateOpen] = useState(false)
+  const ratePrompted = useRef(false)
   // TODO: re-enable with the "Share result" button (see below).
   // const shareCardRef = useRef<HTMLDivElement>(null)
 
@@ -58,7 +71,6 @@ export default function PublicQuizView() {
     { name: string; answers: SubmitAnswer[] },
     ApiResponse<PublicSubmitResponse>
   >()
-  const { mutate: cloneMutation } = usePost<Record<string, never>, ApiResponse<{ id: string }>>()
 
   const handleSubmit = () => {
     if (!quiz || !shareToken || isPending) return
@@ -99,6 +111,30 @@ export default function PublicQuizView() {
     result?.review.forEach((r) => m.set(r.questionId, r))
     return m
   }, [result])
+
+  const { data: listingData } = useGet<{ data: { isMine: boolean } }>(
+    quiz ? MARKETPLACE_LISTING(quiz.id) : '',
+    {
+      enabled: Boolean(quiz?.id) && phase === 'results' && Boolean(user),
+      options: { retry: false },
+    }
+  )
+  const isPublishedQuiz = listingData?.data !== undefined
+  const listingIsMine = listingData?.data?.isMine
+
+  useEffect(() => {
+    if (
+      phase === 'results' &&
+      user &&
+      isPublishedQuiz &&
+      listingIsMine === false &&
+      !ratePrompted.current
+    ) {
+      ratePrompted.current = true
+      const t = setTimeout(() => setRateOpen(true), 800)
+      return () => clearTimeout(t)
+    }
+  }, [phase, user, isPublishedQuiz, listingIsMine])
 
   if (isLoading || quiz?.isOwner) {
     return (
@@ -223,17 +259,23 @@ export default function PublicQuizView() {
         ? `${pct}% — Good effort${nameSuffix}! Keep it up.`
         : `${pct}% — Don't give up${nameSuffix}! Review and try again.`
   }
-  const handleClone = () => {
+  const handleClone = async () => {
     if (!shareToken || isCloning) return
     setIsCloning(true)
-    cloneMutation(
-      QUIZ_CLONE(shareToken),
-      {},
-      {
-        onSuccess: (res) => navigate(PATHS.app.quiz(res.data.id)),
-        onSettled: () => setIsCloning(false),
+    try {
+      const res = await axiosInstance.post<ApiResponse<{ id: string }>>(QUIZ_CLONE(shareToken))
+      navigate(PATHS.app.quiz(res.data.data.id))
+    } catch (err: unknown) {
+      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data
+        ?.error?.code
+      if (code === 'ALREADY_IMPORTED') {
+        toast.error('You already have this quiz in your library')
+      } else {
+        toast.error('Could not save a copy')
       }
-    )
+    } finally {
+      setIsCloning(false)
+    }
   }
 
   return (
@@ -243,7 +285,7 @@ export default function PublicQuizView() {
         <p className={`font-heading text-5xl font-bold tabular-nums ${bandText}`}>
           {result?.correctAnswers}/{result?.totalQuestions}
         </p>
-        <p className="text-muted-foreground text-sm">{feedbackText}</p>
+        <p className="text-muted-foreground text-sm">{feedbackText()}</p>
         <p className="text-muted-foreground text-xs">
           Created by {quiz.owner.fullName} via QuizFlow
         </p>
@@ -286,6 +328,10 @@ export default function PublicQuizView() {
       </div> */}
 
       <AuthPromptModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+
+      {quiz && rateOpen && (
+        <RateQuizModal quizId={quiz.id} open={rateOpen} onClose={() => setRateOpen(false)} />
+      )}
     </div>
   )
 }

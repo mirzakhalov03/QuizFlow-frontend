@@ -166,7 +166,7 @@ export function Toaster() {
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
       className={cn(
-        'pointer-events-none fixed top-4 right-4 z-9999 flex flex-col',
+        'pointer-events-none fixed top-4 right-4 z-[9999] flex flex-col',
         expanded && 'gap-3.5'
       )}
       style={{

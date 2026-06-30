@@ -10,14 +10,12 @@ export default function QuizFormWrapper({ folderId }: { folderId?: string }) {
   const [view, setView] = useState<View>('selector')
   const { isOpen } = useModal('quiz-add')
 
-
   useEffect(() => {
     if (!isOpen) {
       const timer = setTimeout(() => setView('selector'), 300)
       return () => clearTimeout(timer)
     }
   }, [isOpen])
-
 
   return (
     <>

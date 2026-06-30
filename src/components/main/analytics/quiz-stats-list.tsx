@@ -36,9 +36,7 @@ export default function QuizStatsList({ rows }: Props) {
                   <td className="px-4 py-3 text-right tabular-nums">
                     {Math.round(r.averageScore)}%
                   </td>
-                  <td className="px-4 py-3 text-right tabular-nums">
-                    {Math.round(r.bestScore)}%
-                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums">{Math.round(r.bestScore)}%</td>
                 </tr>
               ))}
             </tbody>

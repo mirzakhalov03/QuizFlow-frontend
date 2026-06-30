@@ -45,10 +45,10 @@ export default function MarkdownText({ text, className = '', as: Component = 'di
             return (
               <div
                 key={index}
-                className="my-4 overflow-hidden rounded-lg border border-border bg-muted/30 dark:bg-zinc-900/40"
+                className="border-border bg-muted/30 my-4 overflow-hidden rounded-lg border dark:bg-zinc-900/40"
               >
                 {match[1] && (
-                  <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-1.5 text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
+                  <div className="border-border bg-muted/50 text-muted-foreground flex items-center justify-between border-b px-4 py-1.5 font-mono text-[10px] tracking-wider uppercase">
                     <span>{match[1]}</span>
                   </div>
                 )}
@@ -82,7 +82,7 @@ export default function MarkdownText({ text, className = '', as: Component = 'di
                 return (
                   <code
                     key={i}
-                    className="bg-muted text-foreground rounded-md border border-border px-1.5 py-0.5 font-mono text-[0.85em] font-medium"
+                    className="bg-muted text-foreground border-border rounded-md border px-1.5 py-0.5 font-mono text-[0.85em] font-medium"
                   >
                     {code}
                   </code>

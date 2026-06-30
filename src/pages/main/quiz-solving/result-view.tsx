@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Navigate } from 'react-router-dom'
+import Spinner from '@/components/ui/spinner'
 import { useGet } from '@/hooks/useGet'
 import { QUIZ_RESULT } from '@/constants/api-endpoints'
 import { PATHS } from '@/lib/path'
@@ -42,7 +43,7 @@ export default function QuizResultView() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+        <Spinner size="lg" />
       </div>
     )
   }

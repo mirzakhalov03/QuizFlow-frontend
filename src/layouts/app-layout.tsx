@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, History, Library, ListChecks, LogOut, CircleUser } from 'lucide-react'
+import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser } from 'lucide-react'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
@@ -22,8 +22,11 @@ const navItems = [
   { label: 'History', to: PATHS.app.history, icon: History },
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
   { label: 'Library', to: PATHS.app.library, icon: Library },
+  { label: 'Explore', to: PATHS.app.marketplace, icon: Store },
   { label: 'Account', to: PATHS.app.account, icon: CircleUser },
 ]
+
+const mobileNavItems = navItems.filter((item) => item.label !== 'Account')
 
 export default function AppLayout() {
   const navigate = useNavigate()
@@ -102,7 +105,7 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      <main className="flex h-screen min-w-0 flex-1 flex-col">
+      <main className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
         <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-3 sm:px-6">
           <Logo to={PATHS.app.quizzes} size="sm" className="lg:hidden" />
           {quizHeader ? (
@@ -131,7 +134,11 @@ export default function AppLayout() {
               </div>
             )}
             <ThemeToggle />
-            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
+            <NavLink
+              to={PATHS.app.account}
+              aria-label="Account"
+              className="ring-offset-background focus-visible:ring-primary block h-8 w-8 shrink-0 overflow-hidden rounded-full transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none lg:pointer-events-none"
+            >
               {profilePicture ? (
                 <img src={profilePicture} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -139,7 +146,7 @@ export default function AppLayout() {
                   {firstName.charAt(0).toUpperCase()}
                 </div>
               )}
-            </div>
+            </NavLink>
             <button
               type="button"
               onClick={() => setConfirmingLogout(true)}
@@ -150,37 +157,37 @@ export default function AppLayout() {
             </button>
           </div>
         </div>
-        <div className="bg-secondary/15 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 sm:pb-24 lg:pb-6">
+        <div className="bg-secondary/15 min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
           <Outlet />
         </div>
-      </main>
 
-      <nav
-        aria-label="Primary"
-        className="border-border bg-background fixed inset-x-0 bottom-0 z-40 flex border-t lg:hidden"
-      >
-        {navItems.map(({ label, to, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
-          >
-            {({ isActive }) => (
-              <span
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
-                  isActive
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <Icon size={20} />
-                <span>{label}</span>
-              </span>
-            )}
-          </NavLink>
-        ))}
-      </nav>
+        <nav
+          aria-label="Primary"
+          className="border-border bg-background flex shrink-0 border-t lg:hidden"
+        >
+          {mobileNavItems.map(({ label, to, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
+            >
+              {({ isActive }) => (
+                <span
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
+                    isActive
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <Icon size={20} />
+                  <span>{label}</span>
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+      </main>
 
       <OnboardingModal />
 

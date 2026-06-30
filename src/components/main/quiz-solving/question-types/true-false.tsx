@@ -24,7 +24,7 @@ export default function TrueFalse({ options, value, onChange }: Props) {
                 onChange(option.id)
               }
             }}
-            className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-3 text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            className={`focus-visible:ring-primary flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-3 text-sm font-medium transition-colors outline-none focus-visible:ring-2 ${
               selected
                 ? 'border-primary bg-primary/10 text-primary'
                 : 'border-border hover:border-primary/50 hover:bg-muted/50'
