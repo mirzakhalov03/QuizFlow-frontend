@@ -17,6 +17,7 @@ import type { QuizSolvingHeader } from '@/pages/main/quiz-solving/context'
 import { QUIZ_SOLVING_HEADER_KEY } from '@/pages/main/quiz-solving/context'
 import OnboardingModal from '@/components/main/onboarding/onboarding-modal'
 import { useSidebarStore } from '@/store/use-sidebar-store'
+import { useHasNotionIntegration } from '@/hooks/useHasNotionIntegration'
 
 const navItems = [
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
@@ -33,6 +34,9 @@ export default function AppLayout() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const { profilePicture, fetchProfile } = useUserProfileStore()
+
+  // Pre-fetch Notion integration status to cache it globally
+  useHasNotionIntegration()
 
   useEffect(() => {
     fetchProfile()

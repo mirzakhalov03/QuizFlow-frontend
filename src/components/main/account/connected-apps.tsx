@@ -12,6 +12,7 @@ import {
   type Integration,
   type IntegrationProvider,
 } from '@/types/integration'
+import type { ApiResponse } from '@/types/api'
 
 import NotionLogo from '@/assets/notionLogo.png'
 import GoogleLogo from '@/assets/googleLogo.png'
@@ -38,7 +39,8 @@ const PROVIDER_META: Record<IntegrationProvider, ProviderMeta> = {
 export default function ConnectedApps() {
   const queryClient = useQueryClient()
 
-  const { data: integrations, isLoading } = useGet<Integration[]>(INTEGRATIONS)
+  const { data, isLoading } = useGet<ApiResponse<{ integrations: Integration[] }>>(INTEGRATIONS)
+  const integrations = data?.data?.integrations
 
   const connected = new Set(integrations?.map((i) => i.provider) ?? [])
 
