@@ -45,7 +45,9 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
   const { data: quizzesData } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
     params: { limit: 500 },
   })
-  const quizzes = quizzesData?.data?.items || []
+  const quizzes = [...(quizzesData?.data?.items || [])].sort((a, b) =>
+    a.title.localeCompare(b.title),
+  )
 
   return (
     <>
