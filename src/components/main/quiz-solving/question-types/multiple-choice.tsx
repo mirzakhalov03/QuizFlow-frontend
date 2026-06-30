@@ -24,7 +24,7 @@ export default function MultipleChoice({ options, value, onChange }: Props) {
                 onChange(option.id)
               }
             }}
-            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            className={`focus-visible:ring-primary flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors outline-none focus-visible:ring-2 ${
               selected
                 ? 'border-primary bg-primary/10 font-medium'
                 : 'border-border hover:border-primary/50 hover:bg-muted/50'
@@ -37,7 +37,7 @@ export default function MultipleChoice({ options, value, onChange }: Props) {
             >
               {selected && <div className="bg-primary h-2 w-2 rounded-full" />}
             </div>
-            <MarkdownText text={option.text} className="flex-1 min-w-0" as="div" />
+            <MarkdownText text={option.text} className="min-w-0 flex-1" as="div" />
           </div>
         )
       })}

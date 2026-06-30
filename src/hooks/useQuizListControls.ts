@@ -5,6 +5,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { useGet } from '@/hooks/useGet'
 import type { PaginatedResponse, Quiz, QuestionType } from '@/types/quiz'
 export type SortOption = 'newest' | 'oldest'
+export type StatusFilter = 'published' | 'unpublished' | 'imported'
 
 const SEARCH_DEBOUNCE_MS = 300
 
@@ -12,6 +13,7 @@ export function useQuizListControls() {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortOption>('newest')
   const [filterTypes, setFilterTypes] = useState<QuestionType[]>([])
+  const [statusFilter, setStatusFilter] = useState<StatusFilter | undefined>(undefined)
 
   const debouncedSearch = useDebounce(search.trim(), SEARCH_DEBOUNCE_MS)
 
@@ -20,8 +22,9 @@ export function useQuizListControls() {
       search: debouncedSearch || undefined,
       types: filterTypes.length > 0 ? filterTypes.join(',') : undefined,
       sort,
+      status: statusFilter,
     }),
-    [debouncedSearch, filterTypes, sort]
+    [debouncedSearch, filterTypes, sort, statusFilter]
   )
 
   const { data, isLoading, isFetching, isError } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
@@ -35,18 +38,24 @@ export function useQuizListControls() {
     )
   }, [])
 
+  const toggleStatusFilter = useCallback((status: StatusFilter) => {
+    setStatusFilter((prev) => (prev === status ? undefined : status))
+  }, [])
+
   return {
     items: data?.data?.items ?? [],
     total: data?.data?.pagination?.count ?? 0,
     isLoading,
     isFetching,
     isError,
-    isFiltering: debouncedSearch.length > 0 || filterTypes.length > 0,
+    isFiltering: debouncedSearch.length > 0 || filterTypes.length > 0 || statusFilter !== undefined,
     search,
     setSearch,
     sort,
     setSort,
     filterTypes,
     toggleFilterType,
+    statusFilter,
+    toggleStatusFilter,
   }
 }

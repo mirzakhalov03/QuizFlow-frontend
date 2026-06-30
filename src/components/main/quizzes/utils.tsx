@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import type { QuestionType } from '@/types/quiz'
 import { DEFAULT_MODEL } from '@/lib/models'
 export { SORTED_AI_MODELS as aiModels, DEFAULT_MODEL } from '@/lib/models'

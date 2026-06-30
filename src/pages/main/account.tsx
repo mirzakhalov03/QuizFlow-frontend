@@ -136,7 +136,7 @@ export default function Account() {
       {/* HORIZONTAL TAB MENU */}
       <nav
         role="tablist"
-        className="border-border flex w-full overflow-x-auto border-b [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="bg-muted flex w-full gap-1 overflow-x-auto rounded-xl p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-label="Settings sections"
       >
         {tabs.map((tab) => {
@@ -150,10 +150,10 @@ export default function Account() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'relative -mb-0.5 flex min-w-max flex-1 shrink-0 items-center justify-center gap-2 border-b-2 px-4 pb-3 text-sm font-medium transition-all duration-200 sm:px-0',
+                'flex min-w-max flex-1 shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'border-primary text-primary z-10'
-                  : 'text-muted-foreground hover:text-foreground border-transparent'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/60'
               )}
             >
               <Icon size={16} />

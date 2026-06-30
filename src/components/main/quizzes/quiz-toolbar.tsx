@@ -3,7 +3,7 @@ import { ArrowUpDown, Check, SlidersHorizontal } from 'lucide-react'
 
 import Button from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import type { SortOption } from '@/hooks/useQuizListControls'
+import type { SortOption, StatusFilter } from '@/hooks/useQuizListControls'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { cn } from '@/lib/utils'
 import type { QuestionType } from '@/types/quiz'
@@ -25,6 +25,8 @@ type Props = {
   onSortChange: (sort: SortOption) => void
   filterTypes: QuestionType[]
   onToggleFilter: (type: QuestionType) => void
+  statusFilter: StatusFilter | undefined
+  onToggleStatus: (status: StatusFilter) => void
 }
 
 export function QuizToolbar({
@@ -34,6 +36,8 @@ export function QuizToolbar({
   onSortChange,
   filterTypes,
   onToggleFilter,
+  statusFilter,
+  onToggleStatus,
 }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -47,7 +51,12 @@ export function QuizToolbar({
         />
       </div>
       <SortDropdown sort={sort} onChange={onSortChange} />
-      <FilterDropdown filterTypes={filterTypes} onToggle={onToggleFilter} />
+      <FilterDropdown
+        filterTypes={filterTypes}
+        onToggle={onToggleFilter}
+        statusFilter={statusFilter}
+        onToggleStatus={onToggleStatus}
+      />
     </div>
   )
 }
@@ -91,17 +100,27 @@ function SortDropdown({ sort, onChange }: { sort: SortOption; onChange: (s: Sort
   )
 }
 
+const STATUS_OPTIONS: { label: string; value: StatusFilter }[] = [
+  { label: 'Published', value: 'published' },
+  { label: 'Unpublished', value: 'unpublished' },
+  { label: 'Imported', value: 'imported' },
+]
+
 function FilterDropdown({
   filterTypes,
   onToggle,
+  statusFilter,
+  onToggleStatus,
 }: {
   filterTypes: QuestionType[]
   onToggle: (t: QuestionType) => void
+  statusFilter: StatusFilter | undefined
+  onToggleStatus: (s: StatusFilter) => void
 }) {
   const [open, setOpen] = useState(false)
   const ref = useClickOutside<HTMLDivElement>(() => setOpen(false))
 
-  const isActive = filterTypes.length > 0
+  const isActive = filterTypes.length > 0 || statusFilter !== undefined
 
   return (
     <div ref={ref} className="relative">
@@ -117,7 +136,7 @@ function FilterDropdown({
       </Button>
 
       {open && (
-        <div className="bg-popover text-popover-foreground border-border absolute left-0 z-50 mt-1 min-w-44 rounded-md border shadow-lg sm:left-auto sm:right-0">
+        <div className="bg-popover text-popover-foreground border-border absolute right-0 z-50 mt-1 min-w-44 rounded-md border shadow-lg">
           <div className="border-border text-muted-foreground border-b px-3 py-2 text-xs font-medium">
             Quiz Type
           </div>
@@ -143,6 +162,35 @@ function FilterDropdown({
                   {checked && <Check className="text-primary-foreground h-3 w-3" />}
                 </div>
                 {t.label}
+              </button>
+            )
+          })}
+
+          <div className="border-border text-muted-foreground border-t border-b px-3 py-2 text-xs font-medium">
+            Status
+          </div>
+          {STATUS_OPTIONS.map((opt) => {
+            const checked = statusFilter === opt.value
+            return (
+              <button
+                key={opt.value}
+                onClick={() => onToggleStatus(opt.value)}
+                className={cn(
+                  'flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors',
+                  checked
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                )}
+              >
+                <div
+                  className={cn(
+                    'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border',
+                    checked ? 'bg-primary border-primary' : 'border-border'
+                  )}
+                >
+                  {checked && <div className="bg-primary-foreground h-1.5 w-1.5 rounded-full" />}
+                </div>
+                {opt.label}
               </button>
             )
           })}
