@@ -2,9 +2,8 @@ import { PATHS } from '@/lib/path'
 import { Link } from 'react-router-dom'
 import { FolderPlus, Folder as FolderIcon, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useGet } from '@/hooks/useGet'
+import { useInfinite } from '@/hooks/useInfinite'
 import { useDelete } from '@/hooks/useDelete'
-import { ApiResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
 import { useModal } from '@/hooks/useModal'
 import { useClickOutside } from '@/hooks/useClickOutside'
@@ -18,13 +17,21 @@ import { useQueryClient } from '@tanstack/react-query'
 
 export default function Library() {
   const queryClient = useQueryClient()
-  const { data, isLoading } = useGet<ApiResponse<Folder[]>>('/folders')
+  const {
+    items: folders,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    observerRef,
+  } = useInfinite<Folder>('/folders', {
+    page_key: 'offset',
+    initialPageParam: 0,
+    limit_val: 24,
+  })
   const { openModal } = useModal(NEW_FOLDER_MODAL_KEY)
 
   const [editingFolder, setEditingFolder] = useState<Folder | null>(null)
   const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null)
-
-  const folders = data?.data || []
 
   const { mutate: deleteFolder, isPending: isDeleting } = useDelete({
     onSuccess: () => {
@@ -80,8 +87,19 @@ export default function Library() {
               onDelete={() => setDeletingFolderId(folder.id)}
             />
           ))}
+
+          {hasNextPage && (
+            <div ref={observerRef} className="col-span-full flex justify-center py-8">
+              {isFetchingNextPage ? (
+                <Spinner size="md" />
+              ) : (
+                <div className="h-2 w-2" />
+              )}
+            </div>
+          )}
         </div>
       )}
+
 
       <NewFolderModal />
       <EditFolderModal

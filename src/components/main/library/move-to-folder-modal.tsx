@@ -6,7 +6,7 @@ import { useGet } from '@/hooks/useGet'
 import { usePatch } from '@/hooks/usePatch'
 import { usePost } from '@/hooks/usePost'
 import { useQueryClient } from '@tanstack/react-query'
-import { ApiResponse } from '@/types/api'
+import { PaginatedResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
 import { toast } from '@/lib/toast'
 import { Folder as FolderIcon, Check, X, Search, FolderPlus, Info } from 'lucide-react'
@@ -33,15 +33,18 @@ export default function MoveToFolderModal({
   const [searchTerm, setSearchTerm] = useState('')
 
   const { data: foldersData, isLoading: isLoadingFolders } =
-    useGet<ApiResponse<Folder[]>>('/folders')
+    useGet<PaginatedResponse<Folder>>('/folders', {
+      params: { limit: 500 },
+    })
   const { mutate: createFolder, isPending: isCreatingFolder } = usePost()
   const { mutate: moveQuiz, isPending: isMoving } = usePatch()
 
   const filteredFolders = useMemo(() => {
-    const folders = foldersData?.data || []
+    const folders = foldersData?.data?.items || []
     if (!searchTerm.trim()) return folders
     return folders.filter((f) => f.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  }, [foldersData?.data, searchTerm])
+  }, [foldersData?.data?.items, searchTerm])
+
 
   const handleMove = (folderId: string | null) => {
     moveQuiz(
