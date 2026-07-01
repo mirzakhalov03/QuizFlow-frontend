@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import Modal from '@/components/custom/modal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +13,7 @@ import { Folder as FolderIcon, Check, X, Search, FolderPlus, Info } from 'lucide
 import Spinner from '@/components/ui/spinner'
 import { QUIZ_LIST } from '@/constants/api-endpoints'
 import { cn } from '@/lib/utils'
+import { useDebounce } from '@/hooks/useDebounce'
 
 interface MoveToFolderModalProps {
   quizId: string
@@ -31,17 +32,14 @@ export default function MoveToFolderModal({
   const [showNewFolder, setShowNewFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearch = useDebounce(searchTerm, 300)  
 
   const { data: foldersData, isLoading: isLoadingFolders } =
-    useGet<ApiResponse<Folder[]>>('/folders')
+    useGet<ApiResponse<Folder[]>>('/folders', {
+    params: { search: debouncedSearch || undefined },})
   const { mutate: createFolder, isPending: isCreatingFolder } = usePost()
   const { mutate: moveQuiz, isPending: isMoving } = usePatch()
-
-  const filteredFolders = useMemo(() => {
-    const folders = foldersData?.data || []
-    if (!searchTerm.trim()) return folders
-    return folders.filter((f) => f.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  }, [foldersData?.data, searchTerm])
+  const filteredFolders = foldersData?.data || []
 
   const handleMove = (folderId: string | null) => {
     moveQuiz(
