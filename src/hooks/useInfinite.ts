@@ -119,7 +119,9 @@ export const useInfinite = <
         if (itemsList.length < limit_val) {
           return undefined
         }
-        return allPages.length + initialPageParam
+        return page_key === 'offset'
+          ? allPages.length * limit_val + initialPageParam
+          : allPages.length + initialPageParam
       }
 
       return undefined
