@@ -27,7 +27,7 @@ export default function AiFeedbackCard() {
   if (!feedback.summary && weakTopics.length === 0 && recommendations.length === 0) return null
 
   return (
-    <section className="border-primary/15 from-primary/8 via-primary/3 relative overflow-hidden rounded-2xl border bg-gradient-to-br to-transparent p-5 shadow-sm sm:p-6">
+    <section className="border-primary/15 from-primary/8 via-primary/3 relative overflow-hidden rounded-2xl border bg-linear-to-br to-transparent p-5 shadow-sm sm:p-6">
       {/* Soft glow accent */}
       <div className="bg-primary/10 pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full blur-3xl" />
 

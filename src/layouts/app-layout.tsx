@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser, PanelLeft } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
@@ -17,6 +18,8 @@ import type { QuizSolvingHeader } from '@/pages/main/quiz-solving/context'
 import { QUIZ_SOLVING_HEADER_KEY } from '@/pages/main/quiz-solving/context'
 import OnboardingModal from '@/components/main/onboarding/onboarding-modal'
 import { useSidebarStore } from '@/store/use-sidebar-store'
+import { INTEGRATIONS } from '@/constants/api-endpoints'
+import { getRequest } from '@/hooks/useGet'
 
 const navItems = [
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
@@ -33,10 +36,19 @@ export default function AppLayout() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const { profilePicture, fetchProfile } = useUserProfileStore()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     fetchProfile()
-  }, [fetchProfile])
+    // Pre-warm the integrations cache so the quiz-source modal can read
+    // Notion's connected state instantly, without waiting for a network
+    // round-trip at the moment the modal first opens.
+    queryClient.prefetchQuery({
+      queryKey: [INTEGRATIONS],
+      queryFn: () => getRequest(INTEGRATIONS),
+      staleTime: 1000 * 5 * 60, // 5 min — matches useGet's DEFAULT_STALE_TIME
+    })
+  }, [fetchProfile, queryClient])
 
   const [confirmingLogout, setConfirmingLogout] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)

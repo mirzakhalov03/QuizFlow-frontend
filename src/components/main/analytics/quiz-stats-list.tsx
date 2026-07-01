@@ -29,7 +29,7 @@ export default function QuizStatsList({ rows }: Props) {
             <tbody>
               {rows.map((r) => (
                 <tr key={r.quizId} className="border-border border-b last:border-b-0">
-                  <td className="max-w-[14rem] truncate px-4 py-3" title={r.quizTitle}>
+                  <td className="max-w-56 truncate px-4 py-3" title={r.quizTitle}>
                     {r.quizTitle}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">{r.attemptCount}</td>
