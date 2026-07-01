@@ -4,7 +4,7 @@ import QuizForm from './quiz-form'
 import NotionQuizForm from './notion-quiz-form'
 import { useModal } from '@/hooks/useModal'
 
-type View = 'selector' | 'file' | 'notion' | 'obsidian'
+type View = 'selector' | 'file' | 'notion' 
 
 export default function QuizFormWrapper({ folderId }: { folderId?: string }) {
   const [view, setView] = useState<View>('selector')
@@ -23,14 +23,6 @@ export default function QuizFormWrapper({ folderId }: { folderId?: string }) {
       {view === 'file' && <QuizForm folderId={folderId} onBack={() => setView('selector')} />}
       {view === 'notion' && (
         <NotionQuizForm folderId={folderId} onBack={() => setView('selector')} />
-      )}
-
-      {view === 'obsidian' && (
-        <QuizForm
-          folderId={folderId}
-          onBack={() => setView('selector')}
-          sourceOverride="obsidian"
-        />
       )}
     </>
   )
