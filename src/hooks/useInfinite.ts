@@ -55,7 +55,7 @@ export const useInfinite = <
   }, [params])
 
   const queryKey = useMemo(() => {
-    return [url, ...deps, ...Object.values(cleanedParams)]
+    return [url, ...deps, cleanedParams]
   }, [url, deps, cleanedParams])
 
   const queryResult = useInfiniteQuery<TQueryFnData, TError, TData, QueryKey, number>({
