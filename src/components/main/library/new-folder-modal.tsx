@@ -15,12 +15,14 @@ import { Search, CheckCircle2, Circle, FileQuestion, Calendar, FolderPlus } from
 import { cn } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { TYPE_COLORS, TYPE_LABELS } from '../quizzes/utils'
+import { useDebounce } from '@/hooks/useDebounce'
 
 export const NEW_FOLDER_MODAL_KEY = 'new-folder'
 
 export default function NewFolderModal() {
   const [name, setName] = useState('')
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 300)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   const { isOpen, closeModal } = useModal(NEW_FOLDER_MODAL_KEY)
@@ -31,7 +33,10 @@ export default function NewFolderModal() {
   const { data: quizzesData, isLoading: isLoadingQuizzes } = useGet<PaginatedResponse<Quiz>>(
     QUIZ_LIST,
     {
-      params: { limit: 500 },
+      params: { 
+        search: debouncedSearch || undefined,
+        limit: 500,
+      },
       enabled: isOpen,
     }
   )
@@ -42,11 +47,6 @@ export default function NewFolderModal() {
     return quizzesData.data.items.filter((quiz) => !quiz.folderId)
   }, [quizzesData])
 
-  const filteredQuizzes = useMemo(() => {
-    if (!search.trim()) return availableQuizzes
-    const term = search.toLowerCase()
-    return availableQuizzes.filter((quiz) => quiz.title.toLowerCase().includes(term))
-  }, [availableQuizzes, search])
 
   const toggleSelection = (quizId: string) => {
     const newSelected = new Set(selectedIds)
@@ -149,7 +149,7 @@ export default function NewFolderModal() {
                   No ungrouped quizzes available.
                 </p>
               </div>
-            ) : filteredQuizzes.length === 0 ? (
+            ) : availableQuizzes.length === 0 && debouncedSearch ? (
               <div className="flex h-32 flex-col items-center justify-center p-4 text-center">
                 <div className="bg-muted mb-2 flex h-8 w-8 items-center justify-center rounded-full">
                   <Search className="text-muted-foreground" size={16} />
@@ -160,7 +160,7 @@ export default function NewFolderModal() {
               </div>
             ) : (
               <div className="divide-border bg-background flex flex-col divide-y">
-                {filteredQuizzes.map((quiz) => {
+                {availableQuizzes.map((quiz) => {
                   const isSelected = selectedIds.has(quiz.id)
                   return (
                     <div
