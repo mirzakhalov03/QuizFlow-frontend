@@ -21,6 +21,8 @@ export default function Quizzes() {
     items,
     isLoading,
     isFetching,
+    isFetchingNextPage,
+    hasNextPage,
     isError,
     isFiltering,
     search,
@@ -31,6 +33,7 @@ export default function Quizzes() {
     toggleFilterType,
     statusFilter,
     toggleStatusFilter,
+    observerRef,
   } = useQuizListControls()
 
   return (
@@ -56,7 +59,7 @@ export default function Quizzes() {
         <div
           className={cn(
             'grid grid-cols-1 items-stretch gap-3 transition-opacity sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-            isFetching && 'opacity-60'
+            isFetching && !isFetchingNextPage && 'opacity-60'
           )}
         >
           <Button
@@ -81,6 +84,12 @@ export default function Quizzes() {
           {items.map((quiz) => (
             <QuizCard key={quiz.id} quiz={quiz} />
           ))}
+
+          {hasNextPage && (
+            <div ref={observerRef} className="col-span-full flex justify-center py-8">
+              {isFetchingNextPage ? <Spinner size="md" /> : <div className="h-2 w-2" />}
+            </div>
+          )}
 
           {isError && items.length === 0 && (
             <p className="text-destructive col-span-full py-10 text-center text-sm">

@@ -6,7 +6,7 @@ import { useGet } from '@/hooks/useGet'
 import { usePatch } from '@/hooks/usePatch'
 import { usePost } from '@/hooks/usePost'
 import { useQueryClient } from '@tanstack/react-query'
-import { ApiResponse } from '@/types/api'
+import { PaginatedResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
 import { toast } from '@/lib/toast'
 import { Folder as FolderIcon, Check, X, Search, FolderPlus, Info } from 'lucide-react'
@@ -32,14 +32,16 @@ export default function MoveToFolderModal({
   const [showNewFolder, setShowNewFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  const debouncedSearch = useDebounce(searchTerm, 300)  
+  const debouncedSearch = useDebounce(searchTerm, 300)
 
   const { data: foldersData, isLoading: isLoadingFolders } =
-    useGet<ApiResponse<Folder[]>>('/folders', {
-    params: { search: debouncedSearch || undefined },})
+    useGet<PaginatedResponse<Folder>>('/folders', {
+      params: { search: debouncedSearch || undefined },
+    })
   const { mutate: createFolder, isPending: isCreatingFolder } = usePost()
   const { mutate: moveQuiz, isPending: isMoving } = usePatch()
-  const filteredFolders = foldersData?.data || []
+  const filteredFolders = foldersData?.data?.items || []
+
 
   const handleMove = (folderId: string | null) => {
     moveQuiz(
