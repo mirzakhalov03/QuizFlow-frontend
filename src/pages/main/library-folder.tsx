@@ -10,6 +10,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useGet } from '@/hooks/useGet'
+import { useInfinite } from '@/hooks/useInfinite'
 import { useDelete } from '@/hooks/useDelete'
 import { ApiResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
@@ -52,12 +53,22 @@ export default function LibraryFolder() {
   const { data: folderData, isLoading: isLoadingFolder } = useGet<ApiResponse<Folder>>(
     `/folders/${folderId}`
   )
-  const { data: quizzesData, isLoading: isLoadingQuizzes } = useGet<ApiResponse<Quiz[]>>(
-    `/folders/${folderId}/quizzes`
-  )
+  const {
+    items: quizzes,
+    isLoading: isLoadingQuizzes,
+    isFetchingNextPage,
+    hasNextPage,
+    observerRef,
+  } = useInfinite<Quiz>(`/folders/${folderId}/quizzes`, {
+    page_key: 'offset',
+    initialPageParam: 0,
+    limit_val: 20,
+    options: {
+      enabled: !!folderId,
+    },
+  })
 
   const folder = folderData?.data
-  const quizzes = quizzesData?.data || []
 
   const { mutate: deleteFolder, isPending: isDeleting } = useDelete({
     onSuccess: () => {
@@ -183,6 +194,16 @@ export default function LibraryFolder() {
           {quizzes.map((quiz) => (
             <QuizCard key={quiz.id} quiz={quiz} />
           ))}
+
+          {hasNextPage && (
+            <div ref={observerRef} className="col-span-full flex justify-center py-8">
+              {isFetchingNextPage ? (
+                <Spinner size="md" />
+              ) : (
+                <div className="h-2 w-2" />
+              )}
+            </div>
+          )}
         </div>
       )}
 

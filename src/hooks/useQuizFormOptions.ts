@@ -3,26 +3,25 @@ import type { FieldValues, Path, PathValue, UseFormReturn } from 'react-hook-for
 
 import { useGet } from '@/hooks/useGet'
 import { useByokKeys } from '@/hooks/useByokKeys'
-import { ApiResponse } from '@/types/api'
+import { PaginatedResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
 
-/**
- * Shared data for the quiz-generation forms: folder + BYOK select options, and
- * the BYOK keys themselves. Also seeds the form's `apiKeyId` with the user's
- * first key once (if unset), so BYOK users default to their own credits.
- */
+ 
 export function useQuizFormOptions<T extends FieldValues>(form: UseFormReturn<T>) {
   const { setValue, getValues } = form
   const { keys: byokKeys } = useByokKeys()
-  const { data: foldersData } = useGet<ApiResponse<Folder[]>>('/folders')
+  const { data: foldersData } = useGet<PaginatedResponse<Folder>>('/folders', {
+    params: { limit: 500 },
+  })
 
   const folderOptions = useMemo(() => {
-    const folders = foldersData?.data || []
+    const folders = foldersData?.data?.items || []
     return [
       { label: 'No Folder', value: 'none' },
       ...folders.map((f) => ({ label: f.name, value: f.id })),
     ]
-  }, [foldersData?.data])
+  }, [foldersData?.data?.items])
+
 
   const byokOptions = useMemo(() => {
     return [

@@ -1,13 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
-import { keepPreviousData } from '@tanstack/react-query'
 import { QUIZ_LIST } from '@/constants/api-endpoints'
 import { useDebounce } from '@/hooks/useDebounce'
-import { useGet } from '@/hooks/useGet'
-import type { PaginatedResponse, Quiz, QuestionType } from '@/types/quiz'
+import { useInfinite } from '@/hooks/useInfinite'
+import type { Quiz, QuestionType } from '@/types/quiz'
+
 export type SortOption = 'newest' | 'oldest'
 export type StatusFilter = 'published' | 'unpublished' | 'imported'
 
 const SEARCH_DEBOUNCE_MS = 300
+const LIMIT_PER_PAGE = 12
 
 export function useQuizListControls() {
   const [search, setSearch] = useState('')
@@ -27,9 +28,22 @@ export function useQuizListControls() {
     [debouncedSearch, filterTypes, sort, statusFilter]
   )
 
-  const { data, isLoading, isFetching, isError } = useGet<PaginatedResponse<Quiz>>(QUIZ_LIST, {
+  const {
+    items,
+    isLoading,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    isError,
+    observerRef,
+  } = useInfinite<Quiz>(QUIZ_LIST, {
     params,
-    options: { staleTime: 0, placeholderData: keepPreviousData },
+    page_key: 'offset',
+    initialPageParam: 0,
+    limit_val: LIMIT_PER_PAGE,
+    options: {
+      staleTime: 0,
+    },
   })
 
   const toggleFilterType = useCallback((type: QuestionType) => {
@@ -43,10 +57,11 @@ export function useQuizListControls() {
   }, [])
 
   return {
-    items: data?.data?.items ?? [],
-    total: data?.data?.pagination?.count ?? 0,
+    items,
     isLoading,
     isFetching,
+    isFetchingNextPage,
+    hasNextPage,
     isError,
     isFiltering: debouncedSearch.length > 0 || filterTypes.length > 0 || statusFilter !== undefined,
     search,
@@ -57,5 +72,7 @@ export function useQuizListControls() {
     toggleFilterType,
     statusFilter,
     toggleStatusFilter,
+    observerRef,
   }
 }
+
