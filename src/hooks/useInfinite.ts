@@ -48,9 +48,7 @@ export const useInfinite = <
   const cleanedParams = useMemo(() => {
     if (!params) return {}
     return Object.fromEntries(
-      Object.entries(params).filter(
-        ([, v]) => v !== undefined && v !== null && v !== ''
-      )
+      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
     )
   }, [params])
 
@@ -103,25 +101,15 @@ export const useInfinite = <
             : typeof pag.count === 'number'
               ? pag.count
               : null
-
         if (total !== null) {
-          // If total <= limit it might be the page-count, not total items.
-          // Fall back to items-length heuristic in that case.
-          if (total > limit) {
-            const result = nextOffset < total ? nextOffset : undefined
-            return result
-          }
+          return nextOffset < total ? nextOffset : undefined
         }
-
         // Fallback: if we received a full page of items, assume there are more
         const itemsList = dataObj.items || dataObj.results
         if (Array.isArray(itemsList)) {
-          const result = itemsList.length >= limit ? nextOffset : undefined
-          return result
+          return itemsList.length >= limit ? nextOffset : undefined
         }
-
-        const result = total !== null && nextOffset < total ? nextOffset : undefined
-        return result
+        return undefined
       }
 
       const pageNum = dataObj.page ?? dataObj.current_page
@@ -208,7 +196,8 @@ export const useInfinite = <
       if (hasNextPage && !isFetchingNextPage && !isError) {
         const rect = node.getBoundingClientRect()
         const inViewport =
-          rect.top < (window.innerHeight || document.documentElement.clientHeight) + parseFloat(rootMargin)
+          rect.top <
+          (window.innerHeight || document.documentElement.clientHeight) + parseFloat(rootMargin)
         if (inViewport) {
           fetchNextPage()
         }
