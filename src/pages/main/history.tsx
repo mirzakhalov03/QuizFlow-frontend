@@ -24,7 +24,7 @@ export default function History() {
     options: { staleTime: 0 },
   })
 
-  const folders = foldersQuery.data?.data.items ?? []
+  const folders = foldersQuery.data?.data?.items ?? []
 
   if (historyQuery.isLoading && !historyQuery.data) {
     return (
