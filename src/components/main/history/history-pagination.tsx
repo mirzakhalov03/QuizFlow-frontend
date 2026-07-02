@@ -9,14 +9,17 @@ type Props = {
 }
 
 export default function HistoryPagination({ page, limit, total, onPageChange }: Props) {
-  const totalPages = Math.max(1, Math.ceil(total / limit))
+  // Guard against a bad/zero limit from the API — divide-by-zero would yield
+  // Infinity/NaN and break the page math and prev/next logic.
+  const safeLimit = Math.max(1, limit)
+  const totalPages = Math.max(1, Math.ceil(total / safeLimit))
   const hasPrev = page > 1
   const hasNext = page < totalPages
 
   if (total === 0) return null
 
-  const start = (page - 1) * limit + 1
-  const end = Math.min(page * limit, total)
+  const start = (page - 1) * safeLimit + 1
+  const end = Math.min(page * safeLimit, total)
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

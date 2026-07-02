@@ -6,7 +6,7 @@ import HistoryTable from '@/components/main/history/history-table'
 import Spinner from '@/components/ui/spinner'
 import { FOLDERS, QUIZ_HISTORY } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
-import type { ApiResponse } from '@/types/api'
+import type { ApiResponse, PaginatedResponse } from '@/types/api'
 import type { HistoryLimit, HistoryResponse, HistorySort } from '@/types/analytics'
 import type { Folder } from '@/types/folder'
 
@@ -23,12 +23,12 @@ export default function History() {
   params.set('sort', sort)
   const historyUrl = `${QUIZ_HISTORY}?${params.toString()}`
 
-  const foldersQuery = useGet<ApiResponse<Folder[]>>(FOLDERS)
+  const foldersQuery = useGet<PaginatedResponse<Folder>>(FOLDERS)
   const historyQuery = useGet<ApiResponse<HistoryResponse>>(historyUrl, {
     options: { staleTime: 0, placeholderData: keepPreviousData },
   })
 
-  const folders = foldersQuery.data?.data ?? []
+  const folders = foldersQuery.data?.data?.items ?? []
   const history = historyQuery.data?.data
 
   // Changing any filter resets to the first page.
@@ -62,7 +62,7 @@ export default function History() {
         onSortChange={handleSortChange}
       />
 
-      {historyQuery.isError || (!history && !historyQuery.isLoading) ? (
+      {(historyQuery.isError && !history) || (!history && !historyQuery.isLoading) ? (
         <div className="border-border bg-background rounded-lg border p-8 text-center">
           <p className="text-muted-foreground text-sm">Couldn't load your history right now.</p>
         </div>
@@ -88,8 +88,8 @@ export default function History() {
           </div>
 
           <HistoryPagination
-            page={history.page}
-            limit={history.limit}
+            page={page}
+            limit={limit}
             total={history.total}
             onPageChange={setPage}
           />
