@@ -8,7 +8,7 @@ import { categoryLabel, DIFFICULTY_CHIP } from '@/components/main/marketplace/ut
 import Breadcrumb from '@/components/ui/breadcrumb'
 import Button from '@/components/ui/button'
 import Spinner from '@/components/ui/spinner'
-import { MARKETPLACE_LISTING, QUIZ_CLONE } from '@/constants/api-endpoints'
+import { MARKETPLACE, MARKETPLACE_LISTING, QUIZ_CLONE } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
 import { PATHS } from '@/lib/path'
 import { toast } from '@/lib/toast'
@@ -82,6 +82,8 @@ export default function MarketplaceListingPage() {
       toast.success('Saved to your library')
       // Refresh the listing so isCloned flips to true and button updates
       await queryClient.invalidateQueries({ queryKey: [MARKETPLACE_LISTING(quizId!)] })
+      // Also refresh the marketplace list so the card badge updates if the user navigates back
+      queryClient.invalidateQueries({ queryKey: [MARKETPLACE] })
     } catch (err: unknown) {
       const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data
         ?.error?.code
