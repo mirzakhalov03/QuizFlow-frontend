@@ -4,7 +4,7 @@ import HistoryTable from '@/components/main/history/history-table'
 import Spinner from '@/components/ui/spinner'
 import { FOLDERS, QUIZ_HISTORY } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
-import type { ApiResponse } from '@/types/api'
+import type { ApiResponse, PaginatedResponse } from '@/types/api'
 import type { HistoryLimit, HistoryResponse, HistorySort } from '@/types/analytics'
 import type { Folder } from '@/types/folder'
 
@@ -19,12 +19,12 @@ export default function History() {
   params.set('sort', sort)
   const historyUrl = `${QUIZ_HISTORY}?${params.toString()}`
 
-  const foldersQuery = useGet<ApiResponse<Folder[]>>(FOLDERS)
+  const foldersQuery = useGet<PaginatedResponse<Folder>>(FOLDERS)
   const historyQuery = useGet<ApiResponse<HistoryResponse>>(historyUrl, {
     options: { staleTime: 0 },
   })
 
-  const folders = foldersQuery.data?.data ?? []
+  const folders = foldersQuery.data?.data?.items ?? []
 
   if (historyQuery.isLoading && !historyQuery.data) {
     return (

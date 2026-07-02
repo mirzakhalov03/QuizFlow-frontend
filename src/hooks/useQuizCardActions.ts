@@ -9,6 +9,7 @@ import {
   QUIZ_LIST,
   QUIZ_SHARE_DISABLE,
   QUIZ_SHARE_ENABLE,
+  MARKETPLACE,
 } from '@/constants/api-endpoints'
 import { toast } from '@/lib/toast'
 import { openQuizPdf } from '@/lib/quiz-pdf'
@@ -40,6 +41,8 @@ export function useQuizCardActions(quiz: Quiz) {
         queryClient.invalidateQueries({ queryKey: [`/folders/${quiz.folderId}/quizzes`] })
       }
       queryClient.invalidateQueries({ queryKey: ['/folders'] })
+      // Refresh marketplace so isCloned flips to false on the listing card
+      queryClient.invalidateQueries({ queryKey: [MARKETPLACE] })
       setIsConfirmOpen(false)
       toast.success('Quiz deleted')
     },

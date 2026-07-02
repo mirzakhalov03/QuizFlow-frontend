@@ -48,9 +48,7 @@ export const useInfinite = <
   const cleanedParams = useMemo(() => {
     if (!params) return {}
     return Object.fromEntries(
-      Object.entries(params).filter(
-        ([, v]) => v !== undefined && v !== null && v !== ''
-      )
+      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
     )
   }, [params])
 
@@ -94,9 +92,33 @@ export const useInfinite = <
         const pag = dataObj.pagination as Record<string, unknown>
         const limit = typeof pag.limit === 'number' ? pag.limit : limit_val
         const offset = typeof pag.offset === 'number' ? pag.offset : 0
-        const count = typeof pag.count === 'number' ? pag.count : 0
         const nextOffset = offset + limit
-        return nextOffset < count ? nextOffset : undefined
+
+        // Support both 'total' (explicit total count) and 'count'
+        const total =
+          typeof pag.total === 'number'
+            ? pag.total
+            : typeof pag.count === 'number'
+              ? pag.count
+              : null
+        if (total !== null) {
+          // If total <= limit it might be the page-count, not total items.
+          // Fall back to items-length heuristic in that case.
+          if (total > limit) {
+            const result = nextOffset < total ? nextOffset : undefined
+            return result
+          }
+        }
+
+        // Fallback: if we received a full page of items, assume there are more
+        const itemsList = dataObj.items || dataObj.results
+        if (Array.isArray(itemsList)) {
+          const result = itemsList.length >= limit ? nextOffset : undefined
+          return result
+        }
+
+        const result = total !== null && nextOffset < total ? nextOffset : undefined
+        return result
       }
 
       const pageNum = dataObj.page ?? dataObj.current_page
@@ -154,7 +176,7 @@ export const useInfinite = <
   }, [data])
 
   const observerRef = useRef<IntersectionObserver | null>(null)
-  
+
   const bottomRef = useCallback(
     (node: HTMLElement | null) => {
       if (observerRef.current) {
@@ -175,6 +197,20 @@ export const useInfinite = <
       )
 
       observerRef.current.observe(node)
+
+      // IntersectionObserver only fires on *transitions*. If the sentinel is
+      // already visible when the observer is first attached (e.g. the initial
+      // page doesn't fill the viewport), the callback never fires. Eagerly
+      // trigger fetchNextPage in that case.
+      if (hasNextPage && !isFetchingNextPage && !isError) {
+        const rect = node.getBoundingClientRect()
+        const inViewport =
+          rect.top <
+          (window.innerHeight || document.documentElement.clientHeight) + parseFloat(rootMargin)
+        if (inViewport) {
+          fetchNextPage()
+        }
+      }
     },
     [hasNextPage, isFetchingNextPage, isError, fetchNextPage, rootMargin]
   )
