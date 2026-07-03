@@ -48,7 +48,9 @@ export const useInfinite = <
   const cleanedParams = useMemo(() => {
     if (!params) return {}
     return Object.fromEntries(
-      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
+      Object.entries(params).filter(
+        ([, v]) => v !== undefined && v !== null && v !== ''
+      )
     )
   }, [params])
 
