@@ -102,7 +102,11 @@ export const useInfinite = <
               ? pag.count
               : null
         if (total !== null) {
-          return nextOffset < total ? nextOffset : undefined
+          // If total <= limit it might be the page-count, not total items.
+          // Fall back to items-length heuristic in that case.
+          if (total > limit) {
+            return nextOffset < total ? nextOffset : undefined
+          }
         }
         // Fallback: if we received a full page of items, assume there are more
         const itemsList = dataObj.items || dataObj.results
