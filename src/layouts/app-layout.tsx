@@ -232,7 +232,7 @@ export default function AppLayout() {
             </button>
           </div>
         </div>
-        <div className="bg-secondary/15 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 lg:pl-8 sm:pb-24 lg:pb-6">
+        <div className="bg-secondary/8 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 lg:pl-8 sm:pb-24 lg:pb-6">
           <Outlet />
         </div>
       </main>
