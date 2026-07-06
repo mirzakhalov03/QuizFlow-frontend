@@ -368,3 +368,28 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
     </>
   )
 }
+
+export function QuizCardSkeleton() {
+  return (
+    <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 space-y-2">
+          <div className="skeleton-shimmer h-4 w-5/6 rounded-md" />
+          <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
+        </div>
+        <div className="skeleton-shimmer h-7 w-7 shrink-0 rounded-md" />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="skeleton-shimmer h-5 w-20 rounded-full" />
+        <div className="skeleton-shimmer h-5 w-14 rounded-full" />
+      </div>
+
+      <div className="mt-auto flex items-center justify-between pt-2">
+        <div className="skeleton-shimmer h-3.5 w-24 rounded-md" />
+        <div className="skeleton-shimmer h-4 w-12 rounded-md" />
+      </div>
+    </div>
+  )
+}
+

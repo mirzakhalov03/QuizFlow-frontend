@@ -1,13 +1,13 @@
 import { Plus } from 'lucide-react'
 
 import Modal from '@/components/custom/modal'
-import QuizCard from '@/components/main/quizzes/quiz-card'
+
+import QuizCard, { QuizCardSkeleton } from '@/components/main/quizzes/quiz-card'
 import QuizHeader from '@/components/main/quizzes/header'
 import QuizFormWrapper from '@/components/main/quizzes/quiz-form-wrapper'
 import { PendingQuizCard } from '@/components/main/quizzes/pending-quiz-card'
 import { QuizToolbar } from '@/components/main/quizzes/quiz-toolbar'
 import Button from '@/components/ui/button'
-import Spinner from '@/components/ui/spinner'
 import { useModal } from '@/hooks/useModal'
 import { useQuizListControls } from '@/hooks/useQuizListControls'
 import { cn } from '@/lib/utils'
@@ -51,45 +51,66 @@ export default function Quizzes() {
         onToggleStatus={toggleStatusFilter}
       />
 
-      {isLoading ? (
-        <div className="flex justify-center py-16">
-          <Spinner />
-        </div>
-      ) : (
-        <div
-          className={cn(
-            'grid grid-cols-1 items-stretch gap-3 transition-opacity sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-            isFetching && !isFetchingNextPage && 'opacity-60'
-          )}
-        >
-          <Button
-            onClick={openModal}
-            className={cn(
-              'group border-border/50 bg-card/50 h-full rounded-xl border-2 border-dashed',
-              'flex min-h-30 flex-col items-center justify-center gap-2 p-5',
-              'border-primary/40 hover:bg-primary/5 text-primary',
-              'cursor-pointer transition-all duration-200'
+      <div
+        className={cn(
+          'grid grid-cols-1 items-stretch gap-3 transition-opacity sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+          isFetching && !isFetchingNextPage && 'opacity-60'
+        )}
+      >
+        {isLoading ? (
+          <>
+            <div
+              className={cn(
+                'group border-border/50 bg-card/50 h-full rounded-xl border-2 border-dashed opacity-50 pointer-events-none',
+                'flex min-h-30 flex-col items-center justify-center gap-2 p-5',
+                'border-primary/40 text-primary'
+              )}
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-dashed border-current">
+                <Plus className="h-5 w-5" />
+              </div>
+              <span className="text-xs font-medium">New Quiz</span>
+            </div>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <QuizCardSkeleton key={i} />
+            ))}
+          </>
+        ) : (
+          <>
+            <Button
+              onClick={openModal}
+              className={cn(
+                'group border-border/50 bg-card/50 h-full rounded-xl border-2 border-dashed',
+                'flex min-h-30 flex-col items-center justify-center gap-2 p-5',
+                'border-primary/40 hover:bg-primary/5 text-primary',
+                'cursor-pointer transition-all duration-200'
+              )}
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-dashed border-current">
+                <Plus className="h-5 w-5" />
+              </div>
+              <span className="text-xs font-medium">New Quiz</span>
+            </Button>
+
+            {pendingJobs.map((job) => (
+              <PendingQuizCard key={job.jobId} {...job} />
+            ))}
+
+            {items.map((quiz) => (
+              <QuizCard key={quiz.id} quiz={quiz} />
+            ))}
+            {isFetchingNextPage && (
+              <>
+                <QuizCardSkeleton />
+                <QuizCardSkeleton />
+                <QuizCardSkeleton />
+                <QuizCardSkeleton />
+              </>
             )}
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-dashed border-current">
-              <Plus className="h-5 w-5" />
-            </div>
-            <span className="text-xs font-medium">New Quiz</span>
-          </Button>
+          </>
+        )}
 
-          {pendingJobs.map((job) => (
-            <PendingQuizCard key={job.jobId} {...job} />
-          ))}
-
-          {items.map((quiz) => (
-            <QuizCard key={quiz.id} quiz={quiz} />
-          ))}
-
-          {hasNextPage && (
-            <div ref={observerRef} className="col-span-full flex justify-center py-8">
-              {isFetchingNextPage ? <Spinner size="md" /> : <div className="h-2 w-2" />}
-            </div>
-          )}
+        {hasNextPage && <div ref={observerRef} className="col-span-full h-1" />}
 
           {isError && items.length === 0 && (
             <p className="text-destructive col-span-full py-10 text-center text-sm">
@@ -103,7 +124,6 @@ export default function Quizzes() {
             </p>
           )}
         </div>
-      )}
 
       <Modal size="max-w-3xl" modalKey="quiz-add" title="Create New Quiz" className="pb-0 sm:pb-0">
         <QuizFormWrapper />
