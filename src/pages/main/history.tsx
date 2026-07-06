@@ -23,6 +23,7 @@ export default function History() {
     isFetchingNextPage,
     hasNextPage,
     observerRef,
+    isPlaceholderData,
   } = useInfinite<HistoryItem>(QUIZ_HISTORY, {
     params: { folderId, sort },
     limit_val: 20,
@@ -46,7 +47,7 @@ export default function History() {
         onSortChange={setSort}
       />
 
-      {isError && items.length === 0 ? (
+      {isError && (isPlaceholderData || items.length === 0) ? (
         <div className="border-border bg-background rounded-lg border p-8 text-center">
           <p className="text-muted-foreground text-sm">Couldn't load your history right now.</p>
         </div>
@@ -70,7 +71,7 @@ export default function History() {
 
           <HistoryTable rows={items} />
 
-          {hasNextPage && (
+          {hasNextPage && !isPlaceholderData && (
             <div ref={observerRef} className="flex justify-center py-6">
               {isFetchingNextPage ? <Spinner /> : <div className="h-2 w-2" />}
             </div>

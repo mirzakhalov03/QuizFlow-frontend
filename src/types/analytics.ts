@@ -55,13 +55,6 @@ export type HistoryItem = {
   completedAt: string
 }
 
-export type HistoryResponse = {
-  items: HistoryItem[]
-  total: number
-  page: number
-  limit: number
-}
-
 export type HistorySort = 'recent' | 'best' | 'worst'
 
 export type KeyUsageSummary = {
