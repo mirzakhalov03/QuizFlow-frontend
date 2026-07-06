@@ -63,7 +63,6 @@ export type HistoryResponse = {
 }
 
 export type HistorySort = 'recent' | 'best' | 'worst'
-export type HistoryLimit = 5 | 10 | 50
 
 export type KeyUsageSummary = {
   keyId: string | null
