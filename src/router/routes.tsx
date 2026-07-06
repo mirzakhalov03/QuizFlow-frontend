@@ -46,7 +46,7 @@ export const routes: RouteObject[] = [
       {
         element: <PublicLayout />,
         children: [
-          { path: PATHS.landing, lazy: Landing },
+          { path: PATHS.landing, lazy: Landing, loader: requireGuest },
           { path: PATHS.features, lazy: Features },
           { path: PATHS.contact, lazy: Contact },
           { path: PATHS.pricing, lazy: Pricing },
