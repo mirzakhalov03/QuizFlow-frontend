@@ -57,3 +57,35 @@ export function ListingCard({
     </Link>
   )
 }
+
+export function ListingCardSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="Loading quiz listing card"
+      aria-busy="true"
+      className="border-border bg-card relative flex flex-col gap-3 rounded-xl border p-4"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <div className="skeleton-shimmer h-5 w-16 rounded-full" />
+          <div className="skeleton-shimmer h-5 w-14 rounded-full" />
+        </div>
+        <div className="skeleton-shimmer h-5 w-16 rounded-md shrink-0" />
+      </div>
+
+      <div className="skeleton-shimmer h-5 w-4/5 rounded-md" />
+
+      <div className="space-y-1.5">
+        <div className="skeleton-shimmer h-4 w-full rounded-md" />
+        <div className="skeleton-shimmer h-4 w-5/6 rounded-md" />
+      </div>
+
+      <div className="mt-auto flex items-center gap-4 pt-2">
+        <div className="skeleton-shimmer h-4 w-12 rounded-md shrink-0" />
+        <div className="skeleton-shimmer h-4 w-14 rounded-md shrink-0" />
+        <div className="skeleton-shimmer ml-auto h-4 w-20 rounded-md" />
+      </div>
+    </div>
+  )
+}

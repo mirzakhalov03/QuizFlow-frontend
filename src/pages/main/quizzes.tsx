@@ -72,7 +72,7 @@ export default function Quizzes() {
               <span className="text-xs font-medium">New Quiz</span>
             </div>
             {Array.from({ length: 7 }).map((_, i) => (
-              <QuizCardSkeleton key={i} />
+              <QuizCardSkeleton key={`initial-quiz-skeleton-${i}`} />
             ))}
           </>
         ) : (

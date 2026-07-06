@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 
-import { ListingCard } from '@/components/main/marketplace/listing-card'
+import { ListingCard, ListingCardSkeleton } from '@/components/main/marketplace/listing-card'
 import { MarketplaceFilters } from '@/components/main/marketplace/marketplace-filters'
-import Spinner from '@/components/ui/spinner'
 import { MARKETPLACE } from '@/constants/api-endpoints'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useGet } from '@/hooks/useGet'
@@ -86,8 +85,10 @@ export default function MarketplacePage() {
       />
 
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Spinner size="lg" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <ListingCardSkeleton key={`listing-skeleton-${i}`} />
+          ))}
         </div>
       ) : items.length === 0 ? (
         <p className="text-muted-foreground">No quizzes found.</p>

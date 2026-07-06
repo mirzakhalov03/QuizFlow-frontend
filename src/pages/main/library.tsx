@@ -58,7 +58,7 @@ export default function Library() {
       {isLoading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <FolderCardSkeleton key={i} />
+            <FolderCardSkeleton key={`initial-folder-skeleton-${i}`} />
           ))}
         </div>
       ) : folders.length === 0 ? (
