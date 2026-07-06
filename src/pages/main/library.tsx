@@ -11,7 +11,6 @@ import { useState } from 'react'
 import NewFolderModal, { NEW_FOLDER_MODAL_KEY } from '@/components/main/library/new-folder-modal'
 import EditFolderModal from '@/components/main/library/edit-folder-modal'
 import ConfirmDialog from '@/components/ui/confirm-dialog'
-import Spinner from '@/components/ui/spinner'
 import { toast } from '@/lib/toast'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -44,14 +43,6 @@ export default function Library() {
     },
   })
 
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -59,12 +50,18 @@ export default function Library() {
           <h1 className="text-2xl font-bold">Library</h1>
           <p className="text-muted-foreground">Organize your quizzes into folders.</p>
         </div>
-        <Button onClick={openModal} leftIcon={<FolderPlus size={18} />}>
+        <Button onClick={openModal} leftIcon={<FolderPlus size={18} />} disabled={isLoading}>
           New Folder
         </Button>
       </div>
 
-      {folders.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <FolderCardSkeleton key={`initial-folder-skeleton-${i}`} />
+          ))}
+        </div>
+      ) : folders.length === 0 ? (
         <div className="border-border flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-12 text-center">
           <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-full">
             <FolderIcon className="text-muted-foreground" size={32} />
@@ -88,14 +85,13 @@ export default function Library() {
             />
           ))}
 
+          {isFetchingNextPage &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <FolderCardSkeleton key={"next-page-skeleton-" + i} />
+            ))}
+
           {hasNextPage && (
-            <div ref={observerRef} className="col-span-full flex justify-center py-8">
-              {isFetchingNextPage ? (
-                <Spinner size="md" />
-              ) : (
-                <div className="h-2 w-2" />
-              )}
-            </div>
+            <div ref={observerRef} className="col-span-full h-1" />
           )}
         </div>
       )}
@@ -183,6 +179,22 @@ function FolderCard({
           </button>
         </div>
       )}
+    </div>
+  )
+}
+
+export function FolderCardSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="Loading folder card"
+      aria-busy="true"
+      className="bg-card border-border relative flex flex-col gap-2 rounded-xl border p-4"
+    >
+      <div className="skeleton-shimmer h-8 w-8 rounded-lg" />
+      <div className="skeleton-shimmer h-5 w-3/4 rounded" />
+      <div className="skeleton-shimmer h-4 w-1/2 rounded" />
+      <div className="skeleton-shimmer absolute top-3 right-3 h-7 w-7 rounded-md" />
     </div>
   )
 }
