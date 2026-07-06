@@ -99,14 +99,10 @@ export default function Quizzes() {
             {items.map((quiz) => (
               <QuizCard key={quiz.id} quiz={quiz} />
             ))}
-            {isFetchingNextPage && (
-              <>
-                <QuizCardSkeleton />
-                <QuizCardSkeleton />
-                <QuizCardSkeleton />
-                <QuizCardSkeleton />
-              </>
-            )}
+            {isFetchingNextPage &&
+              Array.from({ length: 4 }).map((_, i) => (
+                <QuizCardSkeleton key={"next-page-skeleton-" + i} />
+              ))}
           </>
         )}
 

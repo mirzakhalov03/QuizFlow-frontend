@@ -85,14 +85,10 @@ export default function Library() {
             />
           ))}
 
-          {isFetchingNextPage && (
-            <>
-              <FolderCardSkeleton />
-              <FolderCardSkeleton />
-              <FolderCardSkeleton />
-              <FolderCardSkeleton />
-            </>
-          )}
+          {isFetchingNextPage &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <FolderCardSkeleton key={"next-page-skeleton-" + i} />
+            ))}
 
           {hasNextPage && (
             <div ref={observerRef} className="col-span-full h-1" />
@@ -189,7 +185,12 @@ function FolderCard({
 
 export function FolderCardSkeleton() {
   return (
-    <div className="bg-card border-border relative flex flex-col gap-2 rounded-xl border p-4">
+    <div
+      role="status"
+      aria-label="Loading folder card"
+      aria-busy="true"
+      className="bg-card border-border relative flex flex-col gap-2 rounded-xl border p-4"
+    >
       <div className="skeleton-shimmer h-8 w-8 rounded-lg" />
       <div className="skeleton-shimmer h-5 w-3/4 rounded" />
       <div className="skeleton-shimmer h-4 w-1/2 rounded" />

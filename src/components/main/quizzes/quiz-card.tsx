@@ -371,7 +371,12 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
 
 export function QuizCardSkeleton() {
   return (
-    <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4">
+    <div
+      role="status"
+      aria-label="Loading quiz card"
+      aria-busy="true"
+      className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4"
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 space-y-2">
           <div className="skeleton-shimmer h-4 w-5/6 rounded-md" />

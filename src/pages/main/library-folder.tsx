@@ -230,14 +230,10 @@ export default function LibraryFolder() {
             </>
           )}
 
-          {isFetchingNextPage && (
-            <>
-              <QuizCardSkeleton />
-              <QuizCardSkeleton />
-              <QuizCardSkeleton />
-              <QuizCardSkeleton />
-            </>
-          )}
+          {isFetchingNextPage &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <QuizCardSkeleton key={"next-page-skeleton-" + i} />
+            ))}
 
           {hasNextPage && (
             <div ref={observerRef} className="col-span-full h-1" />
