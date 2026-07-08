@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, type FormEvent } from 'react'
+import { useEffect, useState, useRef, type FormEvent, useLayoutEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { User, Link2, Key, KeyRound, Trash2 } from 'lucide-react'
 
@@ -68,7 +68,7 @@ export default function Account() {
     setDraftBio(bio ?? '')
   }, [bio])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handleResize = () => {
       const activeEl = tabRefs.current[activeTab]
       if (activeEl) {
@@ -169,7 +169,7 @@ export default function Account() {
       >
         {/* Sliding active indicator */}
         <div
-          className="absolute top-1 bottom-1 bg-primary rounded-lg transition-all duration-300 ease-in-out shadow-sm"
+          className="bg-primary absolute top-1 bottom-1 rounded-lg shadow-sm transition-all duration-300 ease-in-out"
           style={{
             left: `${indicatorStyle.left}px`,
             width: `${indicatorStyle.width}px`,
@@ -190,10 +190,8 @@ export default function Account() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'relative z-10 flex min-w-max flex-1 shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 cursor-pointer',
-                isActive
-                  ? 'text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
+                'relative z-10 flex min-w-max flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300',
+                isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Icon size={16} />
@@ -209,20 +207,21 @@ export default function Account() {
           <div className="space-y-6">
             {/* Personal Details Card */}
             <div className="border-border bg-background rounded-2xl border p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6 lg:p-8">
-              <div className="flex flex-col-reverse items-end sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left w-full">
+              <div className="flex flex-col-reverse items-end gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex w-full flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left">
                   <ImageUpload value={profilePicture} onChange={handleUpload} loading={uploading} />
                   <div className="space-y-1">
                     <h2 className="text-lg font-semibold">Personal details</h2>
                     <p className="text-muted-foreground mt-1 text-sm">
-                      Update your name, email, and bio so the rest of the product feels more personal.
+                      Update your name, email, and bio so the rest of the product feels more
+                      personal.
                     </p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsConfirmDeleteOpen(true)}
-                  className="hidden sm:block p-2 text-destructive hover:bg-destructive/10 rounded-full transition-all duration-200 shrink-0 cursor-pointer border border-transparent hover:border-destructive/20"
+                  className="text-destructive hover:bg-destructive/10 hover:border-destructive/20 hidden shrink-0 cursor-pointer rounded-full border border-transparent p-2 transition-all duration-200 sm:block"
                   aria-label="Delete Account"
                   title="Delete Account"
                 >
@@ -263,11 +262,11 @@ export default function Account() {
                 </label>
               </div>
 
-              <div className="mt-6 flex justify-between items-center sm:justify-end gap-3">
+              <div className="mt-6 flex items-center justify-between gap-3 sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setIsConfirmDeleteOpen(true)}
-                  className="sm:hidden p-2 text-destructive hover:bg-destructive/10 rounded-full transition-all duration-200 cursor-pointer border border-transparent hover:border-destructive/20"
+                  className="text-destructive hover:bg-destructive/10 hover:border-destructive/20 cursor-pointer rounded-full border border-transparent p-2 transition-all duration-200 sm:hidden"
                   aria-label="Delete Account"
                   title="Delete Account"
                 >
@@ -309,7 +308,10 @@ export default function Account() {
             disabled={deleteRequesting || deleteConfirming}
             autoComplete="one-time-code"
             placeholder="000000"
-            className={cn(otpClass, (deleteRequesting || deleteConfirming) && 'opacity-50 pointer-events-none')}
+            className={cn(
+              otpClass,
+              (deleteRequesting || deleteConfirming) && 'pointer-events-none opacity-50'
+            )}
           />
           <Button
             type="submit"
