@@ -119,11 +119,21 @@ export default function QuizCreateForm({ folderId }: { folderId?: string }) {
           {view === 'source' ? 'Cancel' : 'Back'}
         </Button>
         {view === 'source' ? (
-          <Button type="button" onClick={goToParams} className="flex-1" rightIcon={<ChevronRight size={16} />}>
+          // Distinct `key` from the Generate button below so React unmounts this
+          // node instead of mutating it into a `type="submit"` button mid-click —
+          // otherwise clicking Continue would fire a native submit and generate.
+          <Button
+            key="continue"
+            type="button"
+            onClick={goToParams}
+            className="flex-1"
+            rightIcon={<ChevronRight size={16} />}
+          >
             Continue
           </Button>
         ) : (
           <Button
+            key="generate"
             type="submit"
             className="flex-1"
             rightIcon={<Sparkles className="h-4 w-4" />}
