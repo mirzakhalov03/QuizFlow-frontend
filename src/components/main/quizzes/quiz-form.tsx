@@ -22,8 +22,7 @@ interface QuizFormProps {
   folderId?: string
 }
 
-export default function QuizForm({ onBack, folderId, }: QuizFormProps) {
-  
+export default function QuizForm({ onBack, folderId }: QuizFormProps) {
   const { closeModal } = useModal('quiz-add')
   const addJob = usePendingJobsStore((s) => s.addJob)
   const setJobReady = usePendingJobsStore((s) => s.setJobReady)
@@ -94,9 +93,8 @@ export default function QuizForm({ onBack, folderId, }: QuizFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
-      <div className="space-y-1">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-2">
         <FileUpload
           label="Source Documents"
           control={form.control}
@@ -109,9 +107,8 @@ export default function QuizForm({ onBack, folderId, }: QuizFormProps) {
           hideError={false}
           dropAccept={['PDF', 'DOC', 'DOCX', 'TXT', 'MD', 'PPTX']}
         />
-        <p className="text-muted-foreground text-xs">
-          PDF, Word, PPTX, TXT or Markdown (.md) files (including Obsidian notes) · max
-          25 MB · up to 5 files
+        <p className="text-muted-foreground/80 pl-1 text-[11px] leading-relaxed">
+          PDF, Word, PPTX, TXT, or Markdown (.md) · Max 25 MB · Up to 5 files
         </p>
       </div>
 

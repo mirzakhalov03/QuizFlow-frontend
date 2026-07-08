@@ -1,6 +1,6 @@
 import { Control, FieldValues, Path, useController } from 'react-hook-form'
 import { cn } from '@/lib/utils'
-import { X } from 'lucide-react'
+import { X, Upload } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '../ui/button'
 import { FileUploader } from 'react-drag-drop-files'
@@ -153,12 +153,7 @@ export default function FileUpload<TForm extends FieldValues>({
       )}
 
       <FileUploader
-        classes={cn(
-          '!h-16 !w-full !max-w-none  !border-primary mt-4 flex justify-center items-center gap-3 [&_path]:!fill-primary [&_div]:flex-col [&_div]:!justify-center [&_div]:items-center [&_div]:!grow-0',
-          !!fieldState.error && '!border-destructive [&_path]:!fill-destructive',
-          field.disabled &&
-            '!border-muted-foreground [&_path]:!fill-muted-foreground pointer-events-none cursor-not-allowed'
-        )}
+        classes="mt-2 w-full"
         handleChange={
           field.disabled
             ? undefined
@@ -174,7 +169,22 @@ export default function FileUpload<TForm extends FieldValues>({
         multiple={multiple}
         name={field.name}
         types={dropAccept}
-      />
+      >
+        <div
+          className={cn(
+            'flex flex-col items-center justify-center gap-2 border-2 border-dashed border-primary/30 hover:border-primary/60 rounded-xl py-6 px-4 w-full cursor-pointer transition-colors bg-muted/20 hover:bg-muted/40 text-center',
+            !!fieldState.error && 'border-destructive/40 hover:border-destructive/60 bg-destructive/5',
+            field.disabled && 'border-muted-foreground/30 bg-muted/10 cursor-not-allowed pointer-events-none'
+          )}
+        >
+          <Upload className={cn('h-7 w-7 text-primary/80', !!fieldState.error && 'text-destructive/80', field.disabled && 'text-muted-foreground/60')} />
+          <div className="flex flex-col gap-0.5">
+            <p className="text-sm font-medium text-foreground">
+              Drag &amp; drop files, or <span className="text-primary hover:underline font-semibold">browse</span>
+            </p>
+          </div>
+        </div>
+      </FileUploader>
 
       {fieldState.error && !hideError && <FieldError>{fieldState.error?.message}</FieldError>}
 

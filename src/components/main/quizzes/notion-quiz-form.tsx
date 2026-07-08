@@ -43,6 +43,7 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
       model: DEFAULT_MODEL,
       apiKeyId: '',
       isTimerEnabled: false,
+      optionsPerQuestion: 4,
       userInstructions: '',
       folderId: folderId || 'none',
       avoidQuizIds: [],
@@ -128,7 +129,7 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
         <FieldLabel required isError={!!fieldState.error}>
           Add Notion Pages

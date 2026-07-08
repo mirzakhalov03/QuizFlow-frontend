@@ -46,14 +46,14 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
     params: { limit: 500 },
   })
   const quizzes = [...(quizzesData?.data?.items || [])].sort((a, b) =>
-    a.title.localeCompare(b.title),
+    a.title.localeCompare(b.title)
   )
 
   return (
     <>
-      <div className="bg-muted/40 space-y-3 rounded-xl p-3">
-        <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
-          <Settings2 className="h-3.5 w-3.5" />
+      <div className="bg-muted/30 border-border/50 space-y-4 rounded-xl border p-4">
+        <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase">
+          <Settings2 className="text-primary h-4 w-4" />
           Quiz Settings
         </p>
 
@@ -65,7 +65,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
           disabled={!!folderId}
         />
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormSelect
             label="Question Type"
             options={questionTypes}
@@ -84,7 +84,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
 
         <OptionsPerQuestionField form={form} />
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormSelect
             label="Difficulty"
             options={difficulties}
@@ -136,13 +136,10 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
       </div>
 
       {quizzes.length > 0 && (
-        <div className="bg-muted/40 space-y-3 rounded-xl p-3">
-          <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
-            <FileQuestion className="h-3.5 w-3.5" />
+        <div className="bg-muted/30 border-border/50 space-y-3 rounded-xl border p-4">
+          <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase">
+            <FileQuestion className="text-primary h-4 w-4" />
             Avoid Repeating Questions
-          </p>
-          <p className="text-muted-foreground text-xs">
-            Select quizzes whose questions you want to avoid repeating in the new quiz.
           </p>
           <Controller
             name={'avoidQuizIds' as Path<T>}
@@ -166,7 +163,7 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
                     return (
                       <label
                         key={quiz.id}
-                        className="hover:bg-muted/50 flex cursor-pointer items-center gap-2.5 rounded px-2 py-1.5 text-sm transition-colors"
+                        className="hover:bg-muted/50 flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-1.5 text-sm transition-colors"
                       >
                         <Checkbox
                           checked={isChecked}
@@ -188,10 +185,10 @@ export default function QuizSettingsFields<T extends QuizSettingsValues>({
         label="Custom Instructions"
         methods={form}
         name={'userInstructions' as Path<T>}
-        placeholder="e.g. Focus on chapter 3, only ask about dates… (optional)"
+        placeholder="Focus on specific topics, question styles, etc. (optional)"
       />
 
-      <div className="sticky bottom-0 z-10 -mx-4 flex gap-2 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">
+      <div className="sticky bottom-0 z-10 -mx-4 flex gap-3 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">
         <Button
           type="button"
           variant="outline"
@@ -223,12 +220,7 @@ function OptionsPerQuestionField<T extends QuizSettingsValues>({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-foreground text-sm font-medium">
-        Options per question
-        <span className="text-muted-foreground ml-1 text-xs font-normal">
-          (Multiple choice &amp; Multi-select)
-        </span>
-      </label>
+      <label className="text-foreground text-sm font-medium">Options per question</label>
       <Controller
         name={'optionsPerQuestion' as Path<T>}
         control={form.control}
@@ -241,7 +233,7 @@ function OptionsPerQuestionField<T extends QuizSettingsValues>({
                 aria-pressed={field.value === n}
                 onClick={() => field.onChange(n)}
                 className={[
-                  'h-9 w-9 rounded-md border text-sm font-medium transition-colors',
+                  'h-9 w-9 cursor-pointer rounded-md border text-sm font-medium transition-colors',
                   field.value === n
                     ? 'border-primary bg-primary text-primary-foreground'
                     : 'border-input bg-background text-foreground hover:bg-accent',
@@ -253,9 +245,6 @@ function OptionsPerQuestionField<T extends QuizSettingsValues>({
           </div>
         )}
       />
-      <p className="text-muted-foreground text-xs">
-        Each eligible question will have exactly this many answer choices.
-      </p>
     </div>
   )
 }
