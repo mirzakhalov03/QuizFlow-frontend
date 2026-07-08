@@ -29,6 +29,20 @@ export default function QuizSubmitted({
 }: Props) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5">
+      {/* Top Actions */}
+      <div className="flex items-center justify-between gap-3 pb-2 border-b border-border/40">
+        <Link to={PATHS.app.quizzes}>
+          <Button variant="outline" size="sm" className="gap-1.5 cursor-pointer">
+            <ArrowLeft className="h-4 w-4" />
+            Back to quizzes
+          </Button>
+        </Link>
+        <Button onClick={onRetake} size="sm" className="gap-1.5 cursor-pointer">
+          <RotateCcw className="h-4 w-4" />
+          Retake quiz
+        </Button>
+      </div>
+
       {result ? (
         <QuizResultSummary quizTitle={quizTitle} result={result} />
       ) : (
@@ -62,19 +76,6 @@ export default function QuizSubmitted({
           ))}
         </div>
       )}
-
-      <div className="flex flex-wrap justify-center gap-3 pt-2 pb-10">
-        <Button onClick={onRetake} className="gap-1.5">
-          <RotateCcw className="h-4 w-4" />
-          Retake quiz
-        </Button>
-        <Link to={PATHS.app.quizzes}>
-          <Button variant="outline" className="gap-1.5">
-            <ArrowLeft className="h-4 w-4" />
-            Back to quizzes
-          </Button>
-        </Link>
-      </div>
     </div>
   )
 }
