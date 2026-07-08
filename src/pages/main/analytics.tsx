@@ -93,7 +93,7 @@ export default function Analytics() {
 
       <header>
         <h1 className="text-2xl font-bold">Analytics</h1>
-        <p className="text-muted-foreground">Your progress across every quiz you've taken.</p>
+        <p className="text-muted-foreground text-sm sm:text-base">Your progress across every quiz you've taken.</p>
       </header>
       
       <AiFeedbackCard />
@@ -109,8 +109,10 @@ export default function Analytics() {
 
       <AnalyticsStats stat={selectedStat} />
       <ScoreOverTimeChart points={visibleScorePoints} />
-      <TypePieChart rows={visibleTypeBreakdown} />
-      <QuizStatsList rows={visibleQuizStats} />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <QuizStatsList rows={visibleQuizStats} />
+        <TypePieChart rows={visibleTypeBreakdown} />
+      </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ApiKeyAnalytics
           data={summary.keyUsageBreakdown ?? []}

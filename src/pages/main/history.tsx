@@ -36,7 +36,7 @@ export default function History() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">History</h1>
-        <p className="text-muted-foreground">Every attempt you've made, filterable and sortable.</p>
+        <p className="text-muted-foreground text-sm sm:text-base">Every attempt you've made, filterable and sortable.</p>
       </header>
 
       <HistoryFilters

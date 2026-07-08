@@ -72,7 +72,7 @@ export default function MarketplacePage() {
     <div className={`flex flex-col gap-6${isPublic ? ' px-4 py-8 sm:px-6 lg:px-8' : ''}`}>
       <div>
         <h1 className="text-2xl font-bold">Explore</h1>
-        <p className="text-muted-foreground">Discover quizzes shared by the community.</p>
+        <p className="text-muted-foreground text-sm sm:text-base">Discover quizzes shared by the community.</p>
       </div>
 
       <MarketplaceFilters
