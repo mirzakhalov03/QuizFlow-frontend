@@ -63,7 +63,7 @@ function Segmented({ label, value, options, onChange }: SegmentedProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-muted-foreground text-sm">{label}:</span>
-      <div className="border-border inline-flex overflow-hidden rounded-md border" role="group">
+      <div className="border-border inline-flex h-10 overflow-hidden rounded-md border" role="group">
         {options.map((opt) => (
           <button
             key={opt.value}
@@ -71,9 +71,9 @@ function Segmented({ label, value, options, onChange }: SegmentedProps) {
             aria-pressed={value === opt.value}
             onClick={() => onChange(opt.value)}
             className={cn(
-              'px-2.5 py-1.5 text-sm transition-colors sm:px-3',
+              'h-full px-3 text-sm transition-colors cursor-pointer',
               value === opt.value
-                ? 'bg-primary text-primary-foreground'
+                ? 'bg-primary text-primary-foreground font-medium'
                 : 'hover:bg-muted text-foreground'
             )}
           >
