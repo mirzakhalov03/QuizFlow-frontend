@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, useRef, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { User, Link2, Key, KeyRound, Trash2 } from 'lucide-react'
 
@@ -40,12 +40,14 @@ export default function Account() {
   const { profilePicture, updateProfile, bio, fetchProfile } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
-  const email = user?.email
-
   const tabParam = searchParams.get('tab')
   const activeTab = ['profile', 'integrations', 'byok', 'security'].includes(tabParam || '')
     ? (tabParam as string)
     : 'profile'
+
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+  const email = user?.email
 
   const setActiveTab = (tab: string) => {
     setSearchParams((prev) => {
@@ -65,6 +67,28 @@ export default function Account() {
   useEffect(() => {
     setDraftBio(bio ?? '')
   }, [bio])
+
+  useEffect(() => {
+    const handleResize = () => {
+      const activeEl = tabRefs.current[activeTab]
+      if (activeEl) {
+        setIndicatorStyle({
+          left: activeEl.offsetLeft,
+          width: activeEl.clientWidth,
+        })
+      }
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    // Wait a brief tick in case fonts or container layout reflowed
+    const timer = setTimeout(handleResize, 50)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(timer)
+    }
+  }, [activeTab])
 
   const handleSave = async () => {
     try {
@@ -140,24 +164,36 @@ export default function Account() {
       {/* HORIZONTAL TAB MENU */}
       <nav
         role="tablist"
-        className="bg-muted flex w-full gap-1 overflow-x-auto rounded-xl p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="bg-muted relative flex w-full gap-1 overflow-x-auto rounded-xl p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-label="Settings sections"
       >
+        {/* Sliding active indicator */}
+        <div
+          className="absolute top-1 bottom-1 bg-primary rounded-lg transition-all duration-300 ease-in-out shadow-sm"
+          style={{
+            left: `${indicatorStyle.left}px`,
+            width: `${indicatorStyle.width}px`,
+          }}
+        />
+
         {tabs.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
           return (
             <button
               key={tab.id}
+              ref={(el) => {
+                tabRefs.current[tab.id] = el
+              }}
               role="tab"
               aria-selected={isActive}
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex min-w-max flex-1 shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
+                'relative z-10 flex min-w-max flex-1 shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 cursor-pointer',
                 isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/60'
+                  ? 'text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Icon size={16} />
@@ -186,7 +222,7 @@ export default function Account() {
                 <button
                   type="button"
                   onClick={() => setIsConfirmDeleteOpen(true)}
-                  className="p-2 text-destructive hover:bg-destructive/10 rounded-full transition-all duration-200 shrink-0 cursor-pointer border border-transparent hover:border-destructive/20"
+                  className="hidden sm:block p-2 text-destructive hover:bg-destructive/10 rounded-full transition-all duration-200 shrink-0 cursor-pointer border border-transparent hover:border-destructive/20"
                   aria-label="Delete Account"
                   title="Delete Account"
                 >
@@ -227,7 +263,16 @@ export default function Account() {
                 </label>
               </div>
 
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex justify-between items-center sm:justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmDeleteOpen(true)}
+                  className="sm:hidden p-2 text-destructive hover:bg-destructive/10 rounded-full transition-all duration-200 cursor-pointer border border-transparent hover:border-destructive/20"
+                  aria-label="Delete Account"
+                  title="Delete Account"
+                >
+                  <Trash2 size={20} />
+                </button>
                 <Button type="button" onClick={handleSave} loading={saving} disabled={saving}>
                   Save changes
                 </Button>
