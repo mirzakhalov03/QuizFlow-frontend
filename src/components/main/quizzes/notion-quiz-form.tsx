@@ -61,11 +61,13 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
     const tempId = crypto.randomUUID()
     const targetFolderId = values.folderId !== 'none' ? values.folderId : undefined
 
+    const tempTitle = `Notion Quiz (${values.pageIds.length} page${values.pageIds.length > 1 ? 's' : ''})`
+
     closeModal()
     reset()
     addJob({
       jobId: tempId,
-      title: 'Generating quiz…',
+      title: tempTitle,
       type: values.type,
       folderId: targetFolderId,
     })

@@ -49,11 +49,20 @@ export default function QuizForm({ onBack, folderId }: QuizFormProps) {
     const tempId = crypto.randomUUID()
     const targetFolderId = values.folderId !== 'none' ? values.folderId : undefined
 
+    const truncate = (name: string, max = 25) =>
+      name.length > max ? name.slice(0, max - 3) + '...' : name
+
+    const firstFileName = truncate(values.files[0].name)
+    const tempTitle =
+      values.files.length === 1
+        ? `Quiz from ${firstFileName}`
+        : `Quiz from ${firstFileName} and ${values.files.length - 1} more file${values.files.length > 2 ? 's' : ''}`
+
     closeModal()
     reset()
     addJob({
       jobId: tempId,
-      title: 'Generating quiz…',
+      title: tempTitle,
       type: values.type,
       folderId: targetFolderId,
     })

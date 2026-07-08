@@ -36,7 +36,9 @@ export function PendingQuizCard({ jobId, title, type, status, error, folderId }:
     return (
       <div className="bg-card border-destructive/50 flex flex-col gap-3 rounded-xl border p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{title}</h3>
+          <h3 className="line-clamp-2 text-sm leading-snug font-semibold text-destructive">
+            {title === 'Generating quiz…' ? 'Failed to generate quiz' : `Failed: ${title}`}
+          </h3>
           <button
             onClick={() => removeJob(jobId)}
             className="text-muted-foreground hover:text-foreground mt-0.5 shrink-0 transition-colors"
