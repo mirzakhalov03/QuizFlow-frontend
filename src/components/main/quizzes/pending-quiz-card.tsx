@@ -15,7 +15,7 @@ export function PendingQuizCard({ jobId, title, type, status, error, folderId }:
     onDone: () => {
       removeJob(jobId)
       toast.success('Quiz ready!', {
-        description: `"${title}" has been generated successfully.`,
+        description: `Quiz generation has been completed successfully.`,
       })
     },
     onFailed: (err) => {
