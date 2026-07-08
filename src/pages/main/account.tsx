@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { User, Link2, Key, KeyRound, ShieldAlert } from 'lucide-react'
+import { User, Link2, Key, KeyRound, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import ImageUpload from '@/components/ui/image-upload'
@@ -9,6 +9,7 @@ import ConnectedApps from '@/components/main/account/connected-apps'
 import SetPassword from '@/components/main/account/set-password'
 import ByokSection from '@/components/main/account/byok-section'
 import { Input } from '@/components/ui/input'
+import ConfirmDialog from '@/components/ui/confirm-dialog'
 
 import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
@@ -34,6 +35,7 @@ export default function Account() {
   const [saving, setSaving] = useState(false)
   const [deleteRequesting, setDeleteRequesting] = useState(false)
   const [deleteConfirming, setDeleteConfirming] = useState(false)
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false)
 
   const { profilePicture, updateProfile, bio, fetchProfile } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
@@ -86,11 +88,13 @@ export default function Account() {
   }
 
   const handleRequestDelete = async () => {
+    setIsConfirmDeleteOpen(false)
+    openModal()
     setDeleteRequesting(true)
     try {
       await authService.requestDeleteAccount()
-      openModal()
     } catch (err: unknown) {
+      closeModal()
       const e = err as { response?: { data?: { message?: string; detail?: string } } }
       const msg = e?.response?.data?.message ?? e?.response?.data?.detail ?? 'Failed to send code.'
       toast.error(msg)
@@ -169,14 +173,25 @@ export default function Account() {
           <div className="space-y-6">
             {/* Personal Details Card */}
             <div className="border-border bg-background rounded-2xl border p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6 lg:p-8">
-              <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left">
-                <ImageUpload value={profilePicture} onChange={handleUpload} loading={uploading} />
-                <span>
-                  <h2 className="text-lg font-semibold">Personal details</h2>
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    Update your name, email, and bio so the rest of the product feels more personal.
-                  </p>
-                </span>
+              <div className="flex flex-col-reverse items-end sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left w-full">
+                  <ImageUpload value={profilePicture} onChange={handleUpload} loading={uploading} />
+                  <div className="space-y-1">
+                    <h2 className="text-lg font-semibold">Personal details</h2>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      Update your name, email, and bio so the rest of the product feels more personal.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmDeleteOpen(true)}
+                  className="p-2 text-destructive hover:bg-destructive/10 rounded-full transition-all duration-200 shrink-0 cursor-pointer border border-transparent hover:border-destructive/20"
+                  aria-label="Delete Account"
+                  title="Delete Account"
+                >
+                  <Trash2 size={20} />
+                </button>
               </div>
 
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -218,35 +233,6 @@ export default function Account() {
                 </Button>
               </div>
             </div>
-
-            {/* Danger Zone Card */}
-            <div className="rounded-2xl border border-red-200 bg-red-50/10 p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6 lg:p-8 dark:border-red-950/20 dark:bg-red-950/5">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400">
-                  <ShieldAlert size={20} />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">
-                    Danger Zone
-                  </h2>
-                  <p className="text-muted-foreground mt-1 text-sm font-normal">
-                    Permanently delete your account and all associated quizzes and data. This action
-                    cannot be undone.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="text-destructive border-destructive/30 hover:border-destructive hover:bg-destructive transition-all duration-200 hover:text-white"
-                  loading={deleteRequesting}
-                  onClick={handleRequestDelete}
-                >
-                  Delete account
-                </Button>
-              </div>
-            </div>
           </div>
         )}
 
@@ -258,9 +244,14 @@ export default function Account() {
       {/* ACCOUNT DELETION MODAL */}
       <Modal
         modalKey="delete-account"
-        title="Delete account"
-        description={`We sent a 6-digit code to ${email ?? 'your email'}. Enter it below to permanently delete your account. This cannot be undone.`}
+        title="Verify your identity"
+        description={
+          deleteRequesting
+            ? 'Requesting verification code to your email...'
+            : `We sent a 6-digit code to ${email ?? 'your email'}. Enter it below to permanently delete your account.`
+        }
         size="max-w-sm"
+        closable={!deleteRequesting && !deleteConfirming}
       >
         <form onSubmit={handleConfirmDelete} className="space-y-3">
           <input
@@ -270,19 +261,34 @@ export default function Account() {
             pattern="[0-9]{6}"
             maxLength={6}
             required
+            disabled={deleteRequesting || deleteConfirming}
             autoComplete="one-time-code"
             placeholder="000000"
-            className={otpClass}
+            className={cn(otpClass, (deleteRequesting || deleteConfirming) && 'opacity-50 pointer-events-none')}
           />
           <Button
             type="submit"
             className="bg-destructive hover:bg-destructive/90 w-full text-white"
-            loading={deleteConfirming}
+            loading={deleteConfirming || deleteRequesting}
+            disabled={deleteRequesting}
           >
-            Permanently delete
+            {deleteRequesting ? 'Sending Code...' : 'Permanently delete'}
           </Button>
         </form>
       </Modal>
+
+      {/* CONFIRM REQUEST DELETE DIALOG */}
+      <ConfirmDialog
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => setIsConfirmDeleteOpen(false)}
+        onConfirm={handleRequestDelete}
+        title="Delete account?"
+        description="This will permanently delete your account, including all your quizzes, library folders, and analytics. This action cannot be undone. We will send a confirmation code to your email."
+        confirmLabel="Send Code & Delete"
+        cancelLabel="Cancel"
+        variant="destructive"
+        loading={deleteRequesting}
+      />
     </div>
   )
 }
