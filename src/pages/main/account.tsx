@@ -156,7 +156,7 @@ export default function Account() {
     <div className="space-y-6">
       <header className="space-y-1">
         <h1 className="text-2xl font-bold">Account</h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-sm sm:text-base">
           Manage your account preferences, developer keys, and secure connections.
         </p>
       </header>

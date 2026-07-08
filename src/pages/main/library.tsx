@@ -48,7 +48,7 @@ export default function Library() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Library</h1>
-          <p className="text-muted-foreground">Organize your quizzes into folders.</p>
+          <p className="text-muted-foreground text-sm sm:text-base">Organize your quizzes into folders.</p>
         </div>
         <Button onClick={openModal} leftIcon={<FolderPlus size={18} />} disabled={isLoading}>
           New Folder

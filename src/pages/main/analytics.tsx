@@ -93,7 +93,7 @@ export default function Analytics() {
 
       <header>
         <h1 className="text-2xl font-bold">Analytics</h1>
-        <p className="text-muted-foreground">Your progress across every quiz you've taken.</p>
+        <p className="text-muted-foreground text-sm sm:text-base">Your progress across every quiz you've taken.</p>
       </header>
       
       <AiFeedbackCard />

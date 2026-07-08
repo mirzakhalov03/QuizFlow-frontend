@@ -9,8 +9,8 @@ export default function QuizHeader() {
     <>
       <div className="flex items-center justify-between">
         <header>
-          <h1 className="text-xl font-semibold sm:text-2xl">Quizzes</h1>
-          <p className="text-muted-foreground text-sm">Manage your quizzes here.</p>
+          <h1 className="text-2xl font-bold">Quizzes</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">Manage your quizzes here.</p>
         </header>
 
         {/* Desktop button — hidden on mobile */}
