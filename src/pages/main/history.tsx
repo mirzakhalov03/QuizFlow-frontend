@@ -18,7 +18,6 @@ export default function History() {
     items,
     isLoading,
     isError,
-    isFetching,
     isFetchingNextPage,
     hasNextPage,
     observerRef,
@@ -52,7 +51,7 @@ export default function History() {
         <div className="border-border bg-background rounded-lg border p-8 text-center">
           <p className="text-muted-foreground text-sm">Couldn't load your history right now.</p>
         </div>
-      ) : isLoading || (isFetching && !isPlaceholderData && !isFetchingNextPage) ? (
+      ) : isLoading ? (
         <HistoryTableSkeleton />
       ) : (
         <div className="relative">
@@ -69,10 +68,9 @@ function HistoryTableSkeleton() {
   return (
     <div className="bg-card border-border animate-pulse overflow-hidden rounded-xl border shadow-sm">
       {/* Table Header skeleton */}
-      <div className="border-border bg-muted/40 grid grid-cols-5 gap-4 border-b p-4">
+      <div className="border-border bg-muted/40 grid grid-cols-4 gap-4 border-b p-4">
         <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />
         <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
-        <div className="skeleton-shimmer h-4 w-1/3 rounded-md" />
         <div className="skeleton-shimmer h-4 w-1/3 rounded-md" />
         <div className="skeleton-shimmer h-4 w-1/4 animate-none rounded-md" />
       </div>
@@ -80,10 +78,9 @@ function HistoryTableSkeleton() {
       {/* Table Rows skeleton */}
       <div className="divide-border divide-y">
         {Array.from({ length: 5 }).map((_, rowIndex) => (
-          <div key={rowIndex} className="grid grid-cols-5 items-center gap-4 p-4">
+          <div key={rowIndex} className="grid grid-cols-4 items-center gap-4 p-4">
             <div className="skeleton-shimmer h-4 w-5/6 rounded-md" />
             <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />
-            <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
             <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
             <div className="skeleton-shimmer h-8 w-20 justify-self-end rounded-lg" />
           </div>

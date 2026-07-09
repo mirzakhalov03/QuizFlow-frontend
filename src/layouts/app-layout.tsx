@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser, PanelLeft, Bookmark, MoreHorizontal, X } from 'lucide-react'
+import {
+  BarChart3,
+  History,
+  Library,
+  ListChecks,
+  LogOut,
+  Store,
+  CircleUser,
+  PanelLeft,
+  Bookmark,
+  MoreHorizontal,
+  X,
+} from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
@@ -42,9 +54,7 @@ const mobileOverflowItems = mobileOverflowOrder.map(
 )
 
 const tabletNavOrder = ['Explore', 'Library', 'Quizzes', 'Bookmarks', 'Analytics', 'History']
-const tabletNavItems = tabletNavOrder.map(
-  (label) => navItems.find((item) => item.label === label)!
-)
+const tabletNavItems = tabletNavOrder.map((label) => navItems.find((item) => item.label === label)!)
 
 export default function AppLayout() {
   const navigate = useNavigate()
@@ -66,14 +76,14 @@ export default function AppLayout() {
 
   const [confirmingLogout, setConfirmingLogout] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
-  
+
   const sidebarOpen = useSidebarStore((s) => s.sidebarOpen)
   const setSidebarOpen = useSidebarStore((s) => s.setSidebarOpen)
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const moreButtonRef = useRef<HTMLButtonElement>(null)
-  const firstOverflowRef = useRef<HTMLButtonElement>(null)
+  const firstOverflowRef = useRef<HTMLAnchorElement>(null)
   const navContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -131,7 +141,9 @@ export default function AppLayout() {
         firstOverflowRef.current?.focus()
       } else {
         e.preventDefault()
-        const lastItem = document.getElementById(`mobile-overflow-item-${mobileOverflowItems.length - 1}`)
+        const lastItem = document.getElementById(
+          `mobile-overflow-item-${mobileOverflowItems.length - 1}`
+        )
         lastItem?.focus()
       }
     }
@@ -178,7 +190,7 @@ export default function AppLayout() {
             size="lg"
             className={cn(
               'flex items-center transition-opacity duration-200',
-              sidebarOpen ? 'opacity-100 delay-100' : 'opacity-0 w-0 overflow-hidden'
+              sidebarOpen ? 'opacity-100 delay-100' : 'w-0 overflow-hidden opacity-0'
             )}
           />
           <div className="group relative">
@@ -188,15 +200,15 @@ export default function AppLayout() {
               aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
               className={cn(
                 'text-muted-foreground hover:bg-muted hover:text-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors',
-               !sidebarOpen && 'mx-auto'
-            )}
+                !sidebarOpen && 'mx-auto'
+              )}
             >
-            <PanelLeft size={18} />
+              <PanelLeft size={18} />
             </button>
 
             <span className="text-popover-foreground bg-popover border-border pointer-events-none absolute top-1/2 left-full z-50 ml-2 -translate-y-1/2 scale-95 rounded-md border px-2.5 py-1.5 text-sm font-medium whitespace-nowrap opacity-0 shadow-md transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
               {sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
-             </span>
+            </span>
           </div>
         </div>
 
@@ -216,23 +228,24 @@ export default function AppLayout() {
             >
               <Icon size={20} className="shrink-0" />
 
-           <>
-            <span className={cn(
+              <>
+                <span
+                  className={cn(
                     'overflow-hidden whitespace-nowrap transition-all duration-200',
                     sidebarOpen
-                    ? 'max-w-[120px] opacity-100 translate-x-0'
-                    : 'max-w-0 opacity-0 -translate-x-2'
-                   )}
-              >
-            {label}
-            </span>
+                      ? 'max-w-[120px] translate-x-0 opacity-100'
+                      : 'max-w-0 -translate-x-2 opacity-0'
+                  )}
+                >
+                  {label}
+                </span>
 
-            {!sidebarOpen && (
-              <span className="text-popover-foreground bg-popover border-border pointer-events-none absolute left-full z-50 ml-2 scale-95 rounded-md border px-2.5 py-1.5 text-sm font-medium whitespace-nowrap opacity-0 shadow-md transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
-               {label}
-              </span>
-           )}
-          </>
+                {!sidebarOpen && (
+                  <span className="text-popover-foreground bg-popover border-border pointer-events-none absolute left-full z-50 ml-2 scale-95 rounded-md border px-2.5 py-1.5 text-sm font-medium whitespace-nowrap opacity-0 shadow-md transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
+                    {label}
+                  </span>
+                )}
+              </>
             </NavLink>
           ))}
         </nav>
@@ -313,7 +326,7 @@ export default function AppLayout() {
             </button>
           </div>
         </div>
-        <div className="bg-secondary/8 flex-1 overflow-y-auto p-4 pb-24 sm:p-6 lg:pl-8 sm:pb-24 lg:pb-6">
+        <div className="bg-secondary/8 flex-1 overflow-y-auto p-4 pb-24 sm:p-6 sm:pb-24 lg:pb-6 lg:pl-8">
           <Outlet />
         </div>
       </main>
@@ -321,8 +334,8 @@ export default function AppLayout() {
       {/* Semi-transparent backdrop/scrim */}
       <div
         className={cn(
-          'fixed inset-0 z-30 bg-background/50 backdrop-blur-xs transition-opacity duration-300 pointer-events-none opacity-0 sm:hidden',
-          mobileMenuOpen && 'opacity-100 pointer-events-auto'
+          'bg-background/50 pointer-events-none fixed inset-0 z-30 opacity-0 backdrop-blur-xs transition-opacity duration-300 sm:hidden',
+          mobileMenuOpen && 'pointer-events-auto opacity-100'
         )}
         onClick={() => setMobileMenuOpen(false)}
         aria-hidden="true"
@@ -330,7 +343,7 @@ export default function AppLayout() {
 
       {/* Curled Ladder Overflow Menu Container */}
       <div ref={navContainerRef} className="absolute right-0 bottom-0 left-0 z-40 sm:hidden">
-        <div className="absolute bottom-full right-4 left-auto pointer-events-none">
+        <div className="pointer-events-none absolute right-4 bottom-full left-auto">
           {mobileOverflowItems.map((item, index) => {
             const yOffset = -76 - index * 54
             // A curled crescent shape hook for 4 items
@@ -340,8 +353,8 @@ export default function AppLayout() {
             const delay = prefersReducedMotion
               ? '0ms'
               : mobileMenuOpen
-              ? `${index * 50}ms`
-              : `${(mobileOverflowItems.length - 1 - index) * 35}ms`
+                ? `${index * 50}ms`
+                : `${(mobileOverflowItems.length - 1 - index) * 35}ms`
 
             const transform = mobileMenuOpen
               ? `translate3d(${x}px, ${yOffset}px, 0) scale(1)`
@@ -362,25 +375,35 @@ export default function AppLayout() {
                   transform: prefersReducedMotion ? undefined : transform,
                   opacity,
                   transitionProperty: 'transform, opacity, background-color, border-color',
-                  transitionDuration: prefersReducedMotion ? '150ms' : mobileMenuOpen ? '420ms' : '260ms',
+                  transitionDuration: prefersReducedMotion
+                    ? '150ms'
+                    : mobileMenuOpen
+                      ? '420ms'
+                      : '260ms',
                   transitionTimingFunction: prefersReducedMotion
                     ? 'ease'
                     : mobileMenuOpen
-                    ? 'cubic-bezier(0.34, 1.56, 0.64, 1)'
-                    : 'cubic-bezier(0.25, 1, 0.5, 1)',
+                      ? 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+                      : 'cubic-bezier(0.25, 1, 0.5, 1)',
                   transitionDelay: delay,
                   right: '12px',
                   left: 'auto',
                   transformOrigin: 'center center',
                 }}
                 className={cn(
-                  'absolute bottom-0 z-40 flex h-11 min-w-[120px] items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground shadow-md transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                  'border-border bg-card text-foreground hover:bg-muted focus-visible:ring-primary absolute bottom-0 z-40 flex h-11 min-w-[120px] items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold shadow-md transition-colors focus-visible:ring-2 focus-visible:outline-none',
                   mobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'
                 )}
               >
                 {({ isActive }) => (
                   <>
-                    <item.icon size={15} className={cn('shrink-0', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                    <item.icon
+                      size={15}
+                      className={cn(
+                        'shrink-0',
+                        isActive ? 'text-primary' : 'text-muted-foreground'
+                      )}
+                    />
                     <span className="truncate">{item.label}</span>
                   </>
                 )}
@@ -393,7 +416,7 @@ export default function AppLayout() {
       {/* Primary Mobile Bottom Nav (3 items + 1 More) */}
       <nav
         aria-label="Mobile navigation"
-        className="border-border bg-background/95 backdrop-blur-md fixed inset-x-0 bottom-0 z-40 flex h-16 border-t sm:hidden px-2 shadow-lg"
+        className="border-border bg-background/95 fixed inset-x-0 bottom-0 z-40 flex h-16 border-t px-2 shadow-lg backdrop-blur-md sm:hidden"
       >
         <div className="mx-auto flex w-full max-w-lg items-center justify-around">
           {Array.from({ length: 4 }).map((_, colIndex) => {
@@ -407,21 +430,25 @@ export default function AppLayout() {
                   aria-expanded={mobileMenuOpen}
                   aria-haspopup="true"
                   aria-label={mobileMenuOpen ? 'Close menu' : 'More options'}
-                  className="flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="focus-visible:ring-primary flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   <div className="relative h-5 w-5">
                     <MoreHorizontal
                       size={20}
                       className={cn(
-                        'absolute inset-0 transition-all duration-300 transform',
-                        mobileMenuOpen ? 'opacity-0 scale-50 rotate-90 pointer-events-none' : 'opacity-100 scale-100 rotate-0'
+                        'absolute inset-0 transform transition-all duration-300',
+                        mobileMenuOpen
+                          ? 'pointer-events-none scale-50 rotate-90 opacity-0'
+                          : 'scale-100 rotate-0 opacity-100'
                       )}
                     />
                     <X
                       size={20}
                       className={cn(
-                        'absolute inset-0 transition-all duration-300 transform text-primary',
-                        mobileMenuOpen ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-90 pointer-events-none'
+                        'text-primary absolute inset-0 transform transition-all duration-300',
+                        mobileMenuOpen
+                          ? 'scale-100 rotate-0 opacity-100'
+                          : 'pointer-events-none scale-50 -rotate-90 opacity-0'
                       )}
                     />
                   </div>
@@ -446,7 +473,7 @@ export default function AppLayout() {
                 key={item.label}
                 to={item.to}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="focus-visible:ring-primary flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:ring-2 focus-visible:outline-none"
               >
                 {({ isActive }) => (
                   <>
@@ -476,7 +503,7 @@ export default function AppLayout() {
       {/* Tablet Bottom Nav (All 6 items shown flat) */}
       <nav
         aria-label="Tablet navigation"
-        className="border-border bg-background fixed inset-x-0 bottom-0 z-40 hidden h-16 border-t sm:flex lg:hidden px-4 shadow-lg"
+        className="border-border bg-background fixed inset-x-0 bottom-0 z-40 hidden h-16 border-t px-4 shadow-lg sm:flex lg:hidden"
       >
         <div className="mx-auto flex w-full max-w-2xl items-center justify-around">
           {tabletNavItems.map(({ label, to, icon: Icon }) => (
@@ -484,7 +511,7 @@ export default function AppLayout() {
               key={label}
               to={to}
               onClick={() => setMobileMenuOpen(false)}
-              className="flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="focus-visible:ring-primary flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:ring-2 focus-visible:outline-none"
             >
               {({ isActive }) => (
                 <>

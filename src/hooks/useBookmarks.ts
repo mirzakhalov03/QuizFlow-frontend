@@ -30,6 +30,7 @@ export function useBookmarks(delayMs?: number) {
     hasNextPage,
     isError,
     observerRef,
+    fetchNextPage,
   } = useInfinite<BookmarkItem, PageData>(BOOKMARKS, {
     page_key: 'offset',
     initialPageParam: 0,
@@ -53,8 +54,7 @@ export function useBookmarks(delayMs?: number) {
     string,
     { previousBookmarks: BookmarksInfiniteData | undefined }
   >({
-    mutationFn: (questionId: string) =>
-      api.post(QUESTION_BOOKMARK(questionId)),
+    mutationFn: (questionId: string) => api.post(QUESTION_BOOKMARK(questionId)),
     onMutate: async (questionId) => {
       await queryClient.cancelQueries({ queryKey: [BOOKMARKS] })
 
@@ -103,16 +103,16 @@ export function useBookmarks(delayMs?: number) {
       const status = axiosError?.response?.status
       const detail = axiosError?.response?.data?.detail
       if (status === 403) {
-        toast.error("Import the quiz to bookmark questions")
+        toast.error('Import the quiz to bookmark questions')
       } else if (detail) {
         toast.error(detail)
       } else {
-        toast.error("Could not add bookmark. Please try again.")
+        toast.error('Could not add bookmark. Please try again.')
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [BOOKMARKS] })
-      toast.success("Question bookmarked")
+      toast.success('Question bookmarked')
     },
   })
 
@@ -122,8 +122,7 @@ export function useBookmarks(delayMs?: number) {
     string,
     { previousBookmarks: BookmarksInfiniteData | undefined }
   >({
-    mutationFn: (questionId: string) =>
-      api.delete(QUESTION_BOOKMARK(questionId)),
+    mutationFn: (questionId: string) => api.delete(QUESTION_BOOKMARK(questionId)),
     onMutate: async (questionId) => {
       await queryClient.cancelQueries({ queryKey: [BOOKMARKS] })
 
@@ -160,12 +159,12 @@ export function useBookmarks(delayMs?: number) {
       if (detail) {
         toast.error(detail)
       } else {
-        toast.error("Could not remove bookmark. Please try again.")
+        toast.error('Could not remove bookmark. Please try again.')
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [BOOKMARKS] })
-      toast.success("Bookmark removed")
+      toast.success('Bookmark removed')
     },
   })
 
@@ -188,6 +187,7 @@ export function useBookmarks(delayMs?: number) {
     hasNextPage,
     isError,
     observerRef,
+    fetchNextPage,
     isBookmarked,
     toggleBookmark,
   }
