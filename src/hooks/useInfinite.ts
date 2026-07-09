@@ -22,6 +22,7 @@ export type UseInfiniteArgs<TQueryFnData = unknown, TError = unknown, TData = un
   limit_key?: string
   limit_val?: number
   rootMargin?: string
+  delayMs?: number
 }
 
 export const useInfinite = <
@@ -43,6 +44,7 @@ export const useInfinite = <
     limit_key = 'limit',
     limit_val = 20,
     rootMargin = '200px',
+    delayMs,
   } = args || {}
 
   const cleanedParams = useMemo(() => {
@@ -59,6 +61,9 @@ export const useInfinite = <
   const queryResult = useInfiniteQuery<TQueryFnData, TError, TData, QueryKey, number>({
     queryKey,
     queryFn: async ({ pageParam }) => {
+      if (delayMs) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs))
+      }
       const response = await getRequest(url, {
         ...config,
         params: {

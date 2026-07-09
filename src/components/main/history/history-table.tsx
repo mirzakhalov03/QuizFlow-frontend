@@ -5,16 +5,17 @@ import type { HistoryItem } from '@/types/analytics'
 
 type Props = {
   rows: HistoryItem[]
+  isFetchingNextPage?: boolean
 }
 
-export default function HistoryTable({ rows }: Props) {
+export default function HistoryTable({ rows, isFetchingNextPage }: Props) {
   return (
     <div className="border-border bg-background rounded-lg border">
       <div className="border-border border-b px-4 py-3">
         <h3 className="text-sm font-semibold">Attempts</h3>
       </div>
 
-      {rows.length === 0 ? (
+      {rows.length === 0 && !isFetchingNextPage ? (
         <div className="text-muted-foreground p-6 text-center text-sm">
           No attempts match your filters.
         </div>
@@ -50,6 +51,23 @@ export default function HistoryTable({ rows }: Props) {
                   </td>
                 </tr>
               ))}
+              {isFetchingNextPage &&
+                Array.from({ length: 3 }).map((_, index) => (
+                  <tr key={`skeleton-row-${index}`} className="border-border border-b last:border-b-0 animate-pulse">
+                    <td className="px-4 py-3">
+                      <div className="skeleton-shimmer h-4 w-3/4 rounded-md" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="skeleton-shimmer h-4 w-16 rounded-md ml-auto" />
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="skeleton-shimmer h-4 w-24 rounded-md ml-auto" />
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

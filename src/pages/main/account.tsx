@@ -1,6 +1,6 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, useRef, type FormEvent, useLayoutEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { User, Link2, Key, KeyRound, ShieldAlert } from 'lucide-react'
+import { User, Link2, Key, KeyRound, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import ImageUpload from '@/components/ui/image-upload'
@@ -9,6 +9,7 @@ import ConnectedApps from '@/components/main/account/connected-apps'
 import SetPassword from '@/components/main/account/set-password'
 import ByokSection from '@/components/main/account/byok-section'
 import { Input } from '@/components/ui/input'
+import ConfirmDialog from '@/components/ui/confirm-dialog'
 
 import { useAuthStore } from '@/store/use-authstore'
 import { useUserProfileStore } from '@/store/userProfileStore'
@@ -34,16 +35,19 @@ export default function Account() {
   const [saving, setSaving] = useState(false)
   const [deleteRequesting, setDeleteRequesting] = useState(false)
   const [deleteConfirming, setDeleteConfirming] = useState(false)
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false)
 
   const { profilePicture, updateProfile, bio, fetchProfile } = useUserProfileStore()
   const [draftFullName, setDraftFullName] = useState('')
   const [draftBio, setDraftBio] = useState('')
-  const email = user?.email
-
   const tabParam = searchParams.get('tab')
   const activeTab = ['profile', 'integrations', 'byok', 'security'].includes(tabParam || '')
     ? (tabParam as string)
     : 'profile'
+
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+  const email = user?.email
 
   const setActiveTab = (tab: string) => {
     setSearchParams((prev) => {
@@ -63,6 +67,28 @@ export default function Account() {
   useEffect(() => {
     setDraftBio(bio ?? '')
   }, [bio])
+
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      const activeEl = tabRefs.current[activeTab]
+      if (activeEl) {
+        setIndicatorStyle({
+          left: activeEl.offsetLeft,
+          width: activeEl.clientWidth,
+        })
+      }
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    // Wait a brief tick in case fonts or container layout reflowed
+    const timer = setTimeout(handleResize, 50)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(timer)
+    }
+  }, [activeTab])
 
   const handleSave = async () => {
     try {
@@ -86,11 +112,13 @@ export default function Account() {
   }
 
   const handleRequestDelete = async () => {
+    setIsConfirmDeleteOpen(false)
+    openModal()
     setDeleteRequesting(true)
     try {
       await authService.requestDeleteAccount()
-      openModal()
     } catch (err: unknown) {
+      closeModal()
       const e = err as { response?: { data?: { message?: string; detail?: string } } }
       const msg = e?.response?.data?.message ?? e?.response?.data?.detail ?? 'Failed to send code.'
       toast.error(msg)
@@ -128,7 +156,7 @@ export default function Account() {
     <div className="space-y-6">
       <header className="space-y-1">
         <h1 className="text-2xl font-bold">Account</h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-sm sm:text-base">
           Manage your account preferences, developer keys, and secure connections.
         </p>
       </header>
@@ -136,24 +164,34 @@ export default function Account() {
       {/* HORIZONTAL TAB MENU */}
       <nav
         role="tablist"
-        className="bg-muted flex w-full gap-1 overflow-x-auto rounded-xl p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="bg-muted relative flex w-full gap-1 overflow-x-auto rounded-xl p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-label="Settings sections"
       >
+        {/* Sliding active indicator */}
+        <div
+          className="bg-primary absolute top-1 bottom-1 rounded-lg shadow-sm transition-all duration-300 ease-in-out"
+          style={{
+            left: `${indicatorStyle.left}px`,
+            width: `${indicatorStyle.width}px`,
+          }}
+        />
+
         {tabs.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
           return (
             <button
               key={tab.id}
+              ref={(el) => {
+                tabRefs.current[tab.id] = el
+              }}
               role="tab"
               aria-selected={isActive}
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex min-w-max flex-1 shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
-                isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/60'
+                'relative z-10 flex min-w-max flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300',
+                isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Icon size={16} />
@@ -169,14 +207,26 @@ export default function Account() {
           <div className="space-y-6">
             {/* Personal Details Card */}
             <div className="border-border bg-background rounded-2xl border p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6 lg:p-8">
-              <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left">
-                <ImageUpload value={profilePicture} onChange={handleUpload} loading={uploading} />
-                <span>
-                  <h2 className="text-lg font-semibold">Personal details</h2>
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    Update your name, email, and bio so the rest of the product feels more personal.
-                  </p>
-                </span>
+              <div className="flex flex-col-reverse items-end gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex w-full flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left">
+                  <ImageUpload value={profilePicture} onChange={handleUpload} loading={uploading} />
+                  <div className="space-y-1">
+                    <h2 className="text-lg font-semibold">Personal details</h2>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      Update your name, email, and bio so the rest of the product feels more
+                      personal.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmDeleteOpen(true)}
+                  className="text-destructive hover:bg-destructive/10 hover:border-destructive/20 hidden shrink-0 cursor-pointer rounded-full border border-transparent p-2 transition-all duration-200 sm:block"
+                  aria-label="Delete Account"
+                  title="Delete Account"
+                >
+                  <Trash2 size={20} />
+                </button>
               </div>
 
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -212,38 +262,18 @@ export default function Account() {
                 </label>
               </div>
 
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex items-center justify-between gap-3 sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmDeleteOpen(true)}
+                  className="text-destructive hover:bg-destructive/10 hover:border-destructive/20 cursor-pointer rounded-full border border-transparent p-2 transition-all duration-200 sm:hidden"
+                  aria-label="Delete Account"
+                  title="Delete Account"
+                >
+                  <Trash2 size={20} />
+                </button>
                 <Button type="button" onClick={handleSave} loading={saving} disabled={saving}>
                   Save changes
-                </Button>
-              </div>
-            </div>
-
-            {/* Danger Zone Card */}
-            <div className="rounded-2xl border border-red-200 bg-red-50/10 p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6 lg:p-8 dark:border-red-950/20 dark:bg-red-950/5">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400">
-                  <ShieldAlert size={20} />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">
-                    Danger Zone
-                  </h2>
-                  <p className="text-muted-foreground mt-1 text-sm font-normal">
-                    Permanently delete your account and all associated quizzes and data. This action
-                    cannot be undone.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="text-destructive border-destructive/30 hover:border-destructive hover:bg-destructive transition-all duration-200 hover:text-white"
-                  loading={deleteRequesting}
-                  onClick={handleRequestDelete}
-                >
-                  Delete account
                 </Button>
               </div>
             </div>
@@ -258,9 +288,14 @@ export default function Account() {
       {/* ACCOUNT DELETION MODAL */}
       <Modal
         modalKey="delete-account"
-        title="Delete account"
-        description={`We sent a 6-digit code to ${email ?? 'your email'}. Enter it below to permanently delete your account. This cannot be undone.`}
+        title="Verify your identity"
+        description={
+          deleteRequesting
+            ? 'Requesting verification code to your email...'
+            : `We sent a 6-digit code to ${email ?? 'your email'}. Enter it below to permanently delete your account.`
+        }
         size="max-w-sm"
+        closable={!deleteRequesting && !deleteConfirming}
       >
         <form onSubmit={handleConfirmDelete} className="space-y-3">
           <input
@@ -270,19 +305,37 @@ export default function Account() {
             pattern="[0-9]{6}"
             maxLength={6}
             required
+            disabled={deleteRequesting || deleteConfirming}
             autoComplete="one-time-code"
             placeholder="000000"
-            className={otpClass}
+            className={cn(
+              otpClass,
+              (deleteRequesting || deleteConfirming) && 'pointer-events-none opacity-50'
+            )}
           />
           <Button
             type="submit"
             className="bg-destructive hover:bg-destructive/90 w-full text-white"
-            loading={deleteConfirming}
+            loading={deleteConfirming || deleteRequesting}
+            disabled={deleteRequesting}
           >
-            Permanently delete
+            {deleteRequesting ? 'Sending Code...' : 'Permanently delete'}
           </Button>
         </form>
       </Modal>
+
+      {/* CONFIRM REQUEST DELETE DIALOG */}
+      <ConfirmDialog
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => setIsConfirmDeleteOpen(false)}
+        onConfirm={handleRequestDelete}
+        title="Delete account?"
+        description="This will permanently delete your account, including all your quizzes, library folders, and analytics. This action cannot be undone. We will send a confirmation code to your email."
+        confirmLabel="Send Code & Delete"
+        cancelLabel="Cancel"
+        variant="destructive"
+        loading={deleteRequesting}
+      />
     </div>
   )
 }

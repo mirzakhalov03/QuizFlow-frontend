@@ -15,8 +15,7 @@ import { useDelete } from '@/hooks/useDelete'
 import { ApiResponse } from '@/types/api'
 import { Folder } from '@/types/folder'
 import { Quiz } from '@/types/quiz'
-import QuizCard from '@/components/main/quizzes/quiz-card'
-import Spinner from '@/components/ui/spinner'
+import QuizCard, { QuizCardSkeleton } from '@/components/main/quizzes/quiz-card'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
 import { useModal } from '@/hooks/useModal'
@@ -81,10 +80,37 @@ export default function LibraryFolder() {
     },
   })
 
-  if (isLoadingFolder || isLoadingQuizzes) {
+  if (isLoadingFolder) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Spinner size="lg" />
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <div className="text-muted-foreground flex items-center gap-1 text-sm">
+            <ChevronLeft size={14} />
+            Back to Library
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
+                <FolderIcon className="text-primary" size={24} />
+              </div>
+              <div className="skeleton-shimmer h-8 w-36 rounded-md" />
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" disabled leftIcon={<FolderInput size={18} />}>
+                Add Existing
+              </Button>
+              <Button disabled leftIcon={<Plus size={18} />}>
+                New Quiz
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <QuizCardSkeleton key={`initial-folder-quiz-skeleton-${i}`} />
+          ))}
+        </div>
       </div>
     )
   }
@@ -102,7 +128,8 @@ export default function LibraryFolder() {
     )
   }
 
-  const isEmpty = quizzes.length === 0 && folderPendingJobs.length === 0
+  const showSkeletons = isLoadingQuizzes
+  const isEmpty = !showSkeletons && quizzes.length === 0 && folderPendingJobs.length === 0
 
   return (
     <div className="flex flex-col gap-6">
@@ -188,21 +215,28 @@ export default function LibraryFolder() {
         </div>
       ) : (
         <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {folderPendingJobs.map((job) => (
-            <PendingQuizCard key={job.jobId} {...job} />
-          ))}
-          {quizzes.map((quiz) => (
-            <QuizCard key={quiz.id} quiz={quiz} />
-          ))}
+          {showSkeletons ? (
+            Array.from({ length: 8 }).map((_, i) => (
+              <QuizCardSkeleton key={`initial-folder-quizzes-skeleton-${i}`} />
+            ))
+          ) : (
+            <>
+              {folderPendingJobs.map((job) => (
+                <PendingQuizCard key={job.jobId} {...job} />
+              ))}
+              {quizzes.map((quiz) => (
+                <QuizCard key={quiz.id} quiz={quiz} />
+              ))}
+            </>
+          )}
+
+          {isFetchingNextPage &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <QuizCardSkeleton key={"next-page-skeleton-" + i} />
+            ))}
 
           {hasNextPage && (
-            <div ref={observerRef} className="col-span-full flex justify-center py-8">
-              {isFetchingNextPage ? (
-                <Spinner size="md" />
-              ) : (
-                <div className="h-2 w-2" />
-              )}
-            </div>
+            <div ref={observerRef} className="col-span-full h-1" />
           )}
         </div>
       )}

@@ -69,7 +69,7 @@ function SortDropdown({ sort, onChange }: { sort: SortOption; onChange: (s: Sort
 
   return (
     <div ref={ref} className="relative">
-      <Button variant="outline" size="sm" onClick={() => setOpen((o) => !o)} className="gap-1.5">
+      <Button variant="outline" size="md" onClick={() => setOpen((o) => !o)} className="gap-1.5 cursor-pointer">
         <ArrowUpDown className="h-3.5 w-3.5" />
         {currentLabel}
       </Button>
@@ -126,9 +126,9 @@ function FilterDropdown({
     <div ref={ref} className="relative">
       <Button
         variant="outline"
-        size="sm"
+        size="md"
         onClick={() => setOpen((o) => !o)}
-        className="relative gap-1.5"
+        className="relative gap-1.5 cursor-pointer"
       >
         <SlidersHorizontal className="h-3.5 w-3.5" />
         Filter

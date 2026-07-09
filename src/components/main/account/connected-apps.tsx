@@ -14,7 +14,6 @@ import {
 } from '@/types/integration'
 
 import NotionLogo from '@/assets/notionLogo.png'
-import GoogleLogo from '@/assets/googleLogo.png'
 
 type ProviderMeta = {
   name: string
@@ -23,11 +22,6 @@ type ProviderMeta = {
 }
 
 const PROVIDER_META: Record<IntegrationProvider, ProviderMeta> = {
-  google: {
-    name: 'Google',
-    description: 'Use Google sign-in and keep your account secure across devices.',
-    icon: GoogleLogo,
-  },
   notion: {
     name: 'Notion',
     description: 'Sync notes, templates, and study material directly from your workspace.',
@@ -107,7 +101,7 @@ export default function ConnectedApps() {
                     leftIcon={<Link2OffIcon size={14} />}
                     onClick={() => handleDisconnect(provider)}
                     loading={isPendingThis}
-                    disabled={isLoading || provider === 'google'}
+                    disabled={isLoading}
                   >
                     Disconnect
                   </Button>

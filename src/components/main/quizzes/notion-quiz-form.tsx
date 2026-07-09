@@ -43,6 +43,7 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
       model: DEFAULT_MODEL,
       apiKeyId: '',
       isTimerEnabled: false,
+      optionsPerQuestion: 4,
       userInstructions: '',
       folderId: folderId || 'none',
       avoidQuizIds: [],
@@ -60,11 +61,13 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
     const tempId = crypto.randomUUID()
     const targetFolderId = values.folderId !== 'none' ? values.folderId : undefined
 
+    const tempTitle = `Notion Quiz (${values.pageIds.length} page${values.pageIds.length > 1 ? 's' : ''})`
+
     closeModal()
     reset()
     addJob({
       jobId: tempId,
-      title: 'Generating quiz…',
+      title: tempTitle,
       type: values.type,
       folderId: targetFolderId,
     })
@@ -128,7 +131,7 @@ export default function NotionQuizForm({ onBack, folderId }: NotionQuizFormProps
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
         <FieldLabel required isError={!!fieldState.error}>
           Add Notion Pages
