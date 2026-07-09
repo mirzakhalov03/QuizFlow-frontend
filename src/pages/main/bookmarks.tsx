@@ -35,6 +35,7 @@ export default function Bookmarks() {
   const [viewMode, setViewMode] = useState<'grid' | 'flashcard'>('grid')
   const [activeIndex, setActiveIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
+  const [showOptionsFlashcard, setShowOptionsFlashcard] = useState(false)
 
   // Bookmark removal confirmation state
   const [deleteQuestionId, setDeleteQuestionId] = useState<string | null>(null)
@@ -51,11 +52,13 @@ export default function Bookmarks() {
         if (activeIndex < bookmarks.length - 1) {
           setActiveIndex((prev) => prev + 1)
           setIsFlipped(false)
+          setShowOptionsFlashcard(false)
         }
       } else if (e.code === 'ArrowLeft') {
         if (activeIndex > 0) {
           setActiveIndex((prev) => prev - 1)
           setIsFlipped(false)
+          setShowOptionsFlashcard(false)
         }
       }
     }
@@ -74,6 +77,7 @@ export default function Bookmarks() {
         setActiveIndex((prev) => prev - 1)
       }
       setIsFlipped(false)
+      setShowOptionsFlashcard(false)
     }
 
     setDeleteQuestionId(null)
@@ -101,6 +105,7 @@ export default function Bookmarks() {
               onClick={() => {
                 setViewMode('grid')
                 setIsFlipped(false)
+                setShowOptionsFlashcard(false)
               }}
               className={`flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors ${
                 viewMode === 'grid'
@@ -115,6 +120,7 @@ export default function Bookmarks() {
               onClick={() => {
                 setViewMode('flashcard')
                 setIsFlipped(false)
+                setShowOptionsFlashcard(false)
               }}
               className={`flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors ${
                 viewMode === 'flashcard'
@@ -174,7 +180,7 @@ export default function Bookmarks() {
               }`}
             >
               {/* Front Side (Question) */}
-              <div className="bg-card border-border hover:border-primary/40 absolute inset-0 flex h-full w-full flex-col justify-between overflow-y-auto rounded-2xl border-2 p-8 shadow-md transition-colors [backface-visibility:hidden]">
+              <div className="bg-card border-border hover:border-primary/40 absolute inset-0 flex h-full w-full flex-col justify-between overflow-y-auto custom-scrollbar rounded-2xl border-2 p-8 shadow-md transition-colors [backface-visibility:hidden]">
                 <div className="flex items-start justify-between gap-4">
                   <span className="bg-muted text-muted-foreground flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium">
                     <BookOpen className="h-3 w-3" />
@@ -206,21 +212,46 @@ export default function Bookmarks() {
                   {bookmarks[activeIndex].question.type !== 'open_ended' &&
                     bookmarks[activeIndex].question.options &&
                     bookmarks[activeIndex].question.options.length > 0 && (
-                      <div className="mt-2 flex w-full max-w-md flex-col gap-2 text-left">
-                        {bookmarks[activeIndex].question.options.map((opt, idx) => {
-                          const letter = String.fromCharCode(65 + idx)
-                          return (
-                            <div
-                              key={opt.id}
-                              className="bg-muted/40 border-border flex items-start gap-2.5 rounded-lg border p-2.5 text-xs text-foreground/80"
-                            >
-                              <span className="bg-muted text-muted-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded-md font-semibold text-[10px]">
-                                {letter}
-                              </span>
-                              <MarkdownText text={opt.text} className="flex-1 min-w-0 pt-0.5 leading-relaxed font-normal" />
+                      <div className="w-full max-w-md mt-2" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => setShowOptionsFlashcard(!showOptionsFlashcard)}
+                          className="text-primary hover:text-primary/80 mx-auto flex cursor-pointer items-center gap-1 text-xs font-semibold"
+                        >
+                          <span>{showOptionsFlashcard ? 'Hide Options' : 'Show Options'}</span>
+                          <ChevronDown
+                            className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                              showOptionsFlashcard ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+
+                        <div
+                          className={`grid transition-all duration-300 ease-in-out ${
+                            showOptionsFlashcard
+                              ? 'mt-3 grid-rows-[1fr] opacity-100'
+                              : 'grid-rows-[0fr] opacity-0'
+                          }`}
+                        >
+                          <div className="overflow-hidden">
+                            <div className="flex flex-col gap-2 pt-1 text-left">
+                              {bookmarks[activeIndex].question.options.map((opt, idx) => {
+                                const letter = String.fromCharCode(65 + idx)
+                                return (
+                                  <div
+                                    key={opt.id}
+                                    className="bg-muted/40 border-border flex items-start gap-2.5 rounded-lg border p-2.5 text-xs text-foreground/80"
+                                  >
+                                    <span className="bg-muted text-muted-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded-md font-semibold text-[10px]">
+                                      {letter}
+                                    </span>
+                                    <MarkdownText text={opt.text} className="flex-1 min-w-0 pt-0.5 leading-relaxed font-normal" />
+                                  </div>
+                                )
+                              })}
                             </div>
-                          )
-                        })}
+                          </div>
+                        </div>
                       </div>
                     )}
                 </div>
@@ -231,7 +262,7 @@ export default function Bookmarks() {
               </div>
 
               {/* Back Side (Answer) */}
-              <div className="bg-card border-border absolute inset-0 flex h-full w-full [transform:rotateY(180deg)] flex-col justify-between overflow-y-auto rounded-2xl border-2 p-8 shadow-md [backface-visibility:hidden]">
+              <div className="bg-card border-border absolute inset-0 flex h-full w-full [transform:rotateY(180deg)] flex-col justify-between overflow-y-auto custom-scrollbar rounded-2xl border-2 p-8 shadow-md [backface-visibility:hidden]">
                 <div className="mb-4 flex items-start justify-between gap-4">
                   <span className="bg-muted text-muted-foreground flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium">
                     <BookOpen className="h-3 w-3" />
@@ -257,7 +288,7 @@ export default function Bookmarks() {
                       />
                     </div>
                   ) : (
-                    <div className="flex max-h-[220px] flex-col gap-2 overflow-y-auto pr-1 text-left">
+                    <div className="flex max-h-[220px] flex-col gap-2 overflow-y-auto custom-scrollbar pr-1 text-left">
                       {bookmarks[activeIndex].question.correctOptions &&
                       bookmarks[activeIndex].question.correctOptions.length > 0 ? (
                         bookmarks[activeIndex].question.correctOptions.map((opt) => (
@@ -296,6 +327,7 @@ export default function Bookmarks() {
               onClick={() => {
                 setActiveIndex((prev) => prev - 1)
                 setIsFlipped(false)
+                setShowOptionsFlashcard(false)
               }}
               disabled={activeIndex === 0}
               className="gap-1.5"
@@ -308,6 +340,7 @@ export default function Bookmarks() {
               onClick={() => {
                 setActiveIndex((prev) => prev + 1)
                 setIsFlipped(false)
+                setShowOptionsFlashcard(false)
               }}
               disabled={activeIndex === bookmarks.length - 1}
               className="gap-1.5"
@@ -363,6 +396,7 @@ export default function Bookmarks() {
 
 function BookmarkCard({ item, onRemove }: { item: BookmarkItem; onRemove: () => void }) {
   const [showAnswer, setShowAnswer] = useState(false)
+  const [showOptions, setShowOptions] = useState(false)
   const q = item.question
   const quiz = item.quiz
 
@@ -405,21 +439,44 @@ function BookmarkCard({ item, onRemove }: { item: BookmarkItem; onRemove: () => 
 
       {/* Options List */}
       {q.type !== 'open_ended' && q.options && q.options.length > 0 && (
-        <div className="mb-4 flex flex-col gap-2">
-          {q.options.map((opt, idx) => {
-            const letter = String.fromCharCode(65 + idx)
-            return (
-              <div
-                key={opt.id}
-                className="bg-muted/30 border-border flex items-start gap-2.5 rounded-lg border p-2.5 text-xs text-foreground/80"
-              >
-                <span className="bg-muted text-muted-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded-md font-semibold text-[10px]">
-                  {letter}
-                </span>
-                <MarkdownText text={opt.text} className="flex-1 min-w-0 pt-0.5 leading-relaxed font-normal" />
+        <div className="mb-4" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => setShowOptions(!showOptions)}
+            className="text-primary hover:text-primary/80 flex cursor-pointer items-center gap-1 text-xs font-semibold"
+          >
+            <span>{showOptions ? 'Hide Options' : 'Show Options'}</span>
+            <ChevronDown
+              className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                showOptions ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          <div
+            className={`grid transition-all duration-300 ease-in-out ${
+              showOptions ? 'mt-2 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="flex flex-col gap-2 pt-1">
+                {q.options.map((opt, idx) => {
+                  const letter = String.fromCharCode(65 + idx)
+                  return (
+                    <div
+                      key={opt.id}
+                      className="bg-muted/30 border-border flex items-start gap-2.5 rounded-lg border p-2.5 text-xs text-foreground/80"
+                    >
+                      <span className="bg-muted text-muted-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded-md font-semibold text-[10px]">
+                        {letter}
+                      </span>
+                      <MarkdownText text={opt.text} className="flex-1 min-w-0 pt-0.5 leading-relaxed font-normal" />
+                    </div>
+                  )
+                })}
               </div>
-            )
-          })}
+            </div>
+          </div>
         </div>
       )}
 

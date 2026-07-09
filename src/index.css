@@ -250,13 +250,37 @@
 
   .skeleton-shimmer {
     background-image: linear-gradient(
-      90deg,
+      95deg,
       hsl(var(--skeleton-bg)) 25%,
       hsl(var(--skeleton-shimmer)) 50%,
       hsl(var(--skeleton-bg)) 75%
     );
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.6s infinite ease-in-out;
+  }
+
+  /* Custom Scrollbar Utility */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 25%) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 25%);
+    border-radius: 9999px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 45%);
   }
 }
 
@@ -287,6 +311,27 @@
 @layer base {
   * {
     border-color: hsl(var(--border));
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 25%) transparent;
+  }
+
+  /* Global Scrollbar Styles for Webkit Browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 25%);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 45%);
   }
 
   body {
