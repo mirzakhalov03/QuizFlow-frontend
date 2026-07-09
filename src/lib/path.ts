@@ -24,6 +24,7 @@ export const PATHS = {
     quiz: (id: string) => `/app/quizzes/${id}`,
     library: '/app/library',
     libraryFolder: (id: string) => `/app/library/${id}`,
+    bookmarks: '/app/bookmarks',
     marketplace: '/app/marketplace',
     marketplaceListing: (quizId: string) => `/app/marketplace/${quizId}`,
     quizQuestion: (id: string, questionId: string) => `/app/quizzes/${id}/question/${questionId}`,

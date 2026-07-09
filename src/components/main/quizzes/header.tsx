@@ -1,9 +1,11 @@
 import Button from '@/components/ui/button'
 import { useModal } from '@/hooks/useModal'
 import { Plus } from 'lucide-react'
+import { useSidebarStore } from '@/store/use-sidebar-store'
 
 export default function QuizHeader() {
   const { openModal } = useModal('quiz-add')
+  const mobileMenuOpen = useSidebarStore((s) => s.mobileMenuOpen)
 
   return (
     <>
@@ -20,14 +22,16 @@ export default function QuizHeader() {
         </Button>
       </div>
 
-      {/* Mobile floating button — visible only on mobile */}
-      <button
-        onClick={openModal}
-        className="bg-primary text-primary-foreground fixed right-5 bottom-20 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-transform active:scale-95 sm:hidden"
-        aria-label="Add quiz"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
+      {/* Mobile floating button — visible only on mobile when menu is closed */}
+      {!mobileMenuOpen && (
+        <button
+          onClick={openModal}
+          className="bg-primary text-primary-foreground fixed right-5 bottom-20 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-transform active:scale-95 sm:hidden"
+          aria-label="Add quiz"
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+      )}
     </>
   )
 }
