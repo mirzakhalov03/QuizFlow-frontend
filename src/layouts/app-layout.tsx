@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser, PanelLeft, Bookmark } from 'lucide-react'
+import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser, PanelLeft, Bookmark, MoreHorizontal, X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
@@ -31,8 +31,13 @@ const navItems = [
   { label: 'Account', to: PATHS.app.account, icon: CircleUser },
 ]
 
-const mobileNavOrder = ['Explore', 'Library', 'Quizzes', 'Bookmarks', 'Analytics', 'History']
-const mobileNavItems = mobileNavOrder.map(
+const mobilePrimaryOrder = ['Library', 'Quizzes', 'Bookmarks']
+const mobilePrimaryItems = mobilePrimaryOrder.map(
+  (label) => navItems.find((item) => item.label === label)!
+)
+
+const mobileOverflowOrder = ['Explore', 'History', 'Analytics', 'Account']
+const mobileOverflowItems = mobileOverflowOrder.map(
   (label) => navItems.find((item) => item.label === label)!
 )
 
@@ -59,6 +64,73 @@ export default function AppLayout() {
   
   const sidebarOpen = useSidebarStore((s) => s.sidebarOpen)
   const setSidebarOpen = useSidebarStore((s) => s.setSidebarOpen)
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const moreButtonRef = useRef<HTMLButtonElement>(null)
+  const firstOverflowRef = useRef<HTMLButtonElement>(null)
+  const navContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handleChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false)
+        moreButtonRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        navContainerRef.current &&
+        !navContainerRef.current.contains(e.target as Node) &&
+        moreButtonRef.current &&
+        !moreButtonRef.current.contains(e.target as Node)
+      ) {
+        setMobileMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [mobileMenuOpen])
+
+  const handleOverflowKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'Tab') {
+      if (e.shiftKey && index === 0) {
+        e.preventDefault()
+        moreButtonRef.current?.focus()
+      } else if (!e.shiftKey && index === mobileOverflowItems.length - 1) {
+        e.preventDefault()
+        moreButtonRef.current?.focus()
+      }
+    }
+  }
+
+  const handleMoreKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Tab' && mobileMenuOpen) {
+      if (!e.shiftKey) {
+        e.preventDefault()
+        firstOverflowRef.current?.focus()
+      } else {
+        e.preventDefault()
+        const lastItem = document.getElementById(`mobile-overflow-item-${mobileOverflowItems.length - 1}`)
+        lastItem?.focus()
+      }
+    }
+  }
 
   const handleConfirmLogout = async () => {
     setLoggingOut(true)
@@ -236,36 +308,164 @@ export default function AppLayout() {
             </button>
           </div>
         </div>
-        <div className="bg-secondary/8 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 lg:pl-8 sm:pb-24 lg:pb-6">
+        <div className="bg-secondary/8 flex-1 overflow-y-auto p-4 pb-24 sm:p-6 lg:pl-8 sm:pb-24 lg:pb-6">
           <Outlet />
         </div>
       </main>
 
-      <nav
-        aria-label="Primary"
-        className="border-border bg-background fixed inset-x-0 bottom-0 z-40 flex border-t lg:hidden"
-      >
-        {mobileNavItems.map(({ label, to, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className="flex flex-1 flex-col items-center justify-center px-1 py-1.5"
-          >
-            {({ isActive }) => (
-              <span
+      {/* Semi-transparent backdrop/scrim */}
+      <div
+        className={cn(
+          'fixed inset-0 z-30 bg-background/50 backdrop-blur-xs transition-opacity duration-300 pointer-events-none opacity-0 lg:hidden',
+          mobileMenuOpen && 'opacity-100 pointer-events-auto'
+        )}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* Curled Ladder Overflow Menu Container */}
+      <div ref={navContainerRef} className="absolute right-0 bottom-0 left-0 z-40 lg:hidden">
+        <div className="absolute bottom-full right-4 left-auto pointer-events-none">
+          {mobileOverflowItems.map((item, index) => {
+            const yOffset = -64 - index * 54
+            // A curled crescent shape hook for 4 items
+            const xOffsets = [-36, -84, -116, -96]
+            const x = xOffsets[index] || -96
+
+            const delay = prefersReducedMotion
+              ? '0ms'
+              : mobileMenuOpen
+              ? `${index * 50}ms`
+              : `${(mobileOverflowItems.length - 1 - index) * 35}ms`
+
+            const transform = mobileMenuOpen
+              ? `translate3d(${x}px, ${yOffset}px, 0) scale(1)`
+              : `translate3d(0px, 0px, 0px) scale(0.75)`
+
+            const opacity = mobileMenuOpen ? 1 : 0
+
+            return (
+              <NavLink
+                key={item.label}
+                id={`mobile-overflow-item-${index}`}
+                ref={index === 0 ? firstOverflowRef : undefined}
+                to={item.to}
+                onClick={() => setMobileMenuOpen(false)}
+                tabIndex={mobileMenuOpen ? 0 : -1}
+                onKeyDown={(e) => handleOverflowKeyDown(e, index)}
+                style={{
+                  transform: prefersReducedMotion ? undefined : transform,
+                  opacity,
+                  transitionProperty: 'transform, opacity, background-color, border-color',
+                  transitionDuration: prefersReducedMotion ? '150ms' : mobileMenuOpen ? '420ms' : '260ms',
+                  transitionTimingFunction: prefersReducedMotion
+                    ? 'ease'
+                    : mobileMenuOpen
+                    ? 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    : 'cubic-bezier(0.25, 1, 0.5, 1)',
+                  transitionDelay: delay,
+                  right: '12px',
+                  left: 'auto',
+                  transformOrigin: 'center center',
+                }}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-1.5 text-xs transition-colors',
-                  isActive
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  'absolute bottom-0 z-40 flex h-11 min-w-[120px] items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground shadow-md transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                  mobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'
                 )}
               >
-                <Icon size={20} />
-                <span>{label}</span>
-              </span>
-            )}
-          </NavLink>
-        ))}
+                {({ isActive }) => (
+                  <>
+                    <item.icon size={15} className={cn('shrink-0', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                    <span className="truncate">{item.label}</span>
+                  </>
+                )}
+              </NavLink>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Primary Mobile Bottom Nav */}
+      <nav
+        aria-label="Primary"
+        className="border-border bg-background/95 backdrop-blur-md fixed inset-x-0 bottom-0 z-40 flex h-16 border-t lg:hidden px-2 shadow-lg"
+      >
+        <div className="mx-auto flex w-full max-w-lg items-center justify-around">
+          {Array.from({ length: 4 }).map((_, colIndex) => {
+            if (colIndex === 3) {
+              return (
+                <button
+                  key="more-button-toggle"
+                  ref={moreButtonRef}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  onKeyDown={handleMoreKeyDown}
+                  aria-expanded={mobileMenuOpen}
+                  aria-haspopup="true"
+                  aria-label={mobileMenuOpen ? 'Close menu' : 'More options'}
+                  className="flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <div className="relative h-5 w-5">
+                    <MoreHorizontal
+                      size={20}
+                      className={cn(
+                        'absolute inset-0 transition-all duration-300 transform',
+                        mobileMenuOpen ? 'opacity-0 scale-50 rotate-90 pointer-events-none' : 'opacity-100 scale-100 rotate-0'
+                      )}
+                    />
+                    <X
+                      size={20}
+                      className={cn(
+                        'absolute inset-0 transition-all duration-300 transform text-primary',
+                        mobileMenuOpen ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-90 pointer-events-none'
+                      )}
+                    />
+                  </div>
+                  <span
+                    className={cn(
+                      'text-[10px] font-medium transition-colors duration-200',
+                      mobileMenuOpen ? 'text-primary font-semibold' : 'text-muted-foreground'
+                    )}
+                  >
+                    More
+                  </span>
+                </button>
+              )
+            }
+
+            const itemIndex = colIndex
+            const item = mobilePrimaryItems[itemIndex]
+            if (!item) return null
+
+            return (
+              <NavLink
+                key={item.label}
+                to={item.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                {({ isActive }) => (
+                  <>
+                    <item.icon
+                      size={20}
+                      className={cn(
+                        'transition-colors duration-200',
+                        isActive ? 'text-primary' : 'text-muted-foreground'
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        'text-[10px] font-medium transition-colors duration-200',
+                        isActive ? 'text-primary font-semibold' : 'text-muted-foreground'
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                  </>
+                )}
+              </NavLink>
+            )
+          })}
+        </div>
       </nav>
 
       <OnboardingModal />
