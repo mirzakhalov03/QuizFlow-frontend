@@ -15,7 +15,7 @@ interface EditFolderModalProps {
 }
 
 export default function EditFolderModal({ folder, isOpen, onClose }: EditFolderModalProps) {
-  // ✅ initialize from props (safe because we remount via key)
+
   const [name, setName] = useState(folder?.name ?? '')
 
   const queryClient = useQueryClient()
@@ -51,7 +51,6 @@ export default function EditFolderModal({ folder, isOpen, onClose }: EditFolderM
 
   return (
     <Modal
-      key={folder?.id}
       isOpen={isOpen}
       onClose={handleClose}
       title="Edit Folder"

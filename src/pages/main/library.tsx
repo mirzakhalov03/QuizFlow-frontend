@@ -99,6 +99,7 @@ export default function Library() {
 
       <NewFolderModal />
       <EditFolderModal
+        key={editingFolder?.id} 
         folder={editingFolder}
         isOpen={!!editingFolder}
         onClose={() => setEditingFolder(null)}

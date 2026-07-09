@@ -5,10 +5,10 @@ import { useToastStore } from '@/store/toast-store'
 import { cn } from '@/lib/utils'
 
 type Answers = {
-  purpose: string
+  purpose: string[]
   fields: string[]
   otherField: string
-  background: string
+  background: string[]
 }
 
 const PURPOSE_OPTIONS = [
@@ -42,7 +42,7 @@ function compileBio(answers: Answers): string {
   const fields = answers.fields
     .map((f) => (f === 'Other' ? answers.otherField || 'Other' : f))
     .join(', ')
-  return `Purpose: ${answers.purpose}. Fields: ${fields}. Background: ${answers.background}.`
+  return `Purpose: ${answers.purpose.join(', ')}. Fields: ${fields}. Background: ${answers.background.join(', ')}.`
 }
 
 export default function OnboardingModal() {
@@ -51,10 +51,10 @@ export default function OnboardingModal() {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [filledUpTo, setFilledUpTo] = useState(0)
   const [answers, setAnswers] = useState<Answers>({
-    purpose: '',
+    purpose: [],
     fields: [],
     otherField: '',
-    background: '',
+    background: [],
   })
 
   if (isOnboarded !== false || loading) return null
@@ -115,7 +115,14 @@ export default function OnboardingModal() {
           {step === 1 && (
             <StepPurpose
               value={answers.purpose}
-              onChange={(v) => setAnswers((a) => ({ ...a, purpose: v }))}
+              onToggle={(value) =>
+                setAnswers((a) => ({
+                  ...a,
+                  purpose: a.purpose.includes(value)
+                    ? a.purpose.filter((x) => x !== value)
+                    : [...a.purpose, value],
+                }))
+              }
             />
           )}
           {step === 2 && (
@@ -134,8 +141,13 @@ export default function OnboardingModal() {
           {step === 3 && (
             <StepBackground
               value={answers.background}
-              onChange={(v) => {
-                setAnswers((a) => ({ ...a, background: v }))
+              onToggle={(value) => {
+                setAnswers((a) => ({
+                  ...a,
+                  background: a.background.includes(value)
+                    ? a.background.filter((x) => x !== value)
+                    : [...a.background, value],
+                }))
                 setFilledUpTo(3)
               }}
             />
@@ -167,7 +179,7 @@ export default function OnboardingModal() {
                 size="sm"
                 onClick={() => handleAdvance(step)}
                 disabled={
-                  (step === 1 && !answers.purpose) ||
+                  (step === 1 && answers.purpose.length === 0) ||
                   (step === 2 && answers.fields.length === 0) ||
                   updating
                 }
@@ -179,7 +191,7 @@ export default function OnboardingModal() {
               <Button
                 size="sm"
                 onClick={handleFinish}
-                disabled={!answers.background || updating}
+                disabled={answers.background.length === 0 || updating}
                 loading={updating}
               >
                 Finish
@@ -192,7 +204,7 @@ export default function OnboardingModal() {
   )
 }
 
-function StepPurpose({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function StepPurpose({ value, onToggle }: { value: string[]; onToggle: (v: string) => void }) {
   return (
     <div className="space-y-4">
       <div>
@@ -203,11 +215,11 @@ function StepPurpose({ value, onChange }: { value: string; onChange: (v: string)
       </div>
       <div className="grid gap-2">
         {PURPOSE_OPTIONS.map((opt) => {
-          const selected = value === opt
+          const selected = value.includes(opt)
           return (
             <button
               key={opt}
-              onClick={() => onChange(opt)}
+              onClick={() => onToggle(opt)}
               className={cn(
                 'flex items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors',
                 selected
@@ -281,7 +293,7 @@ function StepField({
   )
 }
 
-function StepBackground({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function StepBackground({ value, onToggle }: { value: string[]; onToggle: (v: string) => void }) {
   return (
     <div className="space-y-4">
       <div>
@@ -292,11 +304,11 @@ function StepBackground({ value, onChange }: { value: string; onChange: (v: stri
       </div>
       <div className="grid gap-2">
         {BACKGROUND_OPTIONS.map((opt) => {
-          const selected = value === opt
+          const selected = value.includes(opt)
           return (
             <button
               key={opt}
-              onClick={() => onChange(opt)}
+              onClick={() => onToggle(opt)}
               className={cn(
                 'flex items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors',
                 selected
