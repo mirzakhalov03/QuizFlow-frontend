@@ -7,7 +7,6 @@ import ModelAnalytics from '@/components/main/analytics/model-analytics'
 import QuizStatsList from '@/components/main/analytics/quiz-stats-list'
 import ScoreOverTimeChart from '@/components/main/analytics/score-over-time-chart'
 import TypePieChart from '@/components/main/analytics/type-pie-chart'
-import Spinner from '@/components/ui/spinner'
 import { ANALYTICS_SUMMARY } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
 import { useUserProfileStore } from '@/store/userProfileStore'
@@ -76,9 +75,11 @@ export default function Analytics() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">Analytics</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">Your progress across every quiz you've taken.</p>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Your progress across every quiz you've taken.
+        </p>
       </header>
-      
+
       {isLoading ? (
         <AnalyticsSkeleton />
       ) : isError || !data?.data ? (
@@ -106,12 +107,12 @@ export default function Analytics() {
           </div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <ApiKeyAnalytics
-              data={summary.keyUsageBreakdown ?? []}
-              totalTokens={summary.totalTokensUsed ?? 0}
+              data={summary?.keyUsageBreakdown ?? []}
+              totalTokens={summary?.totalTokensUsed ?? 0}
             />
             <ModelAnalytics
-              data={summary.modelUsageBreakdown ?? []}
-              totalTokens={summary.totalTokensUsed ?? 0}
+              data={summary?.modelUsageBreakdown ?? []}
+              totalTokens={summary?.totalTokensUsed ?? 0}
             />
           </div>
         </>
@@ -122,9 +123,9 @@ export default function Analytics() {
 
 function AnalyticsSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="animate-pulse space-y-6">
       {/* AI Feedback Card Skeleton */}
-      <div className="bg-card border border-border rounded-xl p-6 h-36 flex flex-col justify-between">
+      <div className="bg-card border-border flex h-36 flex-col justify-between rounded-xl border p-6">
         <div className="space-y-3">
           <div className="skeleton-shimmer h-4 w-1/4 rounded-md" />
           <div className="skeleton-shimmer h-4 w-3/4 rounded-md" />
@@ -141,7 +142,10 @@ function AnalyticsSkeleton() {
       {/* Stats Cards Skeleton */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="bg-card border border-border rounded-xl p-5 h-24 flex flex-col justify-between">
+          <div
+            key={i}
+            className="bg-card border-border flex h-24 flex-col justify-between rounded-xl border p-5"
+          >
             <div className="skeleton-shimmer h-3.5 w-24 rounded-md" />
             <div className="skeleton-shimmer h-6 w-16 rounded-md" />
           </div>
@@ -149,16 +153,16 @@ function AnalyticsSkeleton() {
       </div>
 
       {/* Chart Skeleton */}
-      <div className="bg-card border border-border rounded-xl p-6 h-[320px] flex flex-col justify-between">
-        <div className="flex justify-between items-center">
+      <div className="bg-card border-border flex h-[320px] flex-col justify-between rounded-xl border p-6">
+        <div className="flex items-center justify-between">
           <div className="skeleton-shimmer h-4 w-36 rounded-md" />
           <div className="skeleton-shimmer h-4 w-24 rounded-md" />
         </div>
-        <div className="flex-1 flex items-end gap-4 px-2 pt-6">
+        <div className="flex flex-1 items-end gap-4 px-2 pt-6">
           {Array.from({ length: 8 }).map((_, i) => {
             const heights = ['h-1/3', 'h-1/2', 'h-2/3', 'h-2/5', 'h-3/4', 'h-4/5', 'h-1/4', 'h-3/5']
             return (
-              <div key={i} className={cn("skeleton-shimmer flex-1 rounded-t-md", heights[i])} />
+              <div key={i} className={cn('skeleton-shimmer flex-1 rounded-t-md', heights[i])} />
             )
           })}
         </div>
@@ -166,18 +170,18 @@ function AnalyticsSkeleton() {
 
       {/* Grid Lists & Charts Skeleton */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="bg-card border border-border rounded-xl p-6 h-[280px] space-y-4">
+        <div className="bg-card border-border h-[280px] space-y-4 rounded-xl border p-6">
           <div className="skeleton-shimmer h-4 w-32 rounded-md" />
           <div className="space-y-3 pt-2">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex justify-between items-center">
+              <div key={i} className="flex items-center justify-between">
                 <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
                 <div className="skeleton-shimmer h-4 w-12 rounded-md" />
               </div>
             ))}
           </div>
         </div>
-        <div className="bg-card border border-border rounded-xl p-6 h-[280px] flex flex-col items-center justify-center gap-4">
+        <div className="bg-card border-border flex h-[280px] flex-col items-center justify-center gap-4 rounded-xl border p-6">
           <div className="skeleton-shimmer h-32 w-32 rounded-full" />
           <div className="skeleton-shimmer h-4 w-28 rounded-md" />
         </div>
