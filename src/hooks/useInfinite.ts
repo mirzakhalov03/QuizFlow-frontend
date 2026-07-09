@@ -50,9 +50,7 @@ export const useInfinite = <
   const cleanedParams = useMemo(() => {
     if (!params) return {}
     return Object.fromEntries(
-      Object.entries(params).filter(
-        ([, v]) => v !== undefined && v !== null && v !== ''
-      )
+      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
     )
   }, [params])
 
@@ -112,15 +110,20 @@ export const useInfinite = <
           // If total <= limit it might be the page-count, not total items.
           // Fall back to items-length heuristic in that case.
           if (total > limit) {
-            return nextOffset < total ? nextOffset : undefined
+            const result = nextOffset < total ? nextOffset : undefined
+            return result
           }
         }
+
         // Fallback: if we received a full page of items, assume there are more
         const itemsList = dataObj.items || dataObj.results
         if (Array.isArray(itemsList)) {
-          return itemsList.length >= limit ? nextOffset : undefined
+          const result = itemsList.length >= limit ? nextOffset : undefined
+          return result
         }
-        return undefined
+
+        const result = total !== null && nextOffset < total ? nextOffset : undefined
+        return result
       }
 
       const pageNum = dataObj.page ?? dataObj.current_page
