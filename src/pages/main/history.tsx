@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { keepPreviousData } from '@tanstack/react-query'
 import HistoryFilters from '@/components/main/history/history-filters'
+import HistoryPagination from '@/components/main/history/history-pagination'
 import HistoryTable from '@/components/main/history/history-table'
 import { FOLDERS, QUIZ_HISTORY } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
@@ -12,6 +13,7 @@ import type { Folder } from '@/types/folder'
 export default function History() {
   const [folderId, setFolderId] = useState<string | null>(null)
   const [sort, setSort] = useState<HistorySort>('recent')
+  const [page, setPage] = useState(1)
 
   const foldersQuery = useGet<PaginatedResponse<Folder>>(FOLDERS)
   const {
@@ -44,7 +46,7 @@ export default function History() {
         folderId={folderId}
         onFolderChange={setFolderId}
         sort={sort}
-        onSortChange={setSort}
+        onSortChange={handleSortChange}
       />
 
       {isError && (isPlaceholderData || items.length === 0) ? (
