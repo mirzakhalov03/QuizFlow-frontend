@@ -79,8 +79,8 @@ export default function AppLayout() {
 
   const sidebarOpen = useSidebarStore((s) => s.sidebarOpen)
   const setSidebarOpen = useSidebarStore((s) => s.setSidebarOpen)
-
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const mobileMenuOpen = useSidebarStore((s) => s.mobileMenuOpen)
+  const setMobileMenuOpen = useSidebarStore((s) => s.setMobileMenuOpen)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const moreButtonRef = useRef<HTMLButtonElement>(null)
   const firstOverflowRef = useRef<HTMLAnchorElement>(null)
@@ -104,7 +104,7 @@ export default function AppLayout() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [mobileMenuOpen])
+  }, [mobileMenuOpen, setMobileMenuOpen])
 
   useEffect(() => {
     if (!mobileMenuOpen) return
@@ -120,7 +120,7 @@ export default function AppLayout() {
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [mobileMenuOpen])
+  }, [mobileMenuOpen, setMobileMenuOpen])
 
   const handleOverflowKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'Tab') {
