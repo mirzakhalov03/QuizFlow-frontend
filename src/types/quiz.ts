@@ -170,3 +170,24 @@ export type PublicSubmitResponse = {
   wrongAnswers: number
   review: PublicReviewItem[]
 }
+
+export type BookmarkItem = {
+  bookmarkId: string
+  bookmarkedAt: string
+  quiz: {
+    id: string
+    title: string
+  }
+  question: {
+    id: string
+    text: string
+    type: QuestionType
+    correctOptions: {
+      id: string
+      text: string
+      explanation: string | null
+    }[]
+    modelAnswer: string | null
+  }
+}
+

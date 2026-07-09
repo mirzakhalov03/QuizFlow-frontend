@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser, PanelLeft } from 'lucide-react'
+import { BarChart3, History, Library, ListChecks, LogOut, Store, CircleUser, PanelLeft, Bookmark } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { PATHS } from '@/lib/path'
 import { Button } from '@/components/ui/button'
@@ -25,12 +25,13 @@ const navItems = [
   { label: 'Quizzes', to: PATHS.app.quizzes, icon: ListChecks },
   { label: 'Analytics', to: PATHS.app.analytics, icon: BarChart3 },
   { label: 'Library', to: PATHS.app.library, icon: Library },
+  { label: 'Bookmarks', to: PATHS.app.bookmarks, icon: Bookmark },
   { label: 'Explore', to: PATHS.app.marketplace, icon: Store },
   { label: 'History', to: PATHS.app.history, icon: History },
   { label: 'Account', to: PATHS.app.account, icon: CircleUser },
 ]
 
-const mobileNavOrder = ['Explore', 'Library', 'Quizzes', 'Analytics', 'History']
+const mobileNavOrder = ['Explore', 'Library', 'Quizzes', 'Bookmarks', 'Analytics', 'History']
 const mobileNavItems = mobileNavOrder.map(
   (label) => navItems.find((item) => item.label === label)!
 )
