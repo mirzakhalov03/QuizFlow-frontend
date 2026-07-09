@@ -87,7 +87,7 @@ export default function Bookmarks() {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-xl font-semibold sm:text-2xl">
+          <h1 className="flex items-center gap-2 text-2xl font-bold">
             Bookmarks
             {!isLoading && bookmarks.length > 0 && (
               <span className="bg-primary/10 text-primary rounded-full px-2.5 py-0.5 text-xs font-semibold">
@@ -95,7 +95,7 @@ export default function Bookmarks() {
               </span>
             )}
           </h1>
-          <p className="text-muted-foreground text-sm">Review your saved questions and answers.</p>
+          <p className="text-muted-foreground text-sm sm:text-base">Review your saved questions and answers.</p>
         </div>
 
         {/* View Toggle (Grid vs Flashcard) */}
