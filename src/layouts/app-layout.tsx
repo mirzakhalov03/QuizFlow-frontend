@@ -41,6 +41,11 @@ const mobileOverflowItems = mobileOverflowOrder.map(
   (label) => navItems.find((item) => item.label === label)!
 )
 
+const tabletNavOrder = ['Explore', 'Library', 'Quizzes', 'Bookmarks', 'Analytics', 'History']
+const tabletNavItems = tabletNavOrder.map(
+  (label) => navItems.find((item) => item.label === label)!
+)
+
 export default function AppLayout() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
@@ -316,7 +321,7 @@ export default function AppLayout() {
       {/* Semi-transparent backdrop/scrim */}
       <div
         className={cn(
-          'fixed inset-0 z-30 bg-background/50 backdrop-blur-xs transition-opacity duration-300 pointer-events-none opacity-0 lg:hidden',
+          'fixed inset-0 z-30 bg-background/50 backdrop-blur-xs transition-opacity duration-300 pointer-events-none opacity-0 sm:hidden',
           mobileMenuOpen && 'opacity-100 pointer-events-auto'
         )}
         onClick={() => setMobileMenuOpen(false)}
@@ -324,10 +329,10 @@ export default function AppLayout() {
       />
 
       {/* Curled Ladder Overflow Menu Container */}
-      <div ref={navContainerRef} className="absolute right-0 bottom-0 left-0 z-40 lg:hidden">
+      <div ref={navContainerRef} className="absolute right-0 bottom-0 left-0 z-40 sm:hidden">
         <div className="absolute bottom-full right-4 left-auto pointer-events-none">
           {mobileOverflowItems.map((item, index) => {
-            const yOffset = -64 - index * 54
+            const yOffset = -76 - index * 54
             // A curled crescent shape hook for 4 items
             const xOffsets = [-36, -84, -116, -96]
             const x = xOffsets[index] || -96
@@ -385,10 +390,10 @@ export default function AppLayout() {
         </div>
       </div>
 
-      {/* Primary Mobile Bottom Nav */}
+      {/* Primary Mobile Bottom Nav (3 items + 1 More) */}
       <nav
-        aria-label="Primary"
-        className="border-border bg-background/95 backdrop-blur-md fixed inset-x-0 bottom-0 z-40 flex h-16 border-t lg:hidden px-2 shadow-lg"
+        aria-label="Mobile navigation"
+        className="border-border bg-background/95 backdrop-blur-md fixed inset-x-0 bottom-0 z-40 flex h-16 border-t sm:hidden px-2 shadow-lg"
       >
         <div className="mx-auto flex w-full max-w-lg items-center justify-around">
           {Array.from({ length: 4 }).map((_, colIndex) => {
@@ -465,6 +470,43 @@ export default function AppLayout() {
               </NavLink>
             )
           })}
+        </div>
+      </nav>
+
+      {/* Tablet Bottom Nav (All 6 items shown flat) */}
+      <nav
+        aria-label="Tablet navigation"
+        className="border-border bg-background fixed inset-x-0 bottom-0 z-40 hidden h-16 border-t sm:flex lg:hidden px-4 shadow-lg"
+      >
+        <div className="mx-auto flex w-full max-w-2xl items-center justify-around">
+          {tabletNavItems.map(({ label, to, icon: Icon }) => (
+            <NavLink
+              key={label}
+              to={to}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon
+                    size={20}
+                    className={cn(
+                      'transition-colors duration-200',
+                      isActive ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      'text-[10px] font-medium transition-colors duration-200',
+                      isActive ? 'text-primary font-semibold' : 'text-muted-foreground'
+                    )}
+                  >
+                    {label}
+                  </span>
+                </>
+              )}
+            </NavLink>
+          ))}
         </div>
       </nav>
 
