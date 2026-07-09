@@ -32,7 +32,7 @@ export default function Bookmarks() {
     toggleBookmark,
   } = useBookmarks(ARTIFICIAL_WAIT_MS)
 
-  const [viewMode, setViewMode] = useState<'grid' | 'anki'>('grid')
+  const [viewMode, setViewMode] = useState<'grid' | 'flashcard'>('grid')
   const [activeIndex, setActiveIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
 
@@ -41,7 +41,7 @@ export default function Bookmarks() {
 
   // Keyboard navigation listener for Anki Mode
   useEffect(() => {
-    if (viewMode !== 'anki' || bookmarks.length === 0) return
+    if (viewMode !== 'flashcard' || bookmarks.length === 0) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
@@ -69,7 +69,7 @@ export default function Bookmarks() {
 
     toggleBookmark(deleteQuestionId)
 
-    if (viewMode === 'anki') {
+    if (viewMode === 'flashcard') {
       if (activeIndex >= bookmarks.length - 1 && activeIndex > 0) {
         setActiveIndex((prev) => prev - 1)
       }
@@ -83,7 +83,7 @@ export default function Bookmarks() {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold sm:text-2xl flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-xl font-semibold sm:text-2xl">
             Bookmarks
             {!isLoading && bookmarks.length > 0 && (
               <span className="bg-primary/10 text-primary rounded-full px-2.5 py-0.5 text-xs font-semibold">
@@ -94,15 +94,15 @@ export default function Bookmarks() {
           <p className="text-muted-foreground text-sm">Review your saved questions and answers.</p>
         </div>
 
-        {/* View Toggle (Grid vs Anki) */}
+        {/* View Toggle (Grid vs Flashcard) */}
         {!isLoading && bookmarks.length > 0 && (
-          <div className="bg-muted flex items-center gap-1 rounded-lg p-1 text-xs self-start sm:self-auto shadow-sm">
+          <div className="bg-muted flex items-center gap-1 self-start rounded-lg p-1 text-xs shadow-sm sm:self-auto">
             <button
               onClick={() => {
                 setViewMode('grid')
                 setIsFlipped(false)
               }}
-              className={`rounded-md px-3 py-1.5 font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+              className={`flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors ${
                 viewMode === 'grid'
                   ? 'bg-card text-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
@@ -113,69 +113,70 @@ export default function Bookmarks() {
             </button>
             <button
               onClick={() => {
-                setViewMode('anki')
+                setViewMode('flashcard')
                 setIsFlipped(false)
               }}
-              className={`rounded-md px-3 py-1.5 font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'anki'
+              className={`flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors ${
+                viewMode === 'flashcard'
                   ? 'bg-card text-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Layers className="h-3.5 w-3.5" />
-              Anki Mode
+              Flashcard Mode
             </button>
           </div>
         )}
       </header>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <BookmarkCardSkeleton key={`initial-skeleton-${i}`} />
           ))}
         </div>
       ) : isError && bookmarks.length === 0 ? (
-        <div className="border-border bg-card/50 flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 px-4 text-center">
+        <div className="border-border bg-card/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-4 py-16 text-center">
           <p className="text-destructive text-sm">
             Could not load bookmarks. Please refresh the page and try again.
           </p>
         </div>
       ) : bookmarks.length === 0 ? (
-        <div className="border-border bg-card/50 flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 px-4 text-center">
+        <div className="border-border bg-card/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-4 py-16 text-center">
           <div className="bg-muted text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full">
             <Bookmark className="h-6 w-6" />
           </div>
           <h3 className="font-heading text-lg font-bold">No bookmarks yet</h3>
           <p className="text-muted-foreground mt-2 max-w-sm text-sm">
-            Bookmark individual questions while taking quizzes or reviewing your results to review them later.
+            Bookmark individual questions while taking quizzes or reviewing your results to review
+            them later.
           </p>
           <Link to={PATHS.app.quizzes} className="mt-6">
             <Button>Go to Quizzes</Button>
           </Link>
         </div>
-      ) : viewMode === 'anki' ? (
-        /* Anki Mode */
-        <div className="flex flex-col items-center gap-6 py-4 max-w-2xl mx-auto">
+      ) : viewMode === 'flashcard' ? (
+        /* Flashcard Mode */
+        <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 py-4">
           {/* Card Indicator */}
-          <div className="text-muted-foreground text-xs font-semibold tracking-wider uppercase bg-muted/60 px-3 py-1 rounded-full">
+          <div className="text-muted-foreground bg-muted/60 rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase">
             Card {activeIndex + 1} of {bookmarks.length}
           </div>
 
           {/* Flashcard Container */}
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="w-full aspect-[16/10] min-h-[320px] md:min-h-[380px] cursor-pointer [perspective:1200px] group relative select-none"
+            className="group relative aspect-[16/10] min-h-[320px] w-full cursor-pointer select-none [perspective:1200px] md:min-h-[380px]"
           >
             <div
-              className={`relative w-full h-full duration-500 [transform-style:preserve-3d] transition-transform ${
+              className={`relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d] ${
                 isFlipped ? '[transform:rotateY(180deg)]' : ''
               }`}
             >
               {/* Front Side (Question) */}
-              <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-card border-border border-2 rounded-2xl p-8 flex flex-col justify-between shadow-md hover:border-primary/40 transition-colors">
+              <div className="bg-card border-border hover:border-primary/40 absolute inset-0 flex h-full w-full flex-col justify-between rounded-2xl border-2 p-8 shadow-md transition-colors [backface-visibility:hidden]">
                 <div className="flex items-start justify-between gap-4">
-                  <span className="text-xs bg-muted text-muted-foreground font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                  <span className="bg-muted text-muted-foreground flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium">
                     <BookOpen className="h-3 w-3" />
                     {bookmarks[activeIndex].quiz?.title || 'Unknown Quiz'}
                   </span>
@@ -185,7 +186,7 @@ export default function Bookmarks() {
                       e.stopPropagation()
                       setDeleteQuestionId(bookmarks[activeIndex].question.id)
                     }}
-                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer shrink-0 rounded-md p-1 transition-colors"
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 cursor-pointer rounded-md p-1 transition-colors"
                     title="Remove Bookmark"
                     aria-label="Remove Bookmark"
                   >
@@ -193,52 +194,55 @@ export default function Bookmarks() {
                   </button>
                 </div>
 
-                <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
+                <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
                   <MarkdownText
                     text={bookmarks[activeIndex].question.text}
-                    className="text-lg md:text-xl font-bold leading-relaxed text-foreground"
+                    className="text-foreground text-lg leading-relaxed font-bold md:text-xl"
                   />
-                  <span className="capitalize text-[10px] tracking-wider text-muted-foreground mt-3 bg-muted px-2.5 py-1 rounded-full font-semibold">
+                  <span className="text-muted-foreground bg-muted mt-3 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wider capitalize">
                     {bookmarks[activeIndex].question.type.replace('_', ' ')}
                   </span>
                 </div>
 
-                <div className="text-center text-xs text-muted-foreground/60 select-none animate-pulse">
+                <div className="text-muted-foreground/60 animate-pulse text-center text-xs select-none">
                   Click card to reveal answer
                 </div>
               </div>
 
               {/* Back Side (Answer) */}
-              <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-card border-border border-2 rounded-2xl p-8 flex flex-col justify-between shadow-md overflow-y-auto">
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <span className="text-xs bg-muted text-muted-foreground font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+              <div className="bg-card border-border absolute inset-0 flex h-full w-full [transform:rotateY(180deg)] flex-col justify-between overflow-y-auto rounded-2xl border-2 p-8 shadow-md [backface-visibility:hidden]">
+                <div className="mb-4 flex items-start justify-between gap-4">
+                  <span className="bg-muted text-muted-foreground flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium">
                     <BookOpen className="h-3 w-3" />
                     {bookmarks[activeIndex].quiz?.title || 'Unknown Quiz'}
                   </span>
-                  <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold tracking-wider uppercase bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  <div className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
                     Correct Answer
                   </div>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center px-2 py-4">
+                <div className="flex flex-1 flex-col justify-center px-2 py-4">
                   {bookmarks[activeIndex].question.type === 'open_ended' ? (
-                    <div className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 text-left">
-                      <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold tracking-wider uppercase block mb-1">
+                    <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4 text-left dark:bg-emerald-500/10">
+                      <span className="mb-1 block text-xs font-semibold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
                         Suggested Answer
                       </span>
                       <MarkdownText
-                        text={bookmarks[activeIndex].question.modelAnswer || 'No suggested answer available.'}
+                        text={
+                          bookmarks[activeIndex].question.modelAnswer ||
+                          'No suggested answer available.'
+                        }
                         className="text-sm leading-relaxed"
                       />
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-2 text-left max-h-[220px] overflow-y-auto pr-1">
+                    <div className="flex max-h-[220px] flex-col gap-2 overflow-y-auto pr-1 text-left">
                       {bookmarks[activeIndex].question.correctOptions &&
                       bookmarks[activeIndex].question.correctOptions.length > 0 ? (
                         bookmarks[activeIndex].question.correctOptions.map((opt) => (
                           <div
                             key={opt.id}
-                            className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3"
+                            className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 dark:bg-emerald-500/10"
                           >
                             <MarkdownText text={opt.text} className="text-sm font-medium" />
                             {opt.explanation && (
@@ -249,13 +253,15 @@ export default function Bookmarks() {
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted-foreground text-xs italic text-center">No options listed.</p>
+                        <p className="text-muted-foreground text-center text-xs italic">
+                          No options listed.
+                        </p>
                       )}
                     </div>
                   )}
                 </div>
 
-                <div className="text-center text-xs text-muted-foreground/60 select-none pt-4">
+                <div className="text-muted-foreground/60 pt-4 text-center text-xs select-none">
                   Click card to see question
                 </div>
               </div>
@@ -263,7 +269,7 @@ export default function Bookmarks() {
           </div>
 
           {/* Flashcard Deck Controls */}
-          <div className="flex items-center justify-center gap-4 mt-2">
+          <div className="mt-2 flex items-center justify-center gap-4">
             <Button
               variant="outline"
               onClick={() => {
@@ -291,15 +297,17 @@ export default function Bookmarks() {
           </div>
 
           {/* Keyboard Shortcuts Hint */}
-          <div className="text-[11px] text-muted-foreground/50 text-center select-none hidden md:block">
-            Use <span className="bg-muted px-1.5 py-0.5 rounded font-mono font-bold">Left</span> /{' '}
-            <span className="bg-muted px-1.5 py-0.5 rounded font-mono font-bold">Right</span> Arrows to navigate,{' '}
-            <span className="bg-muted px-1.5 py-0.5 rounded font-mono font-bold">Space</span> to flip card.
+          <div className="text-muted-foreground/50 hidden text-center text-[11px] select-none md:block">
+            Use <span className="bg-muted rounded px-1.5 py-0.5 font-mono font-bold">Left</span> /{' '}
+            <span className="bg-muted rounded px-1.5 py-0.5 font-mono font-bold">Right</span> Arrows
+            to navigate,{' '}
+            <span className="bg-muted rounded px-1.5 py-0.5 font-mono font-bold">Space</span> to
+            flip card.
           </div>
         </div>
       ) : (
         /* Grid View */
-        <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
           {bookmarks.map((item) => (
             <BookmarkCard
               key={item.bookmarkId}
@@ -342,18 +350,16 @@ function BookmarkCard({ item, onRemove }: { item: BookmarkItem; onRemove: () => 
   return (
     <div
       onClick={() => setShowAnswer(!showAnswer)}
-      className="bg-card border-border hover:border-primary/30 transition-all duration-200 relative flex flex-col rounded-xl border p-5 shadow-sm cursor-pointer group"
+      className="bg-card border-border hover:border-primary/30 group relative flex cursor-pointer flex-col rounded-xl border p-5 shadow-sm transition-all duration-200"
     >
       {/* Top row */}
-      <div className="flex items-start justify-between gap-4 mb-3">
+      <div className="mb-3 flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs bg-muted text-muted-foreground font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+          <span className="bg-muted text-muted-foreground flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium">
             <BookOpen className="h-3 w-3" />
             {quiz?.title || 'Unknown Quiz'}
           </span>
-          <span className="text-muted-foreground text-[11px]">
-            Saved {formattedDate}
-          </span>
+          <span className="text-muted-foreground text-[11px]">Saved {formattedDate}</span>
         </div>
 
         {/* Remove Bookmark Button */}
@@ -363,7 +369,7 @@ function BookmarkCard({ item, onRemove }: { item: BookmarkItem; onRemove: () => 
             e.stopPropagation() // Prevent expanding
             onRemove()
           }}
-          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer shrink-0 rounded-md p-1 transition-colors"
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 cursor-pointer rounded-md p-1 transition-colors"
           title="Remove Bookmark"
           aria-label="Remove Bookmark"
         >
@@ -373,31 +379,35 @@ function BookmarkCard({ item, onRemove }: { item: BookmarkItem; onRemove: () => 
 
       {/* Question Text */}
       <div className="mb-4 pr-6">
-        <MarkdownText text={q.text} className="text-sm font-semibold leading-relaxed" />
+        <MarkdownText text={q.text} className="text-sm leading-relaxed font-semibold" />
       </div>
 
       {/* Reveal Answer Area */}
-      <div className="mt-auto pt-3 border-t border-border/50 flex flex-col gap-3">
-        <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+      <div className="border-border/50 mt-auto flex flex-col gap-3 border-t pt-3">
+        <div className="text-muted-foreground flex items-center justify-between text-xs font-medium">
           <span className="capitalize">Type: {q.type.replace('_', ' ')}</span>
-          <span className="text-primary group-hover:underline flex items-center gap-1">
+          <span className="text-primary flex items-center gap-1 group-hover:underline">
             {showAnswer ? 'Hide Answer' : 'Show Answer'}
-            {showAnswer ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            {showAnswer ? (
+              <ChevronUp className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronDown className="h-3.5 w-3.5" />
+            )}
           </span>
         </div>
 
         {/* Answer Content Wrapper */}
         <div
           className={`grid transition-all duration-300 ease-in-out ${
-            showAnswer ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0'
+            showAnswer ? 'mt-2 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
           }`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="overflow-hidden">
             <div className="flex flex-col gap-2.5 pt-1">
               {q.type === 'open_ended' ? (
-                <div className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
-                  <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold tracking-wider uppercase block mb-1">
+                <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 dark:bg-emerald-500/10">
+                  <span className="mb-1 block text-xs font-semibold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
                     Suggested Answer
                   </span>
                   <MarkdownText
@@ -407,14 +417,14 @@ function BookmarkCard({ item, onRemove }: { item: BookmarkItem; onRemove: () => 
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold tracking-wider uppercase block mb-1">
+                  <span className="mb-1 block text-xs font-semibold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
                     Correct Option(s)
                   </span>
                   {q.correctOptions && q.correctOptions.length > 0 ? (
                     q.correctOptions.map((opt) => (
                       <div
                         key={opt.id}
-                        className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3"
+                        className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 dark:bg-emerald-500/10"
                       >
                         <MarkdownText text={opt.text} className="text-sm font-medium" />
                         {opt.explanation && (
@@ -445,7 +455,7 @@ function BookmarkCardSkeleton() {
       aria-busy="true"
       className="bg-card border-border flex flex-col gap-4 rounded-xl border p-5 shadow-sm"
     >
-      <div className="flex items-start justify-between gap-4 mb-3">
+      <div className="mb-3 flex items-start justify-between gap-4">
         <div className="flex items-center gap-2">
           <div className="skeleton-shimmer h-5 w-24 rounded-full" />
           <div className="skeleton-shimmer h-3 w-16 rounded-md" />
@@ -456,7 +466,7 @@ function BookmarkCardSkeleton() {
         <div className="skeleton-shimmer h-4 w-full rounded-md" />
         <div className="skeleton-shimmer h-4 w-5/6 rounded-md" />
       </div>
-      <div className="mt-auto pt-3 border-t border-border/50 flex items-center justify-between">
+      <div className="border-border/50 mt-auto flex items-center justify-between border-t pt-3">
         <div className="skeleton-shimmer h-4 w-28 rounded-md" />
         <div className="skeleton-shimmer h-4 w-20 rounded-md" />
       </div>
