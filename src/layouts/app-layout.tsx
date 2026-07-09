@@ -30,7 +30,10 @@ const navItems = [
   { label: 'Account', to: PATHS.app.account, icon: CircleUser },
 ]
 
-const mobileNavItems = navItems.filter((item) => item.label !== 'Account')
+const mobileNavOrder = ['Explore', 'Library', 'Quizzes', 'Analytics', 'History']
+const mobileNavItems = mobileNavOrder.map(
+  (label) => navItems.find((item) => item.label === label)!
+)
 
 export default function AppLayout() {
   const navigate = useNavigate()
