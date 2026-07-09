@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { keepPreviousData } from '@tanstack/react-query'
 import HistoryFilters from '@/components/main/history/history-filters'
 import HistoryTable from '@/components/main/history/history-table'
-import Spinner from '@/components/ui/spinner'
 import { FOLDERS, QUIZ_HISTORY } from '@/constants/api-endpoints'
 import { useGet } from '@/hooks/useGet'
 import { useInfinite } from '@/hooks/useInfinite'
@@ -36,7 +35,9 @@ export default function History() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">History</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">Every attempt you've made, filterable and sortable.</p>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Every attempt you've made, filterable and sortable.
+        </p>
       </header>
 
       <HistoryFilters
@@ -51,33 +52,43 @@ export default function History() {
         <div className="border-border bg-background rounded-lg border p-8 text-center">
           <p className="text-muted-foreground text-sm">Couldn't load your history right now.</p>
         </div>
-      ) : isLoading ? (
-        <div className="flex justify-center py-20" role="status" aria-live="polite">
-          <Spinner />
-          <span className="sr-only">Loading history…</span>
-        </div>
+      ) : isLoading || (isFetching && !isPlaceholderData && !isFetchingNextPage) ? (
+        <HistoryTableSkeleton />
       ) : (
         <div className="relative">
-          {isFetching && !isFetchingNextPage && (
-            <div
-              className="bg-background/60 absolute inset-0 z-10 flex justify-center pt-8"
-              role="status"
-              aria-live="polite"
-            >
-              <Spinner />
-              <span className="sr-only">Updating history…</span>
-            </div>
-          )}
+          <HistoryTable rows={items} isFetchingNextPage={isFetchingNextPage} />
 
-          <HistoryTable rows={items} />
-
-          {hasNextPage && !isPlaceholderData && (
-            <div ref={observerRef} className="flex justify-center py-6">
-              {isFetchingNextPage ? <Spinner /> : <div className="h-2 w-2" />}
-            </div>
-          )}
+          {hasNextPage && !isPlaceholderData && <div ref={observerRef} className="h-6" />}
         </div>
       )}
+    </div>
+  )
+}
+
+function HistoryTableSkeleton() {
+  return (
+    <div className="bg-card border-border animate-pulse overflow-hidden rounded-xl border shadow-sm">
+      {/* Table Header skeleton */}
+      <div className="border-border bg-muted/40 grid grid-cols-5 gap-4 border-b p-4">
+        <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />
+        <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
+        <div className="skeleton-shimmer h-4 w-1/3 rounded-md" />
+        <div className="skeleton-shimmer h-4 w-1/3 rounded-md" />
+        <div className="skeleton-shimmer h-4 w-1/4 animate-none rounded-md" />
+      </div>
+
+      {/* Table Rows skeleton */}
+      <div className="divide-border divide-y">
+        {Array.from({ length: 5 }).map((_, rowIndex) => (
+          <div key={rowIndex} className="grid grid-cols-5 items-center gap-4 p-4">
+            <div className="skeleton-shimmer h-4 w-5/6 rounded-md" />
+            <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />
+            <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
+            <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
+            <div className="skeleton-shimmer h-8 w-20 justify-self-end rounded-lg" />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
