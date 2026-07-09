@@ -174,7 +174,7 @@ export default function Bookmarks() {
               }`}
             >
               {/* Front Side (Question) */}
-              <div className="bg-card border-border hover:border-primary/40 absolute inset-0 flex h-full w-full flex-col justify-between rounded-2xl border-2 p-8 shadow-md transition-colors [backface-visibility:hidden]">
+              <div className="bg-card border-border hover:border-primary/40 absolute inset-0 flex h-full w-full flex-col justify-between overflow-y-auto rounded-2xl border-2 p-8 shadow-md transition-colors [backface-visibility:hidden]">
                 <div className="flex items-start justify-between gap-4">
                   <span className="bg-muted text-muted-foreground flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium">
                     <BookOpen className="h-3 w-3" />
@@ -194,14 +194,35 @@ export default function Bookmarks() {
                   </button>
                 </div>
 
-                <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
+                <div className="flex flex-1 flex-col items-center justify-center px-4 py-4 text-center">
                   <MarkdownText
                     text={bookmarks[activeIndex].question.text}
                     className="text-foreground text-lg leading-relaxed font-bold md:text-xl"
                   />
-                  <span className="text-muted-foreground bg-muted mt-3 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wider capitalize">
+                  <span className="text-muted-foreground bg-muted mt-3 mb-4 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wider capitalize">
                     {bookmarks[activeIndex].question.type.replace('_', ' ')}
                   </span>
+
+                  {bookmarks[activeIndex].question.type !== 'open_ended' &&
+                    bookmarks[activeIndex].question.options &&
+                    bookmarks[activeIndex].question.options.length > 0 && (
+                      <div className="mt-2 flex w-full max-w-md flex-col gap-2 text-left">
+                        {bookmarks[activeIndex].question.options.map((opt, idx) => {
+                          const letter = String.fromCharCode(65 + idx)
+                          return (
+                            <div
+                              key={opt.id}
+                              className="bg-muted/40 border-border flex items-start gap-2.5 rounded-lg border p-2.5 text-xs text-foreground/80"
+                            >
+                              <span className="bg-muted text-muted-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded-md font-semibold text-[10px]">
+                                {letter}
+                              </span>
+                              <MarkdownText text={opt.text} className="flex-1 min-w-0 pt-0.5 leading-relaxed font-normal" />
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                 </div>
 
                 <div className="text-muted-foreground/60 animate-pulse text-center text-xs select-none">
@@ -381,6 +402,26 @@ function BookmarkCard({ item, onRemove }: { item: BookmarkItem; onRemove: () => 
       <div className="mb-4 pr-6">
         <MarkdownText text={q.text} className="text-sm leading-relaxed font-semibold" />
       </div>
+
+      {/* Options List */}
+      {q.type !== 'open_ended' && q.options && q.options.length > 0 && (
+        <div className="mb-4 flex flex-col gap-2">
+          {q.options.map((opt, idx) => {
+            const letter = String.fromCharCode(65 + idx)
+            return (
+              <div
+                key={opt.id}
+                className="bg-muted/30 border-border flex items-start gap-2.5 rounded-lg border p-2.5 text-xs text-foreground/80"
+              >
+                <span className="bg-muted text-muted-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded-md font-semibold text-[10px]">
+                  {letter}
+                </span>
+                <MarkdownText text={opt.text} className="flex-1 min-w-0 pt-0.5 leading-relaxed font-normal" />
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* Reveal Answer Area */}
       <div className="border-border/50 mt-auto flex flex-col gap-3 border-t pt-3">

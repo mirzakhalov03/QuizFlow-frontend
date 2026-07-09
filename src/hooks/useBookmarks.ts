@@ -69,6 +69,7 @@ export function useBookmarks(delayMs?: number) {
           text: '',
           type: 'multiple_choice',
           correctOptions: [],
+          options: [],
           modelAnswer: null,
         },
       }

@@ -187,6 +187,10 @@ export type BookmarkItem = {
       text: string
       explanation: string | null
     }[]
+    options: {
+      id: string
+      text: string
+    }[]
     modelAnswer: string | null
   }
 }
