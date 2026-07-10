@@ -14,7 +14,7 @@ import {
 import { toast } from '@/lib/toast'
 import { openQuizPdf } from '@/lib/quiz-pdf'
 import { PATHS } from '@/lib/path'
-import type { PaginatedResponse, Quiz } from '@/types/quiz'
+import type { Quiz } from '@/types/quiz'
 
 /**
  * All the side-effecting behavior behind a quiz card — delete, share-link
@@ -53,19 +53,9 @@ export function useQuizCardActions(quiz: Quiz) {
       const token = data.data.shareToken
       setShareToken(token)
       setIsPublic(true)
-      // Update the quiz list cache with the new token
-      queryClient.setQueriesData<PaginatedResponse<Quiz>>({ queryKey: [QUIZ_LIST] }, (old) => {
-        if (!old) return old
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            items: old.data.items.map((item) =>
-              item.id === quiz.id ? { ...item, shareToken: token, isPublic: true } : item
-            ),
-          },
-        }
-      })
+      // Invalidate the quiz list cache to reflect the new token
+      queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
+      toast.success('Share link generated')
     },
     onError: () => {
       toast.error('Failed to generate share link')
@@ -75,18 +65,7 @@ export function useQuizCardActions(quiz: Quiz) {
   const { mutate: disableShare, isPending: isDisabling } = usePatch({
     onSuccess: () => {
       setIsPublic(false)
-      queryClient.setQueriesData<PaginatedResponse<Quiz>>({ queryKey: [QUIZ_LIST] }, (old) => {
-        if (!old) return old
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            items: old.data.items.map((item) =>
-              item.id === quiz.id ? { ...item, isPublic: false } : item
-            ),
-          },
-        }
-      })
+      queryClient.invalidateQueries({ queryKey: [QUIZ_LIST] })
       toast.success('Sharing disabled')
     },
     onError: () => {
