@@ -41,6 +41,7 @@ export function useQuizListControls() {
     page_key: 'offset',
     initialPageParam: 0,
     limit_val: LIMIT_PER_PAGE,
+    delayMs: 1500, // Artificial wait for infinite scrolling
     options: {
       staleTime: 0,
     },

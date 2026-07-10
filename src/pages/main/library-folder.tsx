@@ -88,18 +88,18 @@ export default function LibraryFolder() {
             <ChevronLeft size={14} />
             Back to Library
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
                 <FolderIcon className="text-primary" size={24} />
               </div>
               <div className="skeleton-shimmer h-8 w-36 rounded-md" />
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" disabled leftIcon={<FolderInput size={18} />}>
+            <div className="flex w-full items-center gap-2 sm:w-auto">
+              <Button className="flex-1 sm:flex-none" variant="outline" disabled leftIcon={<FolderInput size={18} />}>
                 Add Existing
               </Button>
-              <Button disabled leftIcon={<Plus size={18} />}>
+              <Button className="flex-1 sm:flex-none" disabled leftIcon={<Plus size={18} />}>
                 New Quiz
               </Button>
             </div>
@@ -141,7 +141,7 @@ export default function LibraryFolder() {
           <ChevronLeft size={14} />
           Back to Library
         </Link>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
               <FolderIcon className="text-primary" size={24} />
@@ -182,15 +182,16 @@ export default function LibraryFolder() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <Button
+              className="flex-1 sm:flex-none"
               variant="outline"
               onClick={() => setIsAddExistingOpen(true)}
               leftIcon={<FolderInput size={18} />}
             >
               Add Existing
             </Button>
-            <Button onClick={openModal} leftIcon={<Plus size={18} />}>
+            <Button className="flex-1 sm:flex-none" onClick={openModal} leftIcon={<Plus size={18} />}>
               New Quiz
             </Button>
           </div>
