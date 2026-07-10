@@ -78,3 +78,30 @@ export const TYPE_COLORS: Record<QuestionType, string> = {
   open_ended: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
   mixed: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
 }
+
+/**
+ * One value type for the whole create flow. Both source fields exist on the
+ * form at once; only the active source's field is validated/sent (see QuizCreateForm).
+ */
+export type QuizFormValues = QuizSettingsValues & {
+  source: 'file' | 'notion'
+  files: File[]
+  pageIds: string[]
+}
+
+/** Seed values for a fresh create flow. `folderId` fixes the folder in folder-locked mode. */
+export const formDefaults = (folderId?: string): QuizFormValues => ({
+  source: 'file',
+  files: [],
+  pageIds: [],
+  type: 'multiple_choice',
+  questionCount: '5',
+  difficulty: 'medium',
+  isTimerEnabled: false,
+  optionsPerQuestion: 4,
+  userInstructions: '',
+  model: DEFAULT_MODEL,
+  folderId: folderId || 'none',
+  apiKeyId: '',
+  avoidQuizIds: [],
+})
