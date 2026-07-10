@@ -58,7 +58,7 @@ export default function MarketplaceListingPage() {
     axiosInstance
       .post(QUIZ_CLONE(listing.shareToken))
       .then(() => {
-        toast.success('Saved to your library')
+        toast.success('Imported to quizzes section')
         queryClient.invalidateQueries({ queryKey: [MARKETPLACE_LISTING(quizId!)] })
         queryClient.invalidateQueries({ queryKey: [MARKETPLACE] })
       })
@@ -124,7 +124,7 @@ export default function MarketplaceListingPage() {
     setIsSaving(true)
     try {
       await axiosInstance.post(QUIZ_CLONE(listing.shareToken))
-      toast.success('Saved to your library')
+      toast.success('Imported to quizzes section')
       // Refresh the listing so isCloned flips to true and button updates
       await queryClient.invalidateQueries({ queryKey: [MARKETPLACE_LISTING(quizId!)] })
       // Also refresh the marketplace list so the card badge updates if the user navigates back

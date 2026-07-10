@@ -28,3 +28,7 @@ export const FOLDERS = '/folders'
 export const MARKETPLACE = '/marketplace'
 export const MARKETPLACE_LISTING = (quizId: string) => `/marketplace/${quizId}`
 export const MARKETPLACE_RATINGS = (quizId: string) => `/marketplace/${quizId}/ratings`
+
+export const QUESTION_BOOKMARK = (questionId: string) => `/questions/${questionId}/bookmark`
+export const BOOKMARKS = '/bookmarks'
+

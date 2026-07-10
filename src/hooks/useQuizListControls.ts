@@ -28,23 +28,16 @@ export function useQuizListControls() {
     [debouncedSearch, filterTypes, sort, statusFilter]
   )
 
-  const {
-    items,
-    isLoading,
-    isFetching,
-    isFetchingNextPage,
-    hasNextPage,
-    isError,
-    observerRef,
-  } = useInfinite<Quiz>(QUIZ_LIST, {
-    params,
-    page_key: 'offset',
-    initialPageParam: 0,
-    limit_val: LIMIT_PER_PAGE,
-    options: {
-      staleTime: 0,
-    },
-  })
+  const { items, isLoading, isFetching, isFetchingNextPage, hasNextPage, isError, observerRef } =
+    useInfinite<Quiz>(QUIZ_LIST, {
+      params,
+      page_key: 'offset',
+      initialPageParam: 0,
+      limit_val: LIMIT_PER_PAGE,
+      options: {
+        staleTime: 0,
+      },
+    })
 
   const toggleFilterType = useCallback((type: QuestionType) => {
     setFilterTypes((prev) =>
@@ -75,4 +68,3 @@ export function useQuizListControls() {
     observerRef,
   }
 }
-

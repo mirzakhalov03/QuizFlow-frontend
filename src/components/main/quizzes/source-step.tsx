@@ -6,6 +6,7 @@ import FileUpload from '@/components/form/file-upload'
 import FieldLabel from '@/components/form/form-label'
 import Spinner from '@/components/ui/spinner'
 import Button from '@/components/ui/button'
+import { MouseTooltip } from '@/components/ui/mouse-tooltip'
 import { useNotionPages } from '@/hooks/useNotionPages'
 import { useHasNotionIntegration } from '@/hooks/useHasNotionIntegration'
 import type { QuizFormValues } from '@/components/main/quizzes/utils'
@@ -24,14 +25,24 @@ export default function SourceStep({ form }: { form: UseFormReturn<QuizFormValue
           icon={<FileText className="h-4 w-4 text-blue-600" />}
           label="Upload Document"
         />
-        <SourceToggle
-          active={source === 'notion'}
-          disabled={!hasNotion}
-          onClick={() => form.setValue('source', 'notion')}
-          icon={<img src={NotionLogo} alt="Notion" className="h-4 w-4" />}
-          label="Notion Page"
-          badge={!hasNotion ? 'Not connected' : undefined}
-        />
+        <MouseTooltip
+          disabled={hasNotion}
+          content={
+            <>
+              Connect Notion in the <strong>Account</strong> page.
+            </>
+          }
+          className="max-w-[180px]"
+        >
+          <SourceToggle
+            active={source === 'notion'}
+            disabled={!hasNotion}
+            onClick={() => form.setValue('source', 'notion')}
+            icon={<img src={NotionLogo} alt="Notion" className="h-4 w-4" />}
+            label="Notion Page"
+            badge={!hasNotion ? 'Not connected' : undefined}
+          />
+        </MouseTooltip>
       </div>
 
       {source === 'file' ? <FileSource form={form} /> : <NotionSource form={form} />}
@@ -60,7 +71,7 @@ function SourceToggle({
       disabled={disabled}
       onClick={onClick}
       className={[
-        'relative flex items-center gap-2 rounded-xl border-2 p-3 text-left text-sm font-semibold transition-all',
+        'relative flex w-full items-center gap-2 rounded-xl border-2 p-3 text-left text-sm font-semibold transition-all',
         active
           ? 'border-primary bg-primary/5'
           : 'border-border bg-card/50 enabled:hover:border-primary/50 disabled:cursor-not-allowed disabled:opacity-40',

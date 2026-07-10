@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react'
-import { Check, X } from 'lucide-react'
+import { Check, X, Bookmark } from 'lucide-react'
 import type { Question, QuestionOption } from '@/types/quiz'
 import { getReviewStatus, type ReviewStatus } from '@/lib/quiz-result'
+import { useBookmarks } from '@/hooks/useBookmarks'
 import MarkdownText from './markdown-text'
 
 type Props = {
@@ -48,25 +49,40 @@ export default function QuizResultQuestion({
 }: Props) {
   const status = getReviewStatus(question, userAnswer, { verdict, isGrading })
   const pill = STATUS[status]
+  const { isBookmarked, toggleBookmark } = useBookmarks()
+  const bookmarked = isBookmarked(question.id)
 
   return (
     <article
       style={style}
       className="enter-fade-up border-border bg-card flex flex-col gap-4 rounded-xl border p-5"
     >
-      <div className="flex items-start gap-3">
-        <span className="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
-          {index + 1}
-        </span>
-        <MarkdownText
-          text={question.text}
-          className="min-w-0 flex-1 pt-0.5 text-sm leading-relaxed font-semibold"
-        />
-        <span
-          className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${pill.cls}`}
-        >
-          {pill.label}
-        </span>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <span className="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+            {index + 1}
+          </span>
+          <MarkdownText
+            text={question.text}
+            className="min-w-0 flex-1 pt-0.5 text-sm leading-relaxed font-semibold"
+          />
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => toggleBookmark(question.id)}
+            className="text-muted-foreground hover:text-primary hover:bg-muted/50 cursor-pointer shrink-0 rounded-md p-1 transition-colors"
+            title={bookmarked ? 'Remove bookmark' : 'Bookmark question'}
+            aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark question'}
+          >
+            <Bookmark className={`h-4.5 w-4.5 ${bookmarked ? 'fill-primary text-primary' : ''}`} />
+          </button>
+          <span
+            className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${pill.cls}`}
+          >
+            {pill.label}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-col gap-2 pl-9">
