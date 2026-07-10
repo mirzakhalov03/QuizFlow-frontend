@@ -58,7 +58,9 @@ export function useBookmarks(delayMs?: number) {
     onMutate: async (questionId) => {
       await queryClient.cancelQueries({ queryKey: [BOOKMARKS] })
 
-      const previousBookmarks = queryClient.getQueriesData<BookmarksInfiniteData>({ queryKey: [BOOKMARKS] })
+      const previousBookmarks = queryClient.getQueriesData<BookmarksInfiniteData>({
+        queryKey: [BOOKMARKS],
+      })
 
       const placeholder: BookmarkItem = {
         bookmarkId: `temp-${Date.now()}`,
@@ -128,7 +130,9 @@ export function useBookmarks(delayMs?: number) {
     onMutate: async (questionId) => {
       await queryClient.cancelQueries({ queryKey: [BOOKMARKS] })
 
-      const previousBookmarks = queryClient.getQueriesData<BookmarksInfiniteData>({ queryKey: [BOOKMARKS] })
+      const previousBookmarks = queryClient.getQueriesData<BookmarksInfiniteData>({
+        queryKey: [BOOKMARKS],
+      })
 
       queryClient.setQueriesData<BookmarksInfiniteData>({ queryKey: [BOOKMARKS] }, (old) => {
         if (!old) return old
@@ -177,7 +181,11 @@ export function useBookmarks(delayMs?: number) {
       toast.error('Please log in to bookmark questions')
       return
     }
-    if (addBookmarkMutation.isPending || removeBookmarkMutation.isPending) {
+    const isAddPending =
+      addBookmarkMutation.isPending && addBookmarkMutation.variables === questionId
+    const isRemovePending =
+      removeBookmarkMutation.isPending && removeBookmarkMutation.variables === questionId
+    if (isAddPending || isRemovePending) {
       return
     }
 
