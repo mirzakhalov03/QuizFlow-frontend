@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, QueryKey } from '@tanstack/react-query'
 import { BOOKMARKS, QUESTION_BOOKMARK } from '@/constants/api-endpoints'
 import { api } from '@/api/axios-instance'
 import { toast } from '@/lib/toast'
@@ -52,13 +52,15 @@ export function useBookmarks(delayMs?: number) {
     unknown,
     unknown,
     string,
-    { previousBookmarks: BookmarksInfiniteData | undefined }
+    { previousBookmarks: [QueryKey, BookmarksInfiniteData | undefined][] }
   >({
     mutationFn: (questionId: string) => api.post(QUESTION_BOOKMARK(questionId)),
     onMutate: async (questionId) => {
       await queryClient.cancelQueries({ queryKey: [BOOKMARKS] })
 
-      const previousBookmarks = queryClient.getQueryData<BookmarksInfiniteData>([BOOKMARKS])
+      const previousBookmarks = queryClient.getQueriesData<BookmarksInfiniteData>({
+        queryKey: [BOOKMARKS],
+      })
 
       const placeholder: BookmarkItem = {
         bookmarkId: `temp-${Date.now()}`,
@@ -74,7 +76,7 @@ export function useBookmarks(delayMs?: number) {
         },
       }
 
-      queryClient.setQueryData<BookmarksInfiniteData>([BOOKMARKS], (old) => {
+      queryClient.setQueriesData<BookmarksInfiniteData>({ queryKey: [BOOKMARKS] }, (old) => {
         if (!old) return old
         const pages = [...old.pages]
         if (pages.length > 0) {
@@ -96,7 +98,9 @@ export function useBookmarks(delayMs?: number) {
     },
     onError: (err, _questionId, context) => {
       if (context?.previousBookmarks) {
-        queryClient.setQueryData([BOOKMARKS], context.previousBookmarks)
+        context.previousBookmarks.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
       }
 
       const axiosError = err as { response?: { status?: number; data?: { detail?: string } } }
@@ -120,15 +124,17 @@ export function useBookmarks(delayMs?: number) {
     unknown,
     unknown,
     string,
-    { previousBookmarks: BookmarksInfiniteData | undefined }
+    { previousBookmarks: [QueryKey, BookmarksInfiniteData | undefined][] }
   >({
     mutationFn: (questionId: string) => api.delete(QUESTION_BOOKMARK(questionId)),
     onMutate: async (questionId) => {
       await queryClient.cancelQueries({ queryKey: [BOOKMARKS] })
 
-      const previousBookmarks = queryClient.getQueryData<BookmarksInfiniteData>([BOOKMARKS])
+      const previousBookmarks = queryClient.getQueriesData<BookmarksInfiniteData>({
+        queryKey: [BOOKMARKS],
+      })
 
-      queryClient.setQueryData<BookmarksInfiniteData>([BOOKMARKS], (old) => {
+      queryClient.setQueriesData<BookmarksInfiniteData>({ queryKey: [BOOKMARKS] }, (old) => {
         if (!old) return old
         const pages = old.pages.map((page) => {
           const filteredItems = page.data.items.filter((item) => item.question?.id !== questionId)
@@ -152,7 +158,9 @@ export function useBookmarks(delayMs?: number) {
     },
     onError: (err, _questionId, context) => {
       if (context?.previousBookmarks) {
-        queryClient.setQueryData([BOOKMARKS], context.previousBookmarks)
+        context.previousBookmarks.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
       }
       const axiosError = err as { response?: { data?: { detail?: string } } }
       const detail = axiosError?.response?.data?.detail
@@ -173,6 +181,14 @@ export function useBookmarks(delayMs?: number) {
       toast.error('Please log in to bookmark questions')
       return
     }
+    const isAddPending =
+      addBookmarkMutation.isPending && addBookmarkMutation.variables === questionId
+    const isRemovePending =
+      removeBookmarkMutation.isPending && removeBookmarkMutation.variables === questionId
+    if (isAddPending || isRemovePending) {
+      return
+    }
+
     if (isBookmarked(questionId)) {
       removeBookmarkMutation.mutate(questionId)
     } else {
