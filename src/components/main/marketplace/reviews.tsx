@@ -18,7 +18,13 @@ export function Reviews({ quizId, canRate = true }: { quizId: string; canRate?: 
 
   const endpoint = MARKETPLACE_RATINGS(quizId)
   const params = { page: 1, pageSize: 20 }
-  const { data } = useGet<{ data: ReviewsResponse }>(endpoint, { params })
+  // Always refetch reviews when the listing opens — with the default 5-min
+  // staleTime, client-side navigation served a stale cached copy and skipped
+  // the fetch, so new comments only showed after a full reload (#154).
+  const { data } = useGet<{ data: ReviewsResponse }>(endpoint, {
+    params,
+    options: { staleTime: 0 },
+  })
   const reviews = data?.data.items ?? []
 
   const submit = async () => {
