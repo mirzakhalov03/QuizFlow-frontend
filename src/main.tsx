@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AppRouter } from '@/router/router'
 import { ThemeProvider } from './layouts/theme'
 import { AuthInitializer } from './functions/authInitializer'
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from '@vercel/analytics/react'
 import '@fontsource/inter/400.css'
 import '@fontsource/inter/500.css'
 import '@fontsource/inter/600.css'
