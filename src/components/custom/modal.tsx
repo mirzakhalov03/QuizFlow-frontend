@@ -92,7 +92,7 @@ const Modal = ({
       <div
         ref={contentRef}
         className={cn(
-          'relative z-50 max-h-[90dvh] w-full overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 shadow-lg sm:p-6 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/30',
+          'relative z-50 max-h-[90dvh] w-full overflow-y-auto rounded-lg border border-border bg-card text-card-foreground p-4 shadow-lg sm:p-6',
           size,
           className
         )}
@@ -105,7 +105,7 @@ const Modal = ({
           <button
             onClick={handleClose}
             className={cn(
-              'absolute top-4 right-4 rounded-sm text-gray-500 opacity-70 ring-offset-white transition-opacity hover:text-gray-700 hover:opacity-100 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:outline-none dark:text-gray-400 dark:ring-offset-gray-800 dark:hover:text-gray-200 dark:focus:ring-gray-500',
+              'absolute top-4 right-4 rounded-sm text-muted-foreground opacity-70 ring-offset-background transition-opacity hover:text-foreground hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none',
               classNameIcon
             )}
             aria-label="Close"
@@ -119,7 +119,7 @@ const Modal = ({
           <h2
             id="modal-title"
             className={cn(
-              'text-lg leading-none font-semibold tracking-tight text-gray-900 dark:text-gray-100',
+              'text-lg leading-none font-semibold tracking-tight text-foreground',
               classNameTitle
             )}
           >
@@ -128,7 +128,7 @@ const Modal = ({
         )}
 
         {description && (
-          <p id="modal-description" className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p id="modal-description" className="mt-2 text-sm text-muted-foreground">
             {description}
           </p>
         )}

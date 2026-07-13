@@ -108,7 +108,7 @@ export default function QuizCreateForm({ folderId }: { folderId?: string }) {
         </div>
       )}
 
-      <div className="sticky bottom-0 z-10 -mx-4 flex gap-3 border-t border-gray-200 bg-white px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6 dark:border-gray-700 dark:bg-gray-800">
+      <div className="sticky bottom-0 z-10 -mx-4 flex gap-3 border-t border-border bg-card px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6">
         <Button
           type="button"
           variant="outline"
