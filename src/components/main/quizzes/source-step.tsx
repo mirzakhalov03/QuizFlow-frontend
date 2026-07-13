@@ -33,6 +33,7 @@ export default function SourceStep({ form }: { form: UseFormReturn<QuizFormValue
             </>
           }
           className="max-w-[180px]"
+          wrapperClassName="h-full"
         >
           <SourceToggle
             active={source === 'notion'}
@@ -71,16 +72,16 @@ function SourceToggle({
       disabled={disabled}
       onClick={onClick}
       className={[
-        'relative flex w-full items-center gap-2 rounded-xl border-2 p-3 text-left text-sm font-semibold transition-all',
+        'relative flex h-full w-full items-center gap-2 rounded-xl border-2 p-3 text-left text-sm font-semibold transition-all',
         active
           ? 'border-primary bg-primary/5'
           : 'border-border bg-card/50 enabled:hover:border-primary/50 disabled:cursor-not-allowed disabled:opacity-40',
       ].join(' ')}
     >
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-muted">{icon}</span>
+      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">{icon}</span>
       {label}
       {badge && (
-        <span className="bg-muted text-muted-foreground absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-medium">
+        <span className="bg-muted text-muted-foreground absolute top-1.5 right-1.5 rounded-full px-1.5 py-px text-[9px] leading-tight font-medium">
           {badge}
         </span>
       )}
