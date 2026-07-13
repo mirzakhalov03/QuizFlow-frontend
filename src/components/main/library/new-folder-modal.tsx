@@ -103,7 +103,7 @@ export default function NewFolderModal() {
             htmlFor="folder-name"
             className="text-muted-foreground text-xs font-bold tracking-wider uppercase"
           >
-            Folder Name
+            Folder Name <span className="text-destructive">*</span>
           </label>
           <Input
             id="folder-name"
