@@ -40,8 +40,8 @@ export function QuizToolbar({
   onToggleStatus,
 }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div className="min-w-40 flex-1">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="w-full sm:flex-1">
         <Input
           type="search"
           placeholder="Search quizzes..."
@@ -50,26 +50,42 @@ export function QuizToolbar({
           fullWidth
         />
       </div>
-      <SortDropdown sort={sort} onChange={onSortChange} />
-      <FilterDropdown
-        filterTypes={filterTypes}
-        onToggle={onToggleFilter}
-        statusFilter={statusFilter}
-        onToggleStatus={onToggleStatus}
-      />
+      <div className="flex w-full gap-2 sm:w-auto sm:flex-none">
+        <SortDropdown sort={sort} onChange={onSortChange} className="flex-1 sm:flex-none" />
+        <FilterDropdown
+          filterTypes={filterTypes}
+          onToggle={onToggleFilter}
+          statusFilter={statusFilter}
+          onToggleStatus={onToggleStatus}
+          className="flex-1 sm:flex-none"
+        />
+      </div>
     </div>
   )
 }
 
-function SortDropdown({ sort, onChange }: { sort: SortOption; onChange: (s: SortOption) => void }) {
+function SortDropdown({
+  sort,
+  onChange,
+  className,
+}: {
+  sort: SortOption
+  onChange: (s: SortOption) => void
+  className?: string
+}) {
   const [open, setOpen] = useState(false)
   const ref = useClickOutside<HTMLDivElement>(() => setOpen(false))
 
   const currentLabel = SORT_OPTIONS.find((o) => o.value === sort)?.label ?? 'Sort'
 
   return (
-    <div ref={ref} className="relative">
-      <Button variant="outline" size="md" onClick={() => setOpen((o) => !o)} className="gap-1.5 cursor-pointer">
+    <div ref={ref} className={cn('relative', className)}>
+      <Button
+        variant="outline"
+        size="md"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full gap-1.5 cursor-pointer"
+      >
         <ArrowUpDown className="h-3.5 w-3.5" />
         {currentLabel}
       </Button>
@@ -111,11 +127,13 @@ function FilterDropdown({
   onToggle,
   statusFilter,
   onToggleStatus,
+  className,
 }: {
   filterTypes: QuestionType[]
   onToggle: (t: QuestionType) => void
   statusFilter: StatusFilter | undefined
   onToggleStatus: (s: StatusFilter) => void
+  className?: string
 }) {
   const [open, setOpen] = useState(false)
   const ref = useClickOutside<HTMLDivElement>(() => setOpen(false))
@@ -123,12 +141,12 @@ function FilterDropdown({
   const isActive = filterTypes.length > 0 || statusFilter !== undefined
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className={cn('relative', className)}>
       <Button
         variant="outline"
         size="md"
         onClick={() => setOpen((o) => !o)}
-        className="relative gap-1.5 cursor-pointer"
+        className="relative w-full gap-1.5 cursor-pointer"
       >
         <SlidersHorizontal className="h-3.5 w-3.5" />
         Filter
