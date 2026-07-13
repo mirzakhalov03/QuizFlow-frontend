@@ -7,6 +7,9 @@ type MouseTooltipProps = {
   offsetX?: number
   offsetY?: number
   className?: string
+  /** Applied to the wrapper element so it can stretch to its layout slot
+   *  (e.g. fill a grid cell) instead of shrinking to the trigger's size. */
+  wrapperClassName?: string
   delay?: number
   autoDismiss?: number
 }
@@ -18,6 +21,7 @@ export function MouseTooltip({
   offsetX = 14,
   offsetY = 14,
   className = '',
+  wrapperClassName = '',
   delay = 400,
   autoDismiss = 2500,
 }: MouseTooltipProps) {
@@ -118,7 +122,7 @@ export function MouseTooltip({
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
       onTouchStart={handleTouchStart}
-      className="relative"
+      className={`relative ${wrapperClassName}`}
     >
       {children}
 
