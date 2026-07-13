@@ -35,19 +35,22 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement
+    const resolvedTheme =
+      theme === 'system'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        : theme
+
+    // The inline script in index.html already applied the correct class before
+    // first paint (avoids a flash of the wrong theme on load). Skip the
+    // remove+add here if it already matches — only touch the DOM when the
+    // theme actually changes (e.g. the user toggles it, or a `system` query
+    // result differs from what the inline script guessed).
+    if (root.classList.contains(resolvedTheme)) return
 
     root.classList.remove('light', 'dark')
-
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
-
-      root.classList.add(systemTheme)
-      return
-    }
-
-    root.classList.add(theme)
+    root.classList.add(resolvedTheme)
   }, [theme])
 
   const value = {

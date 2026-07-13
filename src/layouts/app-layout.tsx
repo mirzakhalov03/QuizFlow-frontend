@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   BarChart3,
   History,
@@ -56,6 +56,75 @@ const mobileOverflowItems = mobileOverflowOrder.map(
 const tabletNavOrder = ['Explore', 'Library', 'Quizzes', 'Bookmarks', 'Analytics', 'History']
 const tabletNavItems = tabletNavOrder.map((label) => navItems.find((item) => item.label === label)!)
 
+interface SidebarNavLinkProps {
+  to: string
+  label: string
+  icon: React.ComponentType<{ className?: string; size?: number }>
+  sidebarOpen: boolean
+  prefersReducedMotion: boolean
+}
+
+function SidebarNavLink({
+  to,
+  label,
+  icon: Icon,
+  sidebarOpen,
+  prefersReducedMotion,
+}: SidebarNavLinkProps) {
+  const location = useLocation()
+  const isActive = location.pathname.startsWith(to)
+  const [active, setActive] = useState(false)
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setActive(isActive))
+    return () => cancelAnimationFrame(frame)
+  }, [isActive])
+
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        cn(
+          'group relative flex items-center gap-3 rounded-md px-3 py-2.5 overflow-hidden ease-in-out',
+          isActive
+            ? 'text-primary-foreground transition-colors duration-500'
+            : 'text-muted-foreground hover:bg-muted hover:text-foreground transition-colors duration-150'
+        )
+      }
+    >
+      {/* Sliding background fill */}
+      <div
+        className={cn(
+          'absolute inset-0 bg-primary origin-left pointer-events-none z-0',
+          prefersReducedMotion ? 'transition-none' : 'transition-transform duration-500 ease-out',
+          active ? 'scale-x-100' : 'scale-x-0'
+        )}
+      />
+
+      <Icon size={20} className="shrink-0 relative z-10" />
+
+      <>
+        <span
+          className={cn(
+            'relative z-10 overflow-hidden whitespace-nowrap transition-all duration-200',
+            sidebarOpen
+              ? 'max-w-[120px] translate-x-0 opacity-100'
+              : 'max-w-0 -translate-x-2 opacity-0'
+          )}
+        >
+          {label}
+        </span>
+
+        {!sidebarOpen && (
+          <span className="text-popover-foreground bg-popover border-border pointer-events-none absolute left-full z-50 ml-2 scale-95 rounded-md border px-2.5 py-1.5 text-sm font-medium whitespace-nowrap opacity-0 shadow-md transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
+            {label}
+          </span>
+        )}
+      </>
+    </NavLink>
+  )
+}
+
 export default function AppLayout() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
@@ -82,6 +151,7 @@ export default function AppLayout() {
   const mobileMenuOpen = useSidebarStore((s) => s.mobileMenuOpen)
   const setMobileMenuOpen = useSidebarStore((s) => s.setMobileMenuOpen)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
   const moreButtonRef = useRef<HTMLButtonElement>(null)
   const firstOverflowRef = useRef<HTMLAnchorElement>(null)
   const navContainerRef = useRef<HTMLDivElement>(null)
@@ -214,39 +284,14 @@ export default function AppLayout() {
 
         <nav className="mt-2 flex flex-col gap-1">
           {navItems.map(({ label, to, icon: Icon }) => (
-            <NavLink
+            <SidebarNavLink
               key={to}
               to={to}
-              className={({ isActive }) =>
-                cn(
-                  'group relative flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors',
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                )
-              }
-            >
-              <Icon size={20} className="shrink-0" />
-
-              <>
-                <span
-                  className={cn(
-                    'overflow-hidden whitespace-nowrap transition-all duration-200',
-                    sidebarOpen
-                      ? 'max-w-[120px] translate-x-0 opacity-100'
-                      : 'max-w-0 -translate-x-2 opacity-0'
-                  )}
-                >
-                  {label}
-                </span>
-
-                {!sidebarOpen && (
-                  <span className="text-popover-foreground bg-popover border-border pointer-events-none absolute left-full z-50 ml-2 scale-95 rounded-md border px-2.5 py-1.5 text-sm font-medium whitespace-nowrap opacity-0 shadow-md transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
-                    {label}
-                  </span>
-                )}
-              </>
-            </NavLink>
+              label={label}
+              icon={Icon}
+              sidebarOpen={sidebarOpen}
+              prefersReducedMotion={prefersReducedMotion}
+            />
           ))}
         </nav>
 

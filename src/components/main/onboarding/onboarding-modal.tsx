@@ -92,7 +92,7 @@ export default function OnboardingModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm dark:bg-black/70" />
 
-      <div className="relative z-50 w-full max-w-lg rounded-lg border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+      <div className="relative z-50 w-full max-w-lg rounded-lg border border-border bg-card text-card-foreground p-6 shadow-lg">
         <div className="mb-4 text-center">
           <h2 className="text-lg font-semibold">Let's personalize your experience!</h2>
           <p className="text-muted-foreground mt-1 text-sm">

@@ -37,6 +37,7 @@ export function useQuizListControls() {
       options: {
         staleTime: 0,
       },
+      delayMs: 2000,
     })
 
   const toggleFilterType = useCallback((type: QuestionType) => {
