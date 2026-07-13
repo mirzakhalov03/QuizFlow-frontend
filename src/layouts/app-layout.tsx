@@ -73,11 +73,7 @@ function SidebarNavLink({
 }: SidebarNavLinkProps) {
   const location = useLocation()
   const isActive = location.pathname.startsWith(to)
-  // Seed from isActive so a link that is already active on (re)mount renders in
-  // its filled state with no enter animation. The slide-in then only plays when
-  // isActive genuinely flips false->true (a real section switch), not every time
-  // the sidebar remounts mid-quiz while "Quizzes" stays active.
-  const [active, setActive] = useState(isActive)
+  const [active, setActive] = useState(false)
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setActive(isActive))

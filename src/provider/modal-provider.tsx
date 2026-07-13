@@ -9,8 +9,22 @@ type ModalContextType = {
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined)
 
-const ModalProviderInner: FC<{ children: ReactNode }> = ({ children }) => {
+export const ModalProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const location = useLocation()
   const [modals, setModals] = useState<Record<string, boolean>>({})
+
+  // Close any open modals when the route changes. This used to be done by
+  // keying ModalProviderInner on location.pathname, but that remounted the
+  // entire app subtree (children === the whole <Outlet/> tree) on every
+  // navigation — thrashing state and replaying mount animations like the
+  // sidebar fill. Resetting during render (React's recommended pattern for
+  // adjusting state on a prop change) closes modals on navigate without the
+  // remount and without an effect round-trip.
+  const [prevPath, setPrevPath] = useState(location.pathname)
+  if (prevPath !== location.pathname) {
+    setPrevPath(location.pathname)
+    setModals({})
+  }
 
   const openModal = useCallback((key: string) => {
     setModals((prev) => ({ ...prev, [key]: true }))
@@ -25,12 +39,6 @@ const ModalProviderInner: FC<{ children: ReactNode }> = ({ children }) => {
       {children}
     </ModalContext.Provider>
   )
-}
-
-export const ModalProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const location = useLocation()
-
-  return <ModalProviderInner key={location.pathname}>{children}</ModalProviderInner>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
