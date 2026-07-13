@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
   ArrowRight,
   Clock,
@@ -14,6 +14,7 @@ import {
   Info,
 } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { createPortal } from 'react-dom'
 
 import type { Quiz } from '@/types/quiz'
 import { getModelByValue, DEFAULT_MODEL } from '@/lib/models'
@@ -52,6 +53,144 @@ function getKeyInfo(quiz: Quiz) {
 function getModelInfo(quiz: Quiz) {
   const modelName = quiz.properties?.model || DEFAULT_MODEL
   return getModelByValue(modelName)
+}
+
+type InfoPopoverProps = {
+  keyLabel: string
+  keyColor: string
+  modelLabel: string
+  modelColor: string
+  tokenUsage?: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  } | null
+}
+
+/** Portaled so it always paints above sibling cards in the grid, regardless
+ *  of stacking contexts created by hover transforms on neighboring cards. */
+function InfoPopover({ keyLabel, keyColor, modelLabel, modelColor, tokenUsage }: InfoPopoverProps) {
+  const [open, setOpen] = useState(false)
+  const [coords, setCoords] = useState({ top: 0, left: 0 })
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  const updatePosition = () => {
+    const triggerEl = triggerRef.current
+    if (!triggerEl) return
+    const rect = triggerEl.getBoundingClientRect()
+    const panelWidth = panelRef.current?.offsetWidth ?? 208 // matches w-52 fallback
+
+    setCoords({
+      top: rect.bottom + 6,
+      left: rect.right - panelWidth,
+    })
+  }
+
+  useLayoutEffect(() => {
+    if (open) updatePosition()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    const onReposition = () => updatePosition()
+    window.addEventListener('scroll', onReposition, true)
+    window.addEventListener('resize', onReposition)
+    return () => {
+      window.removeEventListener('scroll', onReposition, true)
+      window.removeEventListener('resize', onReposition)
+    }
+  }, [open])
+
+  return (
+    <div className="flex items-center justify-center">
+      <button
+        ref={triggerRef}
+        type="button"
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/30 flex h-7 w-7 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none"
+      >
+        <Info className="h-4 w-4" />
+      </button>
+
+      {open &&
+        createPortal(
+          <div
+            ref={panelRef}
+            style={{ position: 'fixed', top: coords.top, left: coords.left }}
+            className="border-border bg-popover text-popover-foreground z-50 w-52 rounded-lg border p-3 shadow-md"
+          >
+            <div className="space-y-2 text-xs font-normal">
+              <div className="text-foreground border-border/50 border-b pb-1 font-semibold">
+                Generation Details
+              </div>
+              <div className="space-y-1">
+                <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                  API Key
+                </div>
+                <div className="text-foreground flex items-center gap-1.5 font-medium">
+                  <span
+                    className="h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor: keyColor,
+                      boxShadow: `0 0 5px ${keyColor}80`,
+                    }}
+                  />
+                  <span className="truncate" title={keyLabel}>
+                    {keyLabel}
+                  </span>
+                </div>
+              </div>
+              <div className="border-border/30 space-y-1 border-t pt-1">
+                <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                  AI Model
+                </div>
+                <div className="text-foreground flex items-center gap-1.5 font-medium">
+                  <span
+                    className="h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor: modelColor,
+                      boxShadow: `0 0 5px ${modelColor}80`,
+                    }}
+                  />
+                  <span className="truncate" title={modelLabel}>
+                    {modelLabel}
+                  </span>
+                </div>
+              </div>
+              {tokenUsage && (
+                <div className="border-border/30 space-y-1 border-t pt-1">
+                  <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                    Token Usage
+                  </div>
+                  <div className="text-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px] font-medium">
+                    <span className="text-muted-foreground">Prompt:</span>
+                    <span className="text-right tabular-nums">
+                      {tokenUsage.prompt_tokens.toLocaleString()}
+                    </span>
+                    <span className="text-muted-foreground">Completion:</span>
+                    <span className="text-right tabular-nums">
+                      {tokenUsage.completion_tokens.toLocaleString()}
+                    </span>
+                    <span className="text-foreground border-border/30 mt-0.5 border-t pt-0.5 font-semibold">
+                      Total:
+                    </span>
+                    <span className="border-border/30 mt-0.5 border-t pt-0.5 text-right font-semibold tabular-nums">
+                      {tokenUsage.total_tokens.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
+    </div>
+  )
 }
 
 export default function QuizCard({ quiz }: { quiz: Quiz }) {
@@ -124,7 +263,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         role="button"
         tabIndex={0}
         aria-label={`Open quiz: ${quiz.title}`}
-        className={`group bg-card focus-visible:ring-primary/30 relative flex cursor-pointer flex-col gap-3 rounded-xl transition-colors hover:shadow-sm focus-visible:ring-2 focus-visible:outline-none ${isPublished || isImported ? 'p-4 pb-8' : 'p-4'} ${
+        className={`group bg-card focus-visible:ring-primary/30 relative flex cursor-pointer flex-col gap-3 rounded-xl shadow-md shadow-black/5 dark:shadow-black/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/10 focus-visible:ring-2 focus-visible:outline-none ${isPublished || isImported ? 'p-4 pb-8' : 'p-4'} ${
           isPublished
             ? 'border-2 border-emerald-500/60 hover:border-emerald-500/80 focus-visible:border-emerald-500/80 dark:border-emerald-500/40'
             : 'border-border hover:border-primary focus-visible:border-primary border'
@@ -133,80 +272,14 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         <div className="flex items-center justify-between gap-2">
           <h3 className="line-clamp-2 text-sm leading-snug font-semibold">{quiz.title}</h3>
           <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
-            {/* Info Icon & Custom Dropdown/Tooltip */}
             {!isImported && (
-              <div className="group/info relative flex items-center justify-center">
-                <button
-                  type="button"
-                  className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/30 flex h-7 w-7 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none"
-                >
-                  <Info className="h-4 w-4" />
-                </button>
-                <div className="border-border bg-popover text-popover-foreground pointer-events-none absolute top-8 right-0 z-30 w-52 origin-top-right scale-95 rounded-lg border p-3 opacity-0 shadow-md transition-all duration-200 group-focus-within/info:pointer-events-auto group-focus-within/info:scale-100 group-focus-within/info:opacity-100 group-hover/info:pointer-events-auto group-hover/info:scale-100 group-hover/info:opacity-100">
-                  <div className="space-y-2 text-xs font-normal">
-                    <div className="text-foreground border-border/50 border-b pb-1 font-semibold">
-                      Generation Details
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                        API Key
-                      </div>
-                      <div className="text-foreground flex items-center gap-1.5 font-medium">
-                        <span
-                          className="h-1.5 w-1.5 shrink-0 rounded-full"
-                          style={{
-                            backgroundColor: keyColor,
-                            boxShadow: `0 0 5px ${keyColor}80`,
-                          }}
-                        />
-                        <span className="truncate" title={keyLabel}>
-                          {keyLabel}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="border-border/30 space-y-1 border-t pt-1">
-                      <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                        AI Model
-                      </div>
-                      <div className="text-foreground flex items-center gap-1.5 font-medium">
-                        <span
-                          className="h-1.5 w-1.5 shrink-0 rounded-full"
-                          style={{
-                            backgroundColor: modelColor,
-                            boxShadow: `0 0 5px ${modelColor}80`,
-                          }}
-                        />
-                        <span className="truncate" title={modelLabel}>
-                          {modelLabel}
-                        </span>
-                      </div>
-                    </div>
-                    {quiz.tokenUsage && (
-                      <div className="border-border/30 space-y-1 border-t pt-1">
-                        <div className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                          Token Usage
-                        </div>
-                        <div className="text-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px] font-medium">
-                          <span className="text-muted-foreground">Prompt:</span>
-                          <span className="text-right tabular-nums">
-                            {quiz.tokenUsage.prompt_tokens.toLocaleString()}
-                          </span>
-                          <span className="text-muted-foreground">Completion:</span>
-                          <span className="text-right tabular-nums">
-                            {quiz.tokenUsage.completion_tokens.toLocaleString()}
-                          </span>
-                          <span className="text-foreground border-border/30 mt-0.5 border-t pt-0.5 font-semibold">
-                            Total:
-                          </span>
-                          <span className="border-border/30 mt-0.5 border-t pt-0.5 text-right font-semibold tabular-nums">
-                            {quiz.tokenUsage.total_tokens.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <InfoPopover
+                keyLabel={keyLabel}
+                keyColor={keyColor}
+                modelLabel={modelLabel}
+                modelColor={modelColor}
+                tokenUsage={quiz.tokenUsage}
+              />
             )}
 
             <DropdownMenu
@@ -397,4 +470,3 @@ export function QuizCardSkeleton() {
     </div>
   )
 }
-

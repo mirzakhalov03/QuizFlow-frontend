@@ -75,7 +75,8 @@ export type Question = {
 }
 
 export type QuizWithQuestions = Quiz & {
-  questions: Question[]
+  questions: Question[],
+  lastAttempt: { correctAnswers: number; totalQuestions: number } | null
 }
 
 /**
