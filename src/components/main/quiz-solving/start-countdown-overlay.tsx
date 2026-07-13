@@ -16,7 +16,7 @@ export default function StartCountdownOverlay({ count, quote }: Props) {
   }, [])
 
   return (
-    <div className="bg-background/90 fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 px-6 backdrop-blur-sm">
+    <div className="bg-background/90 fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 px-6 backdrop-blur-sm">
       <span
         key={count}
         className="countdown-pop text-primary text-[7rem] leading-none font-bold tabular-nums sm:text-[9rem]"
