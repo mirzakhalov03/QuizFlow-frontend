@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export type SelectOption = {
   label: string
@@ -18,6 +19,7 @@ type CustomSelectProps = {
   placeholder?: string
   disabled?: boolean
   className?: string
+  align?: 'left' | 'right'
 }
 
 export function CustomSelect({
@@ -27,6 +29,7 @@ export function CustomSelect({
   placeholder = 'Select...',
   disabled = false,
   className = '',
+  align = 'left',
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const selectRef = useRef<HTMLDivElement>(null)
@@ -98,7 +101,13 @@ export function CustomSelect({
       </button>
 
       {isOpen && (
-        <div className="bg-popover text-popover-foreground border-border absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-lg">
+        <div
+          className={cn(
+            'bg-popover text-popover-foreground border-border absolute z-50 mt-1 max-h-60 min-w-full overflow-auto rounded-md border shadow-lg',
+            align === 'right' ? 'right-0' : 'left-0',
+            'w-max max-w-[calc(100vw-2rem)]'
+          )}
+        >
           {options.length === 0 ? (
             <div className="text-muted-foreground px-3 py-2 text-sm">No options available</div>
           ) : hasGroups ? (
