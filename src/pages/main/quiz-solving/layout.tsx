@@ -84,21 +84,26 @@ function QuizSolving() {
   // rows. The full-screen grading overlay (driven by `isPending` below) covers
   // the wait. On error we stay put; usePost surfaces a toast via handleFormError.
   const runSubmit = useCallback(
-    (payload: SubmitAnswer[]) => {
-      if (!id) return
-      submitMutation(
-        QUIZ_SUBMIT(id),
-        { answers: payload },
-        {
-          onSuccess: () => {
-            clearSavedState()
-            goToResult()
-          },
-        }
-      )
-    },
-    [id, submitMutation, clearSavedState, goToResult]
-  )
+  (payload: SubmitAnswer[]) => {
+    if (!id) return
+    submitMutation(
+      QUIZ_SUBMIT(id),
+      { answers: payload },
+      {
+        onSuccess: () => {
+          clearSavedState()
+          // The server now has completedAt set on this quiz, but our cached
+          // QUIZ_BY_ID entry doesn't know that yet — invalidate so navigating
+          // back to the intro screen shows "You scored X% last time" without
+          // requiring a hard reload.
+          queryClient.invalidateQueries({ queryKey: [QUIZ_BY_ID(id)] })
+          goToResult()
+        },
+      }
+    )
+  },
+  [id, submitMutation, clearSavedState, goToResult, queryClient]
+)
 
   // Fires the submit and shows the grading overlay; used for manual submit,
   // timer expiry, and the leave-mid-quiz confirm.

@@ -118,7 +118,7 @@
 
   .enter-fade-up {
     opacity: 0;
-    animation: fade-up-enter 700ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    animation: fade-up-enter 300ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
   }
 
   .enter-fade-right {
@@ -204,7 +204,7 @@
       transform: translateY(0);
     }
   }
-
+  
   .scene-in {
     animation: scene-in 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
@@ -259,6 +259,165 @@
     animation: skeleton-shimmer 1.6s infinite ease-in-out;
   }
 
+  /* Kahoot-style countdown pop: each digit (3 → 2 → 1) bounces in fresh when
+     the Start button's countdown ticks. Paired with a `key={countdown}` remount
+     in QuizIntro so React re-triggers this animation on every tick. */
+  @keyframes countdown-pop {
+    0% {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+ .start-quiz-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.start-quiz-button::after {
+  content: '';
+  position: absolute;
+  inset: -40%;
+
+  background: linear-gradient(
+    115deg,
+    transparent 38%,
+    rgba(255,255,255,.08) 46%,
+    rgba(255,255,255,.22) 50%,
+    rgba(255,255,255,.08) 54%,
+    transparent 62%
+  );
+
+  pointer-events: none;
+  transform: translateX(-180%) rotate(18deg);
+
+  animation: button-shimmer 7s linear infinite;
+}
+
+@keyframes button-shimmer {
+  /* Start immediately */
+  0% {
+    transform: translateX(-180%) rotate(18deg);
+  }
+
+  /* Sweep for 7 seconds (≈64% of 11s) */
+  64% {
+    transform: translateX(180%) rotate(18deg);
+  }
+
+  /* Pause for the remaining 4 seconds */
+  64%,
+  100% {
+    transform: translateX(180%) rotate(18deg);
+  }
+}
+/* Easy — Sparkles: a shine pulse with a pause between bursts, no rotation */
+@keyframes icon-twinkle {
+  0%,
+  20%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
+  10% {
+    transform: scale(1.2);
+    filter: brightness(1.4) drop-shadow(0 0 4px currentColor);
+  }
+}
+
+.icon-twinkle {
+  animation: icon-twinkle 6s ease-in-out infinite;
+}
+/* Medium — Flame: flickering, uneven, like a real flame dancing */
+@keyframes icon-flame {
+  0%,
+  100% {
+    transform: scaleY(1) scaleX(1) rotate(0deg);
+  }
+  15% {
+    transform: scaleY(1.12) scaleX(0.92) rotate(-3deg);
+  }
+  30% {
+    transform: scaleY(0.9) scaleX(1.08) rotate(2deg);
+  }
+  45% {
+    transform: scaleY(1.15) scaleX(0.9) rotate(-2deg);
+  }
+  60% {
+    transform: scaleY(0.95) scaleX(1.05) rotate(3deg);
+  }
+  75% {
+    transform: scaleY(1.08) scaleX(0.95) rotate(-1deg);
+  }
+  90% {
+    transform: scaleY(0.97) scaleX(1.02) rotate(1deg);
+  }
+}
+
+.icon-flame {
+  transform-origin: bottom center;
+  animation: icon-flame 3s ease-in-out infinite;
+}
+
+/* Softer lightning effect */
+@keyframes icon-electric {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1) skewX(0deg);
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
+
+  6% {
+    opacity: 0.8;
+    transform: scale(0.96) skewX(-3deg);
+    filter: brightness(0.9);
+  }
+
+  12% {
+    opacity: 1;
+    transform: scale(1.12) skewX(2deg);
+    filter: brightness(1.35)
+      drop-shadow(0 0 4px currentColor);
+  }
+
+  18% {
+    opacity: 0.9;
+    transform: scale(1.04) skewX(-1deg);
+    filter: brightness(1.15)
+      drop-shadow(0 0 2px currentColor);
+  }
+
+  24% {
+    opacity: 1;
+    transform: scale(1.02);
+    filter: brightness(1.08);
+  }
+
+  32%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1)
+      drop-shadow(0 0 0 transparent);
+  }
+}
+
+.icon-electric {
+  animation: icon-electric 5.5s ease-in-out infinite;
+}
+  .countdown-pop {
+    animation: countdown-pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
   /* Custom Scrollbar Utility */
   .custom-scrollbar {
     scrollbar-width: thin;
@@ -292,7 +451,13 @@
   .scene-in,
   .scene-item,
   .scan-sweep,
-  .skeleton-shimmer {
+  .skeleton-shimmer,
+  .countdown-pop,
+  .icon-twinkle,
+  .icon-flame,
+  .icon-electric,
+  .ripple-wrapper::before,
+  .ripple-wrapper::after {
     opacity: 1;
     transform: none;
     animation: none;
