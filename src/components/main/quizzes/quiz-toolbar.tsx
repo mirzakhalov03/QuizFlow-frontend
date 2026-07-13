@@ -84,14 +84,14 @@ function SortDropdown({
         variant="outline"
         size="md"
         onClick={() => setOpen((o) => !o)}
-        className="w-full gap-1.5 cursor-pointer"
+        className="w-full cursor-pointer gap-1.5"
       >
         <ArrowUpDown className="h-3.5 w-3.5" />
         {currentLabel}
       </Button>
 
       {open && (
-        <div className="bg-popover text-popover-foreground border-border absolute right-0 z-50 mt-1 min-w-40 rounded-md border shadow-lg">
+        <div className="bg-popover text-popover-foreground border-border absolute left-0 z-50 mt-1 min-w-40 rounded-md border shadow-lg">
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.value}
@@ -146,7 +146,7 @@ function FilterDropdown({
         variant="outline"
         size="md"
         onClick={() => setOpen((o) => !o)}
-        className="relative w-full gap-1.5 cursor-pointer"
+        className="relative w-full cursor-pointer gap-1.5"
       >
         <SlidersHorizontal className="h-3.5 w-3.5" />
         Filter
