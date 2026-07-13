@@ -14,5 +14,5 @@ export default function IntegrationSuccess() {
     toast.success('Integration connected')
   }, [queryClient])
 
-  return <Navigate to={PATHS.app.account} replace />
+  return <Navigate to={`${PATHS.app.account}?tab=integrations`} replace />
 }
