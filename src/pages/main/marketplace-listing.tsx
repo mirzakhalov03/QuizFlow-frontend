@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 
@@ -14,6 +14,8 @@ import { PATHS } from '@/lib/path'
 import { toast } from '@/lib/toast'
 import { useAuthStore } from '@/store/use-authstore'
 import type { ListingCard } from '@/types/marketplace'
+import StartCountdownOverlay from '@/components/main/quiz-solving/start-countdown-overlay'
+import { pickIntroQuote } from '@/components/main/quiz-solving/intro-quotes'
 
 export default function MarketplaceListingPage() {
   const { quizId } = useParams<{ quizId: string }>()
@@ -25,6 +27,7 @@ export default function MarketplaceListingPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [takeCountdown, setTakeCountdown] = useState<number | null>(null)
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const quote = useMemo(() => pickIntroQuote(), [])
   const autoSaveTriggered = useRef(false)
 
   const { data, isLoading } = useGet<{ data: ListingCard }>(MARKETPLACE_LISTING(quizId!), {
@@ -171,7 +174,7 @@ export default function MarketplaceListingPage() {
 
         <div className="flex gap-3">
           <Button onClick={onTake} size="md" disabled={takeCountdown !== null} className="min-w-28">
-            {isAuthed && takeCountdown !== null ? takeCountdown : 'Take quiz'}
+            Take quiz
           </Button>
           {/* You already own your own quizzes — no "save a copy" for them. */}
           {!listing.isMine && (
@@ -189,6 +192,10 @@ export default function MarketplaceListingPage() {
 
         {quizId && <Reviews quizId={quizId} canRate={!listing.isMine} />}
       </div>
+
+      {takeCountdown !== null && (
+        <StartCountdownOverlay count={takeCountdown} quote={quote} />
+      )}
     </div>
   )
 }

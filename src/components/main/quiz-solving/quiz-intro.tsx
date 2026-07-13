@@ -242,7 +242,7 @@ export default function QuizIntro({ quiz, onStart, hasAttempt, pastScore }: Prop
                   </div>
                 )}
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 mt-2.5 mb-1">
                   {difficulty && (
                     <span
                       className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold capitalize ${
