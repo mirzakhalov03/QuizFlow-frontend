@@ -9,6 +9,29 @@ import { toast } from '@/lib/toast'
 import { useAuthStore } from '@/store/use-authstore'
 import type { ReviewsResponse } from '@/types/marketplace'
 
+function ReviewSkeleton() {
+  return (
+    <li
+      className="border-border flex flex-col gap-2 rounded-lg border p-3"
+      role="status"
+      aria-label="Loading review"
+    >
+      <div className="flex items-center gap-2">
+        <div className="flex gap-0.5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="skeleton-shimmer size-4 rounded-sm" />
+          ))}
+        </div>
+        <div className="skeleton-shimmer h-4 w-24 rounded-md" />
+      </div>
+      <div className="space-y-1.5 pt-0.5">
+        <div className="skeleton-shimmer h-3.5 w-full rounded-md" />
+        <div className="skeleton-shimmer h-3.5 w-2/3 rounded-md" />
+      </div>
+    </li>
+  )
+}
+
 export function Reviews({ quizId, canRate = true }: { quizId: string; canRate?: boolean }) {
   const queryClient = useQueryClient()
   const isAuthed = useAuthStore((s) => s.isAuthed)
@@ -18,7 +41,13 @@ export function Reviews({ quizId, canRate = true }: { quizId: string; canRate?: 
 
   const endpoint = MARKETPLACE_RATINGS(quizId)
   const params = { page: 1, pageSize: 20 }
-  const { data } = useGet<{ data: ReviewsResponse }>(endpoint, { params })
+  // Always refetch reviews when the listing opens — with the default 5-min
+  // staleTime, client-side navigation served a stale cached copy and skipped
+  // the fetch, so new comments only showed after a full reload (#154).
+  const { data, isLoading } = useGet<{ data: ReviewsResponse }>(endpoint, {
+    params,
+    options: { staleTime: 0 },
+  })
   const reviews = data?.data.items ?? []
 
   const submit = async () => {
@@ -85,20 +114,27 @@ export function Reviews({ quizId, canRate = true }: { quizId: string; canRate?: 
       )}
 
       <ul className="flex flex-col gap-3">
-        {reviews.length === 0 && <p className="text-muted-foreground text-sm">No reviews yet.</p>}
-        {reviews.map((r, i) => (
-          <li key={i} className="border-border rounded-lg border p-3">
-            <div className="flex items-center gap-2">
-              <span className="flex text-amber-400">
-                {Array.from({ length: r.score }).map((_, k) => (
-                  <Star key={k} className="size-4 fill-current" />
-                ))}
-              </span>
-              <span className="text-sm font-medium">{r.authorName}</span>
-            </div>
-            {r.comment && <p className="text-muted-foreground mt-1 text-sm">{r.comment}</p>}
-          </li>
-        ))}
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <ReviewSkeleton key={`review-skeleton-${i}`} />
+          ))
+        ) : reviews.length === 0 ? (
+          <p className="text-muted-foreground text-sm">No reviews yet.</p>
+        ) : (
+          reviews.map((r, i) => (
+            <li key={i} className="border-border rounded-lg border p-3">
+              <div className="flex items-center gap-2">
+                <span className="flex text-amber-400">
+                  {Array.from({ length: r.score }).map((_, k) => (
+                    <Star key={k} className="size-4 fill-current" />
+                  ))}
+                </span>
+                <span className="text-sm font-medium">{r.authorName}</span>
+              </div>
+              {r.comment && <p className="text-muted-foreground mt-1 text-sm">{r.comment}</p>}
+            </li>
+          ))
+        )}
       </ul>
     </section>
   )
