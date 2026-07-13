@@ -198,16 +198,16 @@ function ChangePasswordCard({ email }: { email: string }) {
         </Field>
         <MatchHint value={confirm} against={newPassword} />
 
-        <div className="flex items-center justify-between pt-1">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-1">
           <button
             type="button"
             onClick={sendResetLink}
             disabled={sendingReset || resetSent}
-            className="text-muted-foreground text-xs hover:underline disabled:opacity-50"
+            className="text-muted-foreground text-left text-xs hover:underline disabled:opacity-50"
           >
             {resetSent ? 'Reset link sent' : 'Forgot your current password?'}
           </button>
-          <Button type="submit" size="sm" loading={loading} disabled={!canSubmit}>
+          <Button type="submit" size="sm" loading={loading} disabled={!canSubmit} className="w-full sm:w-auto">
             Change password
           </Button>
         </div>
