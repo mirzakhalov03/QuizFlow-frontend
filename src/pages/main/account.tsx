@@ -94,8 +94,10 @@ export default function Account() {
     try {
       setSaving(true)
       await Promise.all([updateUser({ fullName: draftFullName }), updateProfile({ bio: draftBio })])
+      toast.success('Profile updated successfully')
     } catch (error) {
       console.error('Failed to update profile', error)
+      toast.error('Failed to update profile')
     } finally {
       setSaving(false)
     }
@@ -106,6 +108,9 @@ export default function Account() {
       setUploading(true)
       const updatedProfile = await imageUploadService.uploadProfilePicture(file)
       updateProfile({ profilePicture: updatedProfile.profilePicture })
+      toast.success('Profile picture updated successfully')
+    } catch {
+      toast.error('Failed to upload profile picture')
     } finally {
       setUploading(false)
     }
@@ -151,6 +156,8 @@ export default function Account() {
     { id: 'byok', label: 'API Keys', icon: Key },
     { id: 'security', label: 'Security', icon: KeyRound },
   ]
+
+  const hasChanges = draftFullName !== (user?.fullName ?? '') || draftBio !== (bio ?? '')
 
   return (
     <div className="space-y-6">
@@ -272,7 +279,7 @@ export default function Account() {
                 >
                   <Trash2 size={20} />
                 </button>
-                <Button type="button" onClick={handleSave} loading={saving} disabled={saving}>
+                <Button type="button" onClick={handleSave} loading={saving} disabled={saving || !hasChanges}>
                   Save changes
                 </Button>
               </div>
