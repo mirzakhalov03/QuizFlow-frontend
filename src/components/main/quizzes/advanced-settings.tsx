@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Controller, type UseFormReturn } from 'react-hook-form'
 import { ChevronDown, SlidersHorizontal } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 import { FormSelect } from '@/components/form/form-select'
 import FormTextarea from '@/components/form/textarea'
@@ -41,7 +42,14 @@ export default function AdvancedSettings({ form, folderId }: Props) {
         <ChevronDown className={['h-4 w-4 transition-transform', open ? 'rotate-180' : ''].join(' ')} />
       </button>
 
-      {open && (
+      <div
+        className={cn(
+          'transition-all duration-300 ease-in-out origin-top overflow-hidden',
+          open
+            ? 'max-h-[600px] opacity-100 scale-y-100 visible'
+            : 'max-h-0 opacity-0 scale-y-95 invisible pointer-events-none'
+        )}
+      >
         <div className="space-y-4 px-4 pt-1 pb-4">
           <FormSelect label="Save to Folder" options={folderOptions} name="folderId" control={control} disabled={!!folderId} />
 
@@ -94,7 +102,7 @@ export default function AdvancedSettings({ form, folderId }: Props) {
             </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   )
 }
