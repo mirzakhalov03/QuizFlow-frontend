@@ -66,9 +66,8 @@ export default function MarketplaceListingPage() {
         queryClient.invalidateQueries({ queryKey: [MARKETPLACE] })
       })
       .catch((err: unknown) => {
-        const code = (
-          err as { response?: { data?: { error?: { code?: string } } } }
-        )?.response?.data?.error?.code
+        const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response
+          ?.data?.error?.code
         if (code === 'ALREADY_IMPORTED') {
           toast.error('You already have this quiz in your library')
         } else {
@@ -185,7 +184,7 @@ export default function MarketplaceListingPage() {
               onClick={listing.isCloned ? undefined : onSave}
               disabled={listing.isCloned || isSaving}
             >
-              {listing.isCloned ? 'Already in library' : 'Save to my library'}
+              {listing.isCloned ? 'Already in your quizzes' : 'Save to your quizzes'}
             </Button>
           )}
         </div>
@@ -193,9 +192,7 @@ export default function MarketplaceListingPage() {
         {quizId && <Reviews quizId={quizId} canRate={!listing.isMine} />}
       </div>
 
-      {takeCountdown !== null && (
-        <StartCountdownOverlay count={takeCountdown} quote={quote} />
-      )}
+      {takeCountdown !== null && <StartCountdownOverlay count={takeCountdown} quote={quote} />}
     </div>
   )
 }
