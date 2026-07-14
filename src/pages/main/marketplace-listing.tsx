@@ -184,7 +184,7 @@ export default function MarketplaceListingPage() {
               onClick={listing.isCloned ? undefined : onSave}
               disabled={listing.isCloned || isSaving}
             >
-              {listing.isCloned ? 'Already in your quizzes' : 'Save to my quizzes'}
+              {listing.isCloned ? 'Already in your quizzes' : 'Save to your quizzes'}
             </Button>
           )}
         </div>
