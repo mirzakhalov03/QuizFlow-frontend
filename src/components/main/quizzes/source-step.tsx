@@ -50,7 +50,7 @@ export default function SourceStep({ form }: { form: UseFormReturn<QuizFormValue
             disabled={!hasNotion}
             onClick={() => form.setValue('source', 'notion')}
             icon={<img src={NotionLogo} alt="Notion" className="h-4 w-4" />}
-            label="Notion Page"
+            label="Notion"
             badge={!hasNotion ? 'Not connected' : undefined}
           />
         </MouseTooltip>
