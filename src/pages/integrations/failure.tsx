@@ -8,7 +8,7 @@ export default function IntegrationFailure() {
   const error = searchParams.get('error') || 'Integration failed'
   useEffect(() => {
     toast.error(error === 'access_denied' ? 'Connection canceled' : error)
-    navigate(PATHS.app.account, { replace: true })
+    navigate(`${PATHS.app.account}?tab=integrations`, { replace: true })
   }, [error, navigate])
   return null
 }

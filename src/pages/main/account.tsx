@@ -94,8 +94,10 @@ export default function Account() {
     try {
       setSaving(true)
       await Promise.all([updateUser({ fullName: draftFullName }), updateProfile({ bio: draftBio })])
+      toast.success('Profile updated successfully')
     } catch (error) {
       console.error('Failed to update profile', error)
+      toast.error('Failed to update profile')
     } finally {
       setSaving(false)
     }
@@ -105,7 +107,10 @@ export default function Account() {
     try {
       setUploading(true)
       const updatedProfile = await imageUploadService.uploadProfilePicture(file)
-      updateProfile({ profilePicture: updatedProfile.profilePicture })
+      await updateProfile({ profilePicture: updatedProfile.profilePicture })
+      toast.success('Profile picture updated successfully')
+    } catch {
+      toast.error('Failed to upload profile picture')
     } finally {
       setUploading(false)
     }
@@ -151,6 +156,8 @@ export default function Account() {
     { id: 'byok', label: 'API Keys', icon: Key },
     { id: 'security', label: 'Security', icon: KeyRound },
   ]
+
+  const hasChanges = draftFullName !== (user?.fullName ?? '') || draftBio !== (bio ?? '')
 
   return (
     <div className="space-y-6">
@@ -212,9 +219,11 @@ export default function Account() {
                   <ImageUpload value={profilePicture} onChange={handleUpload} loading={uploading} />
                   <div className="space-y-1">
                     <h2 className="text-lg font-semibold">Personal details</h2>
+                    {email && (
+                      <p className="text-muted-foreground font-mono text-xs font-medium">{email}</p>
+                    )}
                     <p className="text-muted-foreground mt-1 text-sm">
-                      Update your name, email, and bio so the rest of the product feels more
-                      personal.
+                      Update your name and bio so the rest of the product feels more personal.
                     </p>
                   </div>
                 </div>
@@ -229,8 +238,8 @@ export default function Account() {
                 </button>
               </div>
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <label className="grid min-w-0 gap-1.5 text-sm sm:col-span-1">
+              <div className="mt-5 flex flex-col gap-4">
+                <label className="grid min-w-0 gap-1.5 text-sm">
                   Full name
                   <Input
                     fullWidth
@@ -240,18 +249,7 @@ export default function Account() {
                   />
                 </label>
 
-                <label className="grid min-w-0 gap-1.5 text-sm sm:col-span-1">
-                  Email
-                  <Input
-                    fullWidth
-                    type="email"
-                    value={email ?? ''}
-                    disabled
-                    className="bg-background h-11 opacity-70"
-                  />
-                </label>
-
-                <label className="grid min-w-0 gap-1.5 text-sm sm:col-span-2">
+                <label className="grid min-w-0 gap-1.5 text-sm">
                   Bio
                   <textarea
                     className="border-input bg-background focus-visible:ring-ring flex min-h-24 w-full resize-y rounded-md border px-3 py-2 text-sm transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -272,7 +270,12 @@ export default function Account() {
                 >
                   <Trash2 size={20} />
                 </button>
-                <Button type="button" onClick={handleSave} loading={saving} disabled={saving}>
+                <Button
+                  type="button"
+                  onClick={handleSave}
+                  loading={saving}
+                  disabled={saving || !hasChanges}
+                >
                   Save changes
                 </Button>
               </div>
