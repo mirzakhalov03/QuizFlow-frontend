@@ -16,8 +16,8 @@ export const PASTED_TEXT_FILENAME = 'pasted-text.txt'
 /** Human-readable source name, used for the pending-job card title. */
 export const PASTED_TEXT_LABEL = 'pasted text'
 
-export const pastedTextToFile = (text: string): File =>
-  new File([text.trim()], PASTED_TEXT_FILENAME, { type: 'text/plain' })
+export const pastedTextToFile = (text: string | undefined | null): File =>
+  new File([(text ?? '').trim()], PASTED_TEXT_FILENAME, { type: 'text/plain' })
 
 /**
  * Validates pasted content for the create-quiz form. Returns an error message,
