@@ -8,7 +8,13 @@ import { useModal } from '@/hooks/useModal'
 import { toast } from '@/lib/toast'
 import { extractApiErrorMessage } from '@/lib/api-error'
 import { usePendingJobsStore } from '@/store/use-pending-jobs-store'
-import { formDefaults, toTimerSeconds, type QuizFormValues } from '@/components/main/quizzes/utils'
+import {
+  formDefaults,
+  SOURCE_FIELD,
+  toTimerSeconds,
+  type QuizFormValues,
+} from '@/components/main/quizzes/utils'
+import { PASTED_TEXT_LABEL, pastedTextToFile } from '@/lib/pasted-text'
 import SourceStep from '@/components/main/quizzes/source-step'
 import EssentialFields from '@/components/main/quizzes/essential-fields'
 import AdvancedSettings from '@/components/main/quizzes/advanced-settings'
@@ -24,8 +30,7 @@ export default function QuizCreateForm({ folderId }: { folderId?: string }) {
   const { handleSubmit, reset, trigger, getValues, formState } = form
 
   const goToParams = async () => {
-    const field = getValues('source') === 'file' ? 'files' : 'pageIds'
-    if (await trigger(field)) setView('params')
+    if (await trigger(SOURCE_FIELD[getValues('source')])) setView('params')
   }
 
   const onSubmit = (values: QuizFormValues) => {
@@ -43,9 +48,11 @@ export default function QuizCreateForm({ folderId }: { folderId?: string }) {
     const tempTitle =
       values.source === 'notion'
         ? `Notion Quiz (${values.pageIds.length} page${values.pageIds.length > 1 ? 's' : ''})`
-        : values.files.length === 1
-          ? `Quiz from ${truncate(values.files[0].name)}`
-          : `Quiz from ${truncate(values.files[0].name)} and ${values.files.length - 1} more file${values.files.length > 2 ? 's' : ''}`
+        : values.source === 'text'
+          ? `Quiz from ${PASTED_TEXT_LABEL}`
+          : values.files.length === 1
+            ? `Quiz from ${truncate(values.files[0].name)}`
+            : `Quiz from ${truncate(values.files[0].name)} and ${values.files.length - 1} more file${values.files.length > 2 ? 's' : ''}`
 
     const shared = {
       type: values.type,
@@ -71,8 +78,11 @@ export default function QuizCreateForm({ folderId }: { folderId?: string }) {
         if (values.source === 'notion') {
           result = await quizService.createQuiz('notion', { pageIds: values.pageIds, ...shared })
         } else {
+          // Pasted text is uploaded as a .txt so it reuses the file source path.
+          const files =
+            values.source === 'text' ? [pastedTextToFile(values.pastedText)] : values.files
           const keys = await Promise.all(
-            values.files.map(async (file) => {
+            files.map(async (file) => {
               const { uploadUrl, key } = await quizService.getPresignedUrl(file)
               await quizService.uploadToS3(uploadUrl, file)
               return key
@@ -108,7 +118,7 @@ export default function QuizCreateForm({ folderId }: { folderId?: string }) {
         </div>
       )}
 
-      <div className="sticky bottom-0 z-10 -mx-4 flex gap-3 border-t border-border bg-card px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6">
+      <div className="border-border bg-card sticky bottom-0 z-10 -mx-4 flex gap-3 border-t px-4 pt-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-6">
         <Button
           type="button"
           variant="outline"
