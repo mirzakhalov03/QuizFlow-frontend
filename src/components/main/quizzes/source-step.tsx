@@ -151,7 +151,7 @@ function TextSource({ form }: { form: UseFormReturn<QuizFormValues> }) {
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <FieldLabel required isError={!!fieldState.error}>
-          Paste Your Content
+          Content
         </FieldLabel>
         {canReadClipboard && (
           <button
@@ -168,16 +168,14 @@ function TextSource({ form }: { form: UseFormReturn<QuizFormValues> }) {
         {...field}
         rows={9}
         autoFocus
-        placeholder="Paste lecture notes, an article, documentation — anything you want to be quizzed on."
+        placeholder="Paste notes, an article — anything you want to be quizzed on."
         className={[
           'border-border bg-background focus:ring-primary/40 w-full resize-y rounded-md border px-3 py-2 text-sm leading-relaxed focus:ring-2 focus:outline-none',
           fieldState.error ? 'border-destructive' : '',
         ].join(' ')}
       />
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-muted-foreground/80 pl-1 text-[11px] leading-relaxed">
-          Plain text or Markdown · At least {PASTED_TEXT_MIN} characters
-        </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-muted-foreground/80 pl-1 text-[11px]">Min {PASTED_TEXT_MIN} characters</p>
         <span
           className={[
             'shrink-0 text-[11px] tabular-nums',
