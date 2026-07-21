@@ -1,5 +1,5 @@
 import { useController, useWatch, type UseFormReturn } from 'react-hook-form'
-import { ClipboardType, FileText, X } from 'lucide-react'
+import { ClipboardPaste, ClipboardType, FileText, X } from 'lucide-react'
 
 import NotionLogo from '@/assets/notionLogo.png'
 import FileUpload from '@/components/form/file-upload'
@@ -11,6 +11,7 @@ import { useNotionPages } from '@/hooks/useNotionPages'
 import { useHasNotionIntegration } from '@/hooks/useHasNotionIntegration'
 import type { QuizFormValues } from '@/components/main/quizzes/utils'
 import { PASTED_TEXT_MAX, PASTED_TEXT_MIN, validatePastedText } from '@/lib/pasted-text'
+import { toast } from '@/lib/toast'
 
 /** Screen 1 — pick a source (file, pasted text, or Notion) and provide it. */
 export default function SourceStep({ form }: { form: UseFormReturn<QuizFormValues> }) {
@@ -19,18 +20,20 @@ export default function SourceStep({ form }: { form: UseFormReturn<QuizFormValue
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
         <SourceToggle
           active={source === 'file'}
           onClick={() => form.setValue('source', 'file')}
           icon={<FileText className="h-4 w-4 text-blue-600" />}
           label="Upload File"
+          shortLabel="Upload"
         />
         <SourceToggle
           active={source === 'text'}
           onClick={() => form.setValue('source', 'text')}
           icon={<ClipboardType className="h-4 w-4 text-emerald-600" />}
           label="Paste Text"
+          shortLabel="Paste"
         />
         <MouseTooltip
           disabled={hasNotion}
@@ -66,6 +69,7 @@ function SourceToggle({
   onClick,
   icon,
   label,
+  shortLabel,
   badge,
 }: {
   active: boolean
@@ -73,6 +77,7 @@ function SourceToggle({
   onClick: () => void
   icon: React.ReactNode
   label: string
+  shortLabel?: string
   badge?: string
 }) {
   return (
@@ -81,26 +86,39 @@ function SourceToggle({
       disabled={disabled}
       onClick={onClick}
       className={[
-        // Column layout: at three-up the cards are too narrow to sit the label
-        // beside the icon without wrapping mid-word.
-        'flex h-full w-full flex-col items-center justify-start gap-1.5 rounded-xl border-2 p-3 text-center text-xs font-semibold transition-all sm:text-sm',
+        // Mobile: a compact horizontal chip, so three sources fit one row
+        // without the labels wrapping mid-word. `min-h-10` keeps the tap
+        // target comfortable despite the tighter padding.
+        'flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full border-2 px-2 py-2 text-center text-[11px] font-semibold transition-all',
+        // Desktop: the roomier stacked card.
+        'sm:h-full sm:min-h-0 sm:flex-col sm:items-center sm:justify-start sm:gap-1.5 sm:rounded-xl sm:p-3 sm:text-sm',
         active
           ? 'border-primary bg-primary/5'
           : 'border-border bg-card/50 enabled:hover:border-primary/50 disabled:cursor-not-allowed disabled:opacity-40',
       ].join(' ')}
     >
-      <span className="bg-muted inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+      <span className="sm:bg-muted inline-flex shrink-0 items-center justify-center sm:h-8 sm:w-8 sm:rounded-lg">
         {icon}
       </span>
-      <span className="leading-tight">{label}</span>
+      <span className="leading-tight sm:hidden">{shortLabel ?? label}</span>
+      <span className="hidden leading-tight sm:inline">{label}</span>
       {badge && (
-        <span className="bg-muted text-muted-foreground rounded-full px-1.5 py-px text-[9px] leading-tight font-medium">
+        // No room for it in the chip — the disabled styling carries the meaning.
+        <span className="bg-muted text-muted-foreground hidden rounded-full px-1.5 py-px text-[9px] leading-tight font-medium sm:inline-block">
           {badge}
         </span>
       )}
     </button>
   )
 }
+
+/**
+ * Reading the clipboard needs a user gesture and a permission grant in every
+ * browser — there is no way to peek at it when the modal opens and offer what
+ * the user already copied. So it's an explicit button, and Ctrl+V still works
+ * for anyone who denies the prompt or is on a browser without the API.
+ */
+const canReadClipboard = typeof navigator !== 'undefined' && !!navigator.clipboard?.readText
 
 function TextSource({ form }: { form: UseFormReturn<QuizFormValues> }) {
   const { field, fieldState } = useController({
@@ -112,11 +130,36 @@ function TextSource({ form }: { form: UseFormReturn<QuizFormValues> }) {
   const length = (field.value ?? '').trim().length
   const isOver = length > PASTED_TEXT_MAX
 
+  const pasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText()
+      if (!text.trim()) {
+        toast.error('Your clipboard looks empty — copy something first')
+        return
+      }
+      field.onChange(text)
+    } catch {
+      toast.error('Couldn’t read your clipboard — paste with Ctrl+V instead')
+    }
+  }
+
   return (
     <div className="space-y-2">
-      <FieldLabel required isError={!!fieldState.error}>
-        Paste Your Content
-      </FieldLabel>
+      <div className="flex items-center justify-between gap-3">
+        <FieldLabel required isError={!!fieldState.error}>
+          Paste Your Content
+        </FieldLabel>
+        {canReadClipboard && (
+          <button
+            type="button"
+            onClick={pasteFromClipboard}
+            className="text-primary hover:bg-primary/10 -mt-1 flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-xs font-medium transition-colors"
+          >
+            <ClipboardPaste className="h-3.5 w-3.5" />
+            Paste from clipboard
+          </button>
+        )}
+      </div>
       <textarea
         {...field}
         rows={9}
