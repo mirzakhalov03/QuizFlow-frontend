@@ -1,5 +1,5 @@
 import { useController, useWatch, type UseFormReturn } from 'react-hook-form'
-import { FileText, X } from 'lucide-react'
+import { ClipboardType, FileText, X } from 'lucide-react'
 
 import NotionLogo from '@/assets/notionLogo.png'
 import FileUpload from '@/components/form/file-upload'
@@ -10,20 +10,27 @@ import { MouseTooltip } from '@/components/ui/mouse-tooltip'
 import { useNotionPages } from '@/hooks/useNotionPages'
 import { useHasNotionIntegration } from '@/hooks/useHasNotionIntegration'
 import type { QuizFormValues } from '@/components/main/quizzes/utils'
+import { PASTED_TEXT_MAX, PASTED_TEXT_MIN, validatePastedText } from '@/lib/pasted-text'
 
-/** Screen 1 — pick a source (file or Notion) and provide it. */
+/** Screen 1 — pick a source (file, pasted text, or Notion) and provide it. */
 export default function SourceStep({ form }: { form: UseFormReturn<QuizFormValues> }) {
   const source = useWatch({ control: form.control, name: 'source' })
   const { hasIntegration: hasNotion } = useHasNotionIntegration()
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <SourceToggle
           active={source === 'file'}
           onClick={() => form.setValue('source', 'file')}
           icon={<FileText className="h-4 w-4 text-blue-600" />}
-          label="Upload Document"
+          label="Upload File"
+        />
+        <SourceToggle
+          active={source === 'text'}
+          onClick={() => form.setValue('source', 'text')}
+          icon={<ClipboardType className="h-4 w-4 text-emerald-600" />}
+          label="Paste Text"
         />
         <MouseTooltip
           disabled={hasNotion}
@@ -46,7 +53,9 @@ export default function SourceStep({ form }: { form: UseFormReturn<QuizFormValue
         </MouseTooltip>
       </div>
 
-      {source === 'file' ? <FileSource form={form} /> : <NotionSource form={form} />}
+      {source === 'file' && <FileSource form={form} />}
+      {source === 'text' && <TextSource form={form} />}
+      {source === 'notion' && <NotionSource form={form} />}
     </div>
   )
 }
@@ -72,20 +81,67 @@ function SourceToggle({
       disabled={disabled}
       onClick={onClick}
       className={[
-        'relative flex h-full w-full items-center gap-2 rounded-xl border-2 p-3 text-left text-sm font-semibold transition-all',
+        // Column layout: at three-up the cards are too narrow to sit the label
+        // beside the icon without wrapping mid-word.
+        'flex h-full w-full flex-col items-center justify-start gap-1.5 rounded-xl border-2 p-3 text-center text-xs font-semibold transition-all sm:text-sm',
         active
           ? 'border-primary bg-primary/5'
           : 'border-border bg-card/50 enabled:hover:border-primary/50 disabled:cursor-not-allowed disabled:opacity-40',
       ].join(' ')}
     >
-      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">{icon}</span>
-      {label}
+      <span className="bg-muted inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+        {icon}
+      </span>
+      <span className="leading-tight">{label}</span>
       {badge && (
-        <span className="bg-muted text-muted-foreground absolute top-1.5 right-1.5 rounded-full px-1.5 py-px text-[9px] leading-tight font-medium">
+        <span className="bg-muted text-muted-foreground rounded-full px-1.5 py-px text-[9px] leading-tight font-medium">
           {badge}
         </span>
       )}
     </button>
+  )
+}
+
+function TextSource({ form }: { form: UseFormReturn<QuizFormValues> }) {
+  const { field, fieldState } = useController({
+    control: form.control,
+    name: 'pastedText',
+    rules: { validate: validatePastedText },
+  })
+
+  const length = (field.value ?? '').trim().length
+  const isOver = length > PASTED_TEXT_MAX
+
+  return (
+    <div className="space-y-2">
+      <FieldLabel required isError={!!fieldState.error}>
+        Paste Your Content
+      </FieldLabel>
+      <textarea
+        {...field}
+        rows={9}
+        autoFocus
+        placeholder="Paste lecture notes, an article, documentation — anything you want to be quizzed on."
+        className={[
+          'border-border bg-background focus:ring-primary/40 w-full resize-y rounded-md border px-3 py-2 text-sm leading-relaxed focus:ring-2 focus:outline-none',
+          fieldState.error ? 'border-destructive' : '',
+        ].join(' ')}
+      />
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-muted-foreground/80 pl-1 text-[11px] leading-relaxed">
+          Plain text or Markdown · At least {PASTED_TEXT_MIN} characters
+        </p>
+        <span
+          className={[
+            'shrink-0 text-[11px] tabular-nums',
+            isOver ? 'text-destructive font-medium' : 'text-muted-foreground/80',
+          ].join(' ')}
+        >
+          {length.toLocaleString()} / {PASTED_TEXT_MAX.toLocaleString()}
+        </span>
+      </div>
+      {fieldState.error && <p className="text-destructive text-xs">{fieldState.error.message}</p>}
+    </div>
   )
 }
 
