@@ -89,22 +89,24 @@ function SourceToggle({
         // Mobile: a compact horizontal chip, so three sources fit one row
         // without the labels wrapping mid-word. `min-h-10` keeps the tap
         // target comfortable despite the tighter padding.
-        'flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full border-2 px-2 py-2 text-center text-[11px] font-semibold transition-all',
-        // Desktop: the roomier stacked card.
-        'sm:h-full sm:min-h-0 sm:flex-col sm:items-center sm:justify-start sm:gap-1.5 sm:rounded-xl sm:p-3 sm:text-sm',
+        'relative flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full border-2 px-2 py-2 text-center text-[11px] font-semibold transition-all',
+        // Desktop: a stacked card, kept tight — the badge is taken out of flow
+        // below so one source carrying it can't stretch the whole row.
+        'sm:h-full sm:min-h-0 sm:flex-col sm:items-center sm:justify-center sm:gap-1.5 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm',
         active
           ? 'border-primary bg-primary/5'
           : 'border-border bg-card/50 enabled:hover:border-primary/50 disabled:cursor-not-allowed disabled:opacity-40',
       ].join(' ')}
     >
-      <span className="sm:bg-muted inline-flex shrink-0 items-center justify-center sm:h-8 sm:w-8 sm:rounded-lg">
+      <span className="sm:bg-muted inline-flex shrink-0 items-center justify-center sm:h-7 sm:w-7 sm:rounded-lg">
         {icon}
       </span>
       <span className="leading-tight sm:hidden">{shortLabel ?? label}</span>
       <span className="hidden leading-tight sm:inline">{label}</span>
       {badge && (
-        // No room for it in the chip — the disabled styling carries the meaning.
-        <span className="bg-muted text-muted-foreground hidden rounded-full px-1.5 py-px text-[9px] leading-tight font-medium sm:inline-block">
+        // Hidden in the chip (no room — the disabled styling carries it) and
+        // absolute on the card so it adds no height.
+        <span className="bg-muted text-muted-foreground absolute top-1.5 right-1.5 hidden rounded-full px-1.5 py-px text-[9px] leading-tight font-medium sm:inline-block">
           {badge}
         </span>
       )}
