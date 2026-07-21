@@ -136,12 +136,14 @@ function TextSource({ form }: { form: UseFormReturn<QuizFormValues> }) {
     try {
       const text = await navigator.clipboard.readText()
       if (!text.trim()) {
-        toast.error('Your clipboard looks empty — copy something first')
+        // Neither branch here is a failure — an empty clipboard or a declined
+        // permission prompt are both normal, so they read as info, not error.
+        toast.info('Nothing on your clipboard yet — copy some text first')
         return
       }
       field.onChange(text)
     } catch {
-      toast.error('Couldn’t read your clipboard — paste with Ctrl+V instead')
+      toast.info('Clipboard access is blocked — you can still paste with Ctrl+V')
     }
   }
 
