@@ -84,15 +84,24 @@ export const TYPE_COLORS: Record<QuestionType, string> = {
  * form at once; only the active source's field is validated/sent (see QuizCreateForm).
  */
 export type QuizFormValues = QuizSettingsValues & {
-  source: 'file' | 'notion'
+  source: 'file' | 'text' | 'notion'
   files: File[]
+  pastedText: string
   pageIds: string[]
+}
+
+/** The form field each source validates before advancing to the settings step. */
+export const SOURCE_FIELD: Record<QuizFormValues['source'], keyof QuizFormValues> = {
+  file: 'files',
+  text: 'pastedText',
+  notion: 'pageIds',
 }
 
 /** Seed values for a fresh create flow. `folderId` fixes the folder in folder-locked mode. */
 export const formDefaults = (folderId?: string): QuizFormValues => ({
   source: 'file',
   files: [],
+  pastedText: '',
   pageIds: [],
   type: 'multiple_choice',
   questionCount: '5',
